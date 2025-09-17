@@ -220,7 +220,7 @@ function getBracketColor(bracketContent: string): string {
  * @param source Event source
  * @returns Color hex string
  */
-export function getEventColor(title: string, source: 'icloud' | 'outlook'): string {
+export function getEventColor(title: string, _source: 'icloud' | 'outlook'): string {
   const titleLower = title.toLowerCase();
   
   // 1. Vérifier d'abord les couleurs spécifiques pour les professeurs

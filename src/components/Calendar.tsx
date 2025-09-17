@@ -308,7 +308,7 @@ export const Calendar: React.FC = () => {
           ))}
         </div>
         <div className="calendar-days">
-          {days.map((day, index) => {
+          {days.map((day, _index) => {
             const dayEvents = getEventsForDay(day);
             const isCurrentMonth = isSameMonth(day, currentDate);
             const isCurrentDay = isToday(day);
@@ -452,7 +452,7 @@ export const Calendar: React.FC = () => {
       <div className="upcoming-events">
         <h2>Prochains événements</h2>
         <div className="events-list">
-          {paginatedEvents.map((event, index) => (
+          {paginatedEvents.map((event, _index) => (
             <div
               key={`${event.id}-${event.start.getTime()}`}
               className={`event-card ${event.source}`}

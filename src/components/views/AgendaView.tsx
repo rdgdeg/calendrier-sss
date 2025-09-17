@@ -13,7 +13,6 @@ interface AgendaViewProps {
 }
 
 export const AgendaView: React.FC<AgendaViewProps> = ({
-  currentDate,
   events,
   onEventClick,
   onEventHover,

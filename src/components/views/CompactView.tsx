@@ -60,7 +60,7 @@ export const CompactView: React.FC<CompactViewProps> = ({
         </div>
         
         <div className="compact-days">
-          {days.map((day, index) => {
+          {days.map((day) => {
             const dayEvents = getEventsForDay(day);
             const isCurrentMonth = isSameMonth(day, currentDate);
             const isCurrentDay = isToday(day);

@@ -1,7 +1,6 @@
 import React from 'react';
 import { CalendarEvent } from '../../types';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
 
 interface MonthViewProps {
   currentDate: Date;

@@ -24,3 +24,11 @@ export interface CalendarSource {
   source: 'icloud' | 'outlook';
   color: string;
 }
+
+export type CalendarView = 'month' | 'week' | 'agenda' | 'compact';
+
+export interface CalendarViewConfig {
+  view: CalendarView;
+  title: string;
+  icon: string;
+}

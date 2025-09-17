@@ -1,27 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { CalendarEvent, CalendarSource } from '../types';
+import { CalendarEvent, CalendarSource, CalendarView } from '../types';
 import { ICalParser } from '../utils/icalParser';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { format, addMonths, subMonths, addWeeks, subWeeks } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { syncCalendarStatus, cacheEvents, getCachedEvents } from '../lib/supabase';
+import { ViewSelector } from './ViewSelector';
+import { MonthView } from './views/MonthView';
+import { WeekView } from './views/WeekView';
+import { AgendaView } from './views/AgendaView';
+import { CompactView } from './views/CompactView';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
-    name: 'Calendrier iCloud',
+    name: 'Calendrier de Duve',
     url: 'https://p25-caldav.icloud.com/published/2/MjE3MzIxMzkxMTYyMTczMtrwrElZXGcjHRcJohH3ZTG9v2l4po1v88R9tID706X9RxGohLKxmB8cXu3SUYxqWQyqiN7dN3ZkiPAFAAQE2b8',
     source: 'icloud',
-    color: '#ff6b6b'
+    color: '#ff9999'
   },
   {
-    name: 'Calendrier Outlook UCLouvain',
+    name: 'Calendrier Secteur SSS',
     url: 'https://outlook.office365.com/owa/calendar/7442b8c05d40441795e06a2f0b095720@uclouvain.be/32bcbe6b269b4cf78cd02da934b381c215406410938849709841/calendar.ics',
     source: 'outlook',
-    color: '#4ecdc4'
+    color: '#87ceeb'
   }
 ];
 
 export const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date(2025, 8, 1)); // Septembre 2025
+  const [currentView, setCurrentView] = useState<CalendarView>('month');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +35,7 @@ export const Calendar: React.FC = () => {
   const [debugInfo, setDebugInfo] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(0);
   const eventsPerPage = 5;
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'icloud' | 'outlook'>('all');
   
   // État pour la tooltip
   const [tooltip, setTooltip] = useState<{
@@ -93,23 +100,56 @@ export const Calendar: React.FC = () => {
     setTooltip(prev => ({ ...prev, visible: false }));
   };
 
-  // Fonction pour formater la description en paragraphes lisibles
+  // Fonction améliorée pour formater la description avec retours à la ligne après chaque phrase
   const formatDescription = (description: string): JSX.Element[] => {
     if (!description) return [];
     
-    const cleanText = cleanHtmlContent(description);
+    // Préserver les retours à la ligne HTML avant le nettoyage
+    let processedText = description
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n\n')
+      .replace(/<p[^>]*>/gi, '')
+      .replace(/<\/div>/gi, '\n')
+      .replace(/<div[^>]*>/gi, '');
     
-    // Diviser en paragraphes basés sur des patterns courants
-    const paragraphs = cleanText
-      .split(/(?:\r?\n\s*\r?\n|\s{4,}|—\s*—|___+)/)
-      .map(p => p.trim())
-      .filter(p => p.length > 0);
+    const cleanText = cleanHtmlContent(processedText);
     
-    return paragraphs.map((paragraph, index) => {
-      // Détecter les listes (lignes commençant par *, -, •, ou des numéros)
-      if (paragraph.includes('*') || paragraph.includes('•') || paragraph.includes('-')) {
-        const listItems = paragraph
-          .split(/(?:\r?\n|^)\s*[*•-]\s*/)
+    // Diviser le texte en phrases (après chaque point suivi d'un espace ou fin de ligne)
+    const sentences = cleanText
+      .split(/\.(?:\s+|$)/)
+      .map(sentence => sentence.trim())
+      .filter(sentence => sentence.length > 0)
+      .map(sentence => sentence.endsWith('.') ? sentence : sentence + '.');
+    
+    // Regrouper les phrases courtes ensemble (moins de 50 caractères)
+    const groupedSentences: string[] = [];
+    let currentGroup = '';
+    
+    sentences.forEach((sentence, index) => {
+      if (sentence.length < 50 && currentGroup.length < 100) {
+        currentGroup += (currentGroup ? ' ' : '') + sentence;
+      } else {
+        if (currentGroup) {
+          groupedSentences.push(currentGroup);
+          currentGroup = '';
+        }
+        groupedSentences.push(sentence);
+      }
+      
+      // Ajouter le dernier groupe s'il existe
+      if (index === sentences.length - 1 && currentGroup) {
+        groupedSentences.push(currentGroup);
+      }
+    });
+    
+    return groupedSentences.map((sentence, index) => {
+      // Détecter les informations importantes (contenant des mots-clés)
+      const isImportant = /(?:date|heure|lieu|contact|inscription|programme|horaire|adresse|public|catégories)/i.test(sentence);
+      
+      // Détecter les listes (contenant des puces ou des énumérations)
+      if (sentence.includes('*') || sentence.includes('•') || sentence.includes('-') || /^\d+\./.test(sentence.trim())) {
+        const listItems = sentence
+          .split(/[*•-]|\d+\./)
           .map(item => item.trim())
           .filter(item => item.length > 0);
         
@@ -124,16 +164,13 @@ export const Calendar: React.FC = () => {
         }
       }
       
-      // Détecter les informations importantes (contenant des mots-clés)
-      const isImportant = /(?:date|heure|lieu|contact|inscription|programme)/i.test(paragraph);
-      
       return (
-        <p 
+        <div 
           key={index} 
-          className={`description-paragraph ${isImportant ? 'important-info' : ''}`}
+          className={`description-sentence ${isImportant ? 'important-info' : ''}`}
         >
-          {paragraph}
-        </p>
+          {sentence}
+        </div>
       );
     });
   };
@@ -248,10 +285,17 @@ export const Calendar: React.FC = () => {
     loadEvents();
   }, []);
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentDate(prev => 
-      direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1)
-    );
+  const navigateDate = (direction: 'prev' | 'next') => {
+    setCurrentDate(prev => {
+      switch (currentView) {
+        case 'week':
+          return direction === 'prev' ? subWeeks(prev, 1) : addWeeks(prev, 1);
+        case 'month':
+        case 'compact':
+        default:
+          return direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1);
+      }
+    });
     setCurrentPage(0); // Réinitialiser la pagination
   };
 
@@ -260,16 +304,31 @@ export const Calendar: React.FC = () => {
     setCurrentPage(0); // Réinitialiser la pagination
   };
 
-  const getEventsForDay = (date: Date): CalendarEvent[] => {
-    return events.filter(event => {
-      const eventDate = new Date(event.start);
-      return eventDate.toDateString() === date.toDateString();
-    });
+  const getNavigationLabel = (): string => {
+    switch (currentView) {
+      case 'week':
+        return format(currentDate, "'Semaine du' d MMMM yyyy", { locale: fr });
+      case 'month':
+      case 'compact':
+        return format(currentDate, 'MMMM yyyy', { locale: fr });
+      case 'agenda':
+        return 'Vue Agenda';
+      default:
+        return format(currentDate, 'MMMM yyyy', { locale: fr });
+    }
+  };
+
+  const getFilteredEvents = (): CalendarEvent[] => {
+    if (sourceFilter === 'all') {
+      return events;
+    }
+    return events.filter(event => event.source === sourceFilter);
   };
 
   const getUpcomingEvents = (): CalendarEvent[] => {
     const now = new Date();
-    return events
+    const filteredEvents = getFilteredEvents();
+    return filteredEvents
       .filter(event => new Date(event.start) >= now)
       .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   };
@@ -285,78 +344,38 @@ export const Calendar: React.FC = () => {
     return Math.ceil(upcomingEvents.length / eventsPerPage);
   };
 
-  const generateCalendarDays = () => {
-    const monthStart = startOfMonth(currentDate);
-    const monthEnd = endOfMonth(currentDate);
-    
-    // Commencer par le lundi de la semaine qui contient le premier jour du mois
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // 1 = lundi
-    // Finir par le dimanche de la semaine qui contient le dernier jour du mois
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-    
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  };
+  const renderCurrentView = () => {
+    const filteredEvents = getFilteredEvents();
+    const commonProps = {
+      currentDate,
+      events: filteredEvents,
+      onEventClick: setSelectedEvent,
+      onEventHover: showTooltip,
+      onEventLeave: hideTooltip
+    };
 
-  const renderCalendarGrid = () => {
-    const days = generateCalendarDays();
-
-    return (
-      <div className="calendar-grid">
-        <div className="calendar-weekdays">
-          {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
-            <div key={day} className="weekday">{day}</div>
-          ))}
-        </div>
-        <div className="calendar-days">
-          {days.map((day, _index) => {
-            const dayEvents = getEventsForDay(day);
-            const isCurrentMonth = isSameMonth(day, currentDate);
-            const isCurrentDay = isToday(day);
-            
-            return (
-              <div
-                key={`${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`}
-                className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} ${isCurrentDay ? 'today' : ''}`}
-              >
-                <div className="day-number">
-                  {day.getDate()}
-                </div>
-                <div className="day-events">
-                  {dayEvents.slice(0, 3).map((event, eventIndex) => (
-                    <div
-                      key={`${event.id}-${event.start.getTime()}-${eventIndex}`}
-                      className={`event-item ${event.source}`}
-                      style={{ 
-                        backgroundColor: event.color, 
-                        borderLeftColor: `rgba(255, 255, 255, 0.4)`,
-                        boxShadow: `0 1px 3px rgba(0, 0, 0, 0.2)`
-                      }}
-                      onClick={() => setSelectedEvent(event)}
-                      onMouseEnter={(e) => showTooltip(e, event.title)}
-                      onMouseLeave={hideTooltip}
-                    >
-                      {event.title}
-                    </div>
-                  ))}
-                  {dayEvents.length > 3 && (
-                    <div className="event-item more-events" style={{ background: '#999' }}>
-                      +{dayEvents.length - 3} autres
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
+    switch (currentView) {
+      case 'month':
+        return <MonthView {...commonProps} />;
+      case 'week':
+        return <WeekView {...commonProps} />;
+      case 'agenda':
+        return <AgendaView {...commonProps} />;
+      case 'compact':
+        return <CompactView {...commonProps} onDayClick={(date) => {
+          setCurrentDate(date);
+          setCurrentView('month');
+        }} />;
+      default:
+        return <MonthView {...commonProps} />;
+    }
   };
 
   const renderEventDetails = () => {
     if (!selectedEvent) return null;
 
     return (
-      <div className="event-details">
+      <div className="event-details-inline">
         <div className="event-details-header">
           <h3 className="event-details-title">{selectedEvent.title}</h3>
           <button 
@@ -369,67 +388,71 @@ export const Calendar: React.FC = () => {
         </div>
         
         <div className="event-details-content">
-          <div className="event-detail-row">
-            <span className="detail-icon">📅</span>
-            <div className="detail-content">
-              <strong>Date</strong>
-              <span>{format(selectedEvent.start, 'EEEE d MMMM yyyy', { locale: fr })}</span>
-            </div>
-          </div>
-
-          <div className="event-detail-row">
-            <span className="detail-icon">🕒</span>
-            <div className="detail-content">
-              <strong>Heure</strong>
-              <span>{
-                selectedEvent.allDay 
-                  ? 'Toute la journée'
-                  : `${format(selectedEvent.start, 'HH:mm')} - ${format(selectedEvent.end, 'HH:mm')}`
-              }</span>
-            </div>
-          </div>
-
-          {selectedEvent.location && (
+          <div className="event-details-grid">
             <div className="event-detail-row">
-              <span className="detail-icon">📍</span>
+              <span className="detail-icon">📅</span>
               <div className="detail-content">
-                <strong>Lieu</strong>
-                <span>{selectedEvent.location}</span>
+                <strong>Date</strong>
+                <span>{format(selectedEvent.start, 'EEEE d MMMM yyyy', { locale: fr })}</span>
               </div>
             </div>
-          )}
 
-          {selectedEvent.description && (
-            <div className="event-detail-row description-row">
-              <span className="detail-icon">📝</span>
+            <div className="event-detail-row">
+              <span className="detail-icon">🕒</span>
               <div className="detail-content">
-                <strong>Description</strong>
-                <div className="description-content">
-                  {formatDescription(selectedEvent.description)}
+                <strong>Heure</strong>
+                <span>{
+                  selectedEvent.allDay 
+                    ? 'Toute la journée'
+                    : `${format(selectedEvent.start, 'HH:mm')} - ${format(selectedEvent.end, 'HH:mm')}`
+                }</span>
+              </div>
+            </div>
+
+            {selectedEvent.location && (
+              <div className="event-detail-row">
+                <span className="detail-icon">📍</span>
+                <div className="detail-content">
+                  <strong>Lieu</strong>
+                  <span>{selectedEvent.location}</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="event-detail-row">
-            <span className="detail-icon">🏷️</span>
-            <div className="detail-content">
-              <strong>Catégorie</strong>
-              <span 
-                className="category-tag"
-                style={{ 
-                  backgroundColor: selectedEvent.color,
-                  color: 'white',
-                  padding: '2px 8px',
-                  borderRadius: '12px',
-                  fontSize: '12px',
-                  fontWeight: '500'
-                }}
-              >
-                {selectedEvent.category.name}
-              </span>
+            <div className="event-detail-row">
+              <span className="detail-icon">📅</span>
+              <div className="detail-content">
+                <strong>Source</strong>
+                <span 
+                  className="source-tag"
+                  style={{ 
+                    backgroundColor: selectedEvent.source === 'icloud' ? '#ffe6e6' : '#e6f3ff',
+                    color: selectedEvent.source === 'icloud' ? '#cc4444' : '#4488cc',
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    border: `1px solid ${selectedEvent.source === 'icloud' ? '#ffcccc' : '#cce6ff'}`,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  {selectedEvent.source === 'icloud' ? 'Calendrier de Duve' : 'Secteur SSS'}
+                </span>
+              </div>
             </div>
           </div>
+
+          {selectedEvent.description && (
+            <div className="event-description-section">
+              <div className="description-header">
+                <span className="detail-icon">📝</span>
+                <strong>Description</strong>
+              </div>
+              <div className="description-content">
+                {formatDescription(selectedEvent.description)}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -477,12 +500,21 @@ export const Calendar: React.FC = () => {
                 {event.location && (
                   <p className="event-location">📍 {event.location}</p>
                 )}
-                <p className="event-category">
+                <p className="event-source">
                   <span 
-                    className="category-badge"
-                    style={{ backgroundColor: event.category.color }}
+                    className="source-badge"
+                    style={{ 
+                      backgroundColor: event.source === 'icloud' ? '#ffe6e6' : '#e6f3ff',
+                      color: event.source === 'icloud' ? '#cc4444' : '#4488cc',
+                      padding: '4px 10px',
+                      borderRadius: '14px',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      border: `1px solid ${event.source === 'icloud' ? '#ffcccc' : '#cce6ff'}`,
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                    }}
                   >
-                    {event.category.name}
+                    {event.source === 'icloud' ? 'Duve' : 'SSS'}
                   </span>
                 </p>
               </div>
@@ -530,38 +562,76 @@ export const Calendar: React.FC = () => {
   }
 
   return (
-    <div className="calendar-container">
+    <div className="calendar-container fade-in">
       <div className="calendar-header">
         <div className="calendar-nav">
-          <button onClick={() => navigateMonth('prev')} className="nav-button">
+          <button 
+            onClick={() => navigateDate('prev')} 
+            className="nav-button"
+            aria-label="Mois précédent"
+          >
             ← Précédent
           </button>
-          <button onClick={goToToday} className="nav-button">
+          <button 
+            onClick={goToToday} 
+            className="nav-button"
+            aria-label="Aller à aujourd'hui"
+          >
             Aujourd'hui
           </button>
-          <button onClick={() => navigateMonth('next')} className="nav-button">
+          <button 
+            onClick={() => navigateDate('next')} 
+            className="nav-button"
+            aria-label="Mois suivant"
+          >
             Suivant →
           </button>
         </div>
+        
         <h1 className="month-year">
-          {format(currentDate, 'MMMM yyyy', { locale: fr })}
+          {getNavigationLabel()}
         </h1>
-        <div>
-          <button onClick={loadEvents} className="nav-button">
+        
+        <div className="header-controls">
+          <div className="source-filter">
+            <select 
+              value={sourceFilter} 
+              onChange={(e) => setSourceFilter(e.target.value as 'all' | 'icloud' | 'outlook')}
+              className="filter-select"
+            >
+              <option value="all">Tous les calendriers</option>
+              <option value="icloud">Calendrier de Duve</option>
+              <option value="outlook">Secteur SSS</option>
+            </select>
+          </div>
+          <ViewSelector 
+            currentView={currentView} 
+            onViewChange={setCurrentView} 
+          />
+          <button 
+            onClick={loadEvents} 
+            className="nav-button"
+            aria-label="Actualiser les calendriers"
+            title="Actualiser les calendriers"
+          >
             🔄 Actualiser
           </button>
         </div>
       </div>
 
-      {renderCalendarGrid()}
+      <div className="calendar-content scale-in">
+        {renderCurrentView()}
+      </div>
+
       {renderEventDetails()}
-      {renderUpcomingEvents()}
+      
+      {/* Afficher les événements à venir seulement pour certaines vues */}
+      {(currentView === 'month' || currentView === 'compact') && renderUpcomingEvents()}
 
       {debugInfo && (
         <div className="debug-section">
           <h4>Informations de debug:</h4>
           <pre>{debugInfo}</pre>
-          <p>Nombre de jours générés: {generateCalendarDays().length}</p>
         </div>
       )}
 

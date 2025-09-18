@@ -148,39 +148,48 @@ export const Calendar: React.FC = () => {
       // Si forceRefresh est true, vider le cache d'abord
       if (forceRefresh) {
         setLoadingMessage('Vidage du cache...');
-        await clearCache();
+        try {
+          await clearCache();
+        } catch (error) {
+          console.warn('Cache non disponible, continuons sans cache');
+        }
         setLoadingProgress(10);
       }
       
-      // Essayer de charger depuis le cache d'abord pour un affichage rapide
+      // Essayer de charger depuis le cache d'abord pour un affichage rapide (seulement si pas de forceRefresh)
       if (!forceRefresh) {
         setLoadingMessage('Vérification du cache...');
-        const cachedEvents = await getCachedEvents();
-        setLoadingProgress(20);
-        
-        if (cachedEvents.length > 0) {
-          const eventsWithColors = cachedEvents.map(cached => ({
-            id: cached.event_id,
-            title: cached.title,
-            start: new Date(cached.start_date),
-            end: new Date(cached.end_date),
-            description: cached.description || '',
-            location: cached.location || '',
-            source: cached.source as 'icloud' | 'outlook',
-            color: cached.color || '#6c757d',
-            allDay: false,
-            category: {
-              id: `${cached.source}-${cached.category || 'default'}`,
-              name: cached.category || 'default',
-              color: cached.color || '#6c757d',
-              source: cached.source as 'icloud' | 'outlook'
-            }
-          }));
+        try {
+          const cachedEvents = await getCachedEvents();
+          setLoadingProgress(20);
           
-          // Afficher immédiatement les événements en cache
-          setEvents(eventsWithColors);
-          setLoading(false);
-          setLoadingMessage('Événements en cache affichés');
+          if (cachedEvents.length > 0) {
+            const eventsWithColors = cachedEvents.map(cached => ({
+              id: cached.event_id,
+              title: cached.title,
+              start: new Date(cached.start_date),
+              end: new Date(cached.end_date),
+              description: cached.description || '',
+              location: cached.location || '',
+              source: cached.source as 'icloud' | 'outlook',
+              color: cached.color || '#6c757d',
+              allDay: false,
+              category: {
+                id: `${cached.source}-${cached.category || 'default'}`,
+                name: cached.category || 'default',
+                color: cached.color || '#6c757d',
+                source: cached.source as 'icloud' | 'outlook'
+              }
+            }));
+            
+            // Afficher immédiatement les événements en cache
+            setEvents(eventsWithColors);
+            setLoading(false);
+            setLoadingMessage('Événements en cache affichés');
+          }
+        } catch (error) {
+          console.warn('Cache non disponible, chargement direct des calendriers');
+          setLoadingProgress(20);
         }
       }
 
@@ -197,26 +206,34 @@ export const Calendar: React.FC = () => {
           const progressIncrement = 40 / CALENDAR_SOURCES.length;
           setLoadingProgress(prev => prev + progressIncrement);
           
-          // Synchroniser le statut avec Supabase
-          await syncCalendarStatus({
-            source_name: source.name,
-            source_url: source.url,
-            last_sync: new Date().toISOString(),
-            events_count: sourceEvents.length,
-            status: 'success'
-          });
+          // Synchroniser le statut avec Supabase (si disponible)
+          try {
+            await syncCalendarStatus({
+              source_name: source.name,
+              source_url: source.url,
+              last_sync: new Date().toISOString(),
+              events_count: sourceEvents.length,
+              status: 'success'
+            });
+          } catch (error) {
+            console.warn('Synchronisation du statut non disponible');
+          }
           
           return sourceEvents;
         } catch (sourceError) {
-          // Enregistrer l'erreur dans Supabase
-          await syncCalendarStatus({
-            source_name: source.name,
-            source_url: source.url,
-            last_sync: new Date().toISOString(),
-            events_count: 0,
-            status: 'error',
-            error_message: sourceError instanceof Error ? sourceError.message : 'Erreur inconnue'
-          });
+          // Enregistrer l'erreur dans Supabase (si disponible)
+          try {
+            await syncCalendarStatus({
+              source_name: source.name,
+              source_url: source.url,
+              last_sync: new Date().toISOString(),
+              events_count: 0,
+              status: 'error',
+              error_message: sourceError instanceof Error ? sourceError.message : 'Erreur inconnue'
+            });
+          } catch (error) {
+            console.warn('Synchronisation du statut d\'erreur non disponible');
+          }
           return [];
         }
       });
@@ -252,20 +269,24 @@ export const Calendar: React.FC = () => {
         setLoadingMessage('Mise en cache...');
         setLoadingProgress(90);
         
-        // Mettre en cache les nouveaux événements
-        const eventsToCache = eventsWithSourceColors.map(event => ({
-          event_id: event.id,
-          title: event.title,
-          start_date: event.start.toISOString(),
-          end_date: event.end.toISOString(),
-          description: event.description,
-          location: event.location,
-          source: event.source,
-          color: event.color,
-          category: event.category.name
-        }));
-        
-        await cacheEvents(eventsToCache);
+        // Mettre en cache les nouveaux événements (si disponible)
+        try {
+          const eventsToCache = eventsWithSourceColors.map(event => ({
+            event_id: event.id,
+            title: event.title,
+            start_date: event.start.toISOString(),
+            end_date: event.end.toISOString(),
+            description: event.description,
+            location: event.location,
+            source: event.source,
+            color: event.color,
+            category: event.category.name
+          }));
+          
+          await cacheEvents(eventsToCache);
+        } catch (error) {
+          console.warn('Mise en cache non disponible, continuons sans cache');
+        }
       }
       
       setLoadingMessage('Terminé !');

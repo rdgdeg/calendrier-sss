@@ -25,7 +25,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
   selectedEventId
 }) => {
   const [dateRange, setDateRange] = useState('all'); // 'all', '7', '30', '60', '90'
-  const [showPastEvents, setShowPastEvents] = useState(true);
+  const [showPastEvents, setShowPastEvents] = useState(false);
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -139,7 +139,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                 checked={showPastEvents}
                 onChange={(e) => setShowPastEvents(e.target.checked)}
               />
-              Événements passés
+              Inclure les événements passés
             </label>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { CalendarEvent, CalendarSource, CalendarView } from '../types';
 import { ICalParser } from '../utils/icalParser';
 import { format, addMonths, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { syncCalendarStatus, cacheEvents, getCachedEvents } from '../lib/supabase';
+import { syncCalendarStatus, cacheEvents, getCachedEvents, clearCache } from '../lib/supabase';
 import { ViewSelector } from './ViewSelector';
 import { MonthView } from './views/MonthView';
 import { AgendaView } from './views/AgendaView';
@@ -15,6 +15,7 @@ import { SearchBar } from './SearchBar';
 import { UniversalSidebar } from './UniversalSidebar';
 import { SearchResults } from './SearchResults';
 import { SkeletonLoader } from './SkeletonLoader';
+import { ProgressBar } from './ProgressBar';
 import { useSearch } from '../hooks/useSearch';
 import { EVENT_TYPES } from '../utils/eventCategories';
 
@@ -41,6 +42,8 @@ export const Calendar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('Initialisation...');
 
   
   // Hook de recherche
@@ -135,39 +138,62 @@ export const Calendar: React.FC = () => {
 
 
 
-  const loadEvents = async () => {
+  const loadEvents = async (forceRefresh = false) => {
     setLoading(true);
     setError(null);
+    setLoadingProgress(0);
+    setLoadingMessage('Initialisation...');
     
     try {
+      // Si forceRefresh est true, vider le cache d'abord
+      if (forceRefresh) {
+        setLoadingMessage('Vidage du cache...');
+        await clearCache();
+        setLoadingProgress(10);
+      }
+      
       // Essayer de charger depuis le cache d'abord pour un affichage rapide
-      const cachedEvents = await getCachedEvents();
-      if (cachedEvents.length > 0) {
-        const eventsWithColors = cachedEvents.map(cached => ({
-          id: cached.event_id,
-          title: cached.title,
-          start: new Date(cached.start_date),
-          end: new Date(cached.end_date),
-          description: cached.description || '',
-          location: cached.location || '',
-          source: cached.source as 'icloud' | 'outlook',
-          color: cached.color || '#6c757d',
-          allDay: false,
-          category: {
-            name: cached.category || 'default',
-            color: cached.color || '#6c757d'
-          }
-        }));
+      if (!forceRefresh) {
+        setLoadingMessage('Vérification du cache...');
+        const cachedEvents = await getCachedEvents();
+        setLoadingProgress(20);
         
-        // Afficher immédiatement les événements en cache
-        setEvents(eventsWithColors);
-        setLoading(false);
+        if (cachedEvents.length > 0) {
+          const eventsWithColors = cachedEvents.map(cached => ({
+            id: cached.event_id,
+            title: cached.title,
+            start: new Date(cached.start_date),
+            end: new Date(cached.end_date),
+            description: cached.description || '',
+            location: cached.location || '',
+            source: cached.source as 'icloud' | 'outlook',
+            color: cached.color || '#6c757d',
+            allDay: false,
+            category: {
+              name: cached.category || 'default',
+              color: cached.color || '#6c757d'
+            }
+          }));
+          
+          // Afficher immédiatement les événements en cache
+          setEvents(eventsWithColors);
+          setLoading(false);
+          setLoadingMessage('Événements en cache affichés');
+        }
       }
 
       // Charger les événements frais en arrière-plan (en parallèle pour plus de rapidité)
-      const sourcePromises = CALENDAR_SOURCES.map(async (source) => {
+      setLoadingMessage('Chargement des calendriers...');
+      setLoadingProgress(30);
+      
+      const sourcePromises = CALENDAR_SOURCES.map(async (source, index) => {
         try {
+          setLoadingMessage(`Chargement ${source.name}...`);
           const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
+          
+          // Mettre à jour la progression
+          const progressIncrement = 40 / CALENDAR_SOURCES.length;
+          setLoadingProgress(prev => prev + progressIncrement);
           
           // Synchroniser le statut avec Supabase
           await syncCalendarStatus({
@@ -194,10 +220,16 @@ export const Calendar: React.FC = () => {
       });
 
       // Attendre tous les calendriers en parallèle
+      setLoadingMessage('Traitement des données...');
+      setLoadingProgress(70);
+      
       const allSourceEvents = await Promise.all(sourcePromises);
       const allEvents: CalendarEvent[] = allSourceEvents.flat();
 
       if (allEvents.length > 0) {
+        setLoadingMessage('Application des couleurs...');
+        setLoadingProgress(80);
+        
         // Utiliser les couleurs par source pour une meilleure visibilité
         const eventsWithSourceColors = allEvents.map(event => {
           const sourceConfig = CALENDAR_SOURCES.find(s => s.source === event.source);
@@ -212,6 +244,9 @@ export const Calendar: React.FC = () => {
         });
         
         setEvents(eventsWithSourceColors);
+        
+        setLoadingMessage('Mise en cache...');
+        setLoadingProgress(90);
         
         // Mettre en cache les nouveaux événements
         const eventsToCache = eventsWithSourceColors.map(event => ({
@@ -228,6 +263,9 @@ export const Calendar: React.FC = () => {
         
         await cacheEvents(eventsToCache);
       }
+      
+      setLoadingMessage('Terminé !');
+      setLoadingProgress(100);
 
 
 
@@ -387,6 +425,11 @@ export const Calendar: React.FC = () => {
             📅 Calendrier SSS - UCLouvain
           </h1>
         </div>
+        <ProgressBar 
+          progress={loadingProgress} 
+          message={loadingMessage}
+          isIndeterminate={loadingProgress === 0}
+        />
         <SkeletonLoader />
       </div>
     );
@@ -510,6 +553,14 @@ export const Calendar: React.FC = () => {
             title="Actualiser les calendriers (rechargement complet)"
           >
             🔄 Actualiser
+          </button>
+          <button 
+            onClick={() => loadEvents(true)} 
+            className="nav-button"
+            aria-label="Forcer le rechargement"
+            title="Vider le cache et recharger complètement"
+          >
+            🗑️ Vider cache
           </button>
         </div>
       </div>

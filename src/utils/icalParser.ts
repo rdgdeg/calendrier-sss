@@ -38,37 +38,49 @@ export class ICalParser {
   static async fetchAndParse(url: string, source: 'icloud' | 'outlook'): Promise<CalendarEvent[]> {
     try {
       
-      // Utiliser un proxy CORS pour éviter les blocages
+      // Utiliser plusieurs proxies CORS pour éviter les blocages
       const proxyUrls = [
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
         `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${url}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
         url // Essayer direct en dernier
       ];
 
       let icsData = '';
       let lastError = null;
 
-      for (const proxyUrl of proxyUrls) {
+      for (let i = 0; i < proxyUrls.length; i++) {
+        const proxyUrl = proxyUrls[i];
         try {
-          // Ajouter un timeout de 10 secondes pour éviter les blocages
+          console.log(`🔄 Tentative ${i + 1}/${proxyUrls.length} pour ${source}:`, proxyUrl.includes('corsproxy') ? 'corsproxy.io' : proxyUrl.includes('codetabs') ? 'codetabs.com' : proxyUrl.includes('thingproxy') ? 'thingproxy' : proxyUrl.includes('allorigins') ? 'allorigins.win' : 'direct');
+          
+          // Timeout plus court pour les premiers essais
+          const timeout = i < 2 ? 8000 : 15000;
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
           
           const response = await fetch(proxyUrl, {
             headers: {
-              'User-Agent': 'CalendrierUnifie/1.0'
+              'User-Agent': 'Mozilla/5.0 (compatible; CalendrierSSS/1.0)',
+              'Accept': 'text/calendar,text/plain,*/*',
+              'Cache-Control': 'no-cache'
             },
-            signal: controller.signal
+            signal: controller.signal,
+            mode: proxyUrl === url ? 'cors' : 'cors'
           });
           
           clearTimeout(timeoutId);
           
           if (response.ok) {
             icsData = await response.text();
+            console.log(`✅ Succès avec ${proxyUrl.includes('corsproxy') ? 'corsproxy.io' : proxyUrl.includes('codetabs') ? 'codetabs.com' : proxyUrl.includes('thingproxy') ? 'thingproxy' : proxyUrl.includes('allorigins') ? 'allorigins.win' : 'direct'} pour ${source}`);
             break;
+          } else {
+            console.warn(`⚠️ Échec HTTP ${response.status} avec proxy ${i + 1}`);
           }
         } catch (error) {
+          console.warn(`⚠️ Erreur avec proxy ${i + 1}:`, error instanceof Error ? error.message : error);
           lastError = error;
           continue;
         }

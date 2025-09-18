@@ -232,6 +232,8 @@ export const Calendar: React.FC = () => {
           const progressIncrement = 40 / CALENDAR_SOURCES.length;
           setLoadingProgress(prev => prev + progressIncrement);
           
+          console.log(`📅 ${source.name}: ${sourceEvents.length} événements chargés`);
+          
           // Synchroniser le statut avec Supabase (si disponible)
           try {
             await syncCalendarStatus({
@@ -247,6 +249,8 @@ export const Calendar: React.FC = () => {
           
           return sourceEvents;
         } catch (sourceError) {
+          console.error(`❌ Erreur lors du chargement de ${source.name}:`, sourceError);
+          
           // Enregistrer l'erreur dans Supabase (si disponible)
           try {
             await syncCalendarStatus({
@@ -260,6 +264,10 @@ export const Calendar: React.FC = () => {
           } catch (error) {
             console.warn('Synchronisation du statut d\'erreur non disponible');
           }
+          
+          // Afficher une notification d'erreur spécifique
+          showToast('error', `Erreur de chargement: ${source.name}`);
+          
           return [];
         }
       });
@@ -271,6 +279,8 @@ export const Calendar: React.FC = () => {
       const allSourceEvents = await Promise.all(sourcePromises);
       const allEvents: CalendarEvent[] = allSourceEvents.flat();
 
+      console.log(`📊 Total des événements chargés: ${allEvents.length}`);
+      
       if (allEvents.length > 0) {
         setLoadingMessage('Application des couleurs...');
         setLoadingProgress(80);
@@ -318,8 +328,13 @@ export const Calendar: React.FC = () => {
       setLoadingMessage('Terminé !');
       setLoadingProgress(100);
       
-      // Notification de succès
-      showToast('success', 'Calendriers actualisés avec succès !');
+      // Notification de succès avec informations
+      const totalEvents = allEvents.length;
+      if (totalEvents > 0) {
+        showToast('success', `${totalEvents} événements chargés avec succès !`);
+      } else {
+        showToast('error', 'Aucun événement chargé - Vérifiez la console pour plus de détails');
+      }
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';

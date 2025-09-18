@@ -42,8 +42,8 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress, message 
         {/* Conseils utiles pendant le chargement */}
         <div className="loading-tips">
           <div className="loading-tip">
-            <span className="tip-icon">💡</span>
-            <span>Synchronisation des calendriers de Duve et SSS en cours...</span>
+            <span className="tip-icon">🔄</span>
+            <span>Synchronisation via proxies CORS sécurisés...</span>
           </div>
           <div className="loading-tip">
             <span className="tip-icon">🔍</span>
@@ -51,7 +51,11 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress, message 
           </div>
           <div className="loading-tip">
             <span className="tip-icon">📱</span>
-            <span>L'interface s'adapte automatiquement à votre écran</span>
+            <span>Interface responsive adaptée à tous les écrans</span>
+          </div>
+          <div className="loading-tip">
+            <span className="tip-icon">⚡</span>
+            <span>Chargement intelligent avec cache pour plus de rapidité</span>
           </div>
         </div>
 

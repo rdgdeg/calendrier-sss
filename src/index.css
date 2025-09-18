@@ -743,10 +743,15 @@ body {
 
 .events-count {
   font-size: var(--ucl-font-size-sm);
-  background: rgba(255, 255, 255, 0.2);
-  padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
-  border-radius: var(--ucl-border-radius);
-  font-weight: var(--ucl-font-weight-medium);
+  background: var(--ucl-white);
+  color: var(--ucl-primary);
+  padding: var(--ucl-spacing-xs) var(--ucl-spacing-md);
+  border-radius: var(--ucl-border-radius-lg);
+  font-weight: var(--ucl-font-weight-bold);
+  border: 2px solid var(--ucl-primary);
+  box-shadow: 0 2px 4px rgba(0, 61, 122, 0.2);
+  min-width: 60px;
+  text-align: center;
 }
 
 .agenda-events {
@@ -3482,7 +3487,15 @@ VUES MULTIPLES DU CALENDRIER ===== */
 
 .events-count {
   font-size: var(--ucl-font-size-sm);
-  opacity: 0.9;
+  background: var(--ucl-white);
+  color: var(--ucl-primary);
+  padding: var(--ucl-spacing-xs) var(--ucl-spacing-md);
+  border-radius: var(--ucl-border-radius-lg);
+  font-weight: var(--ucl-font-weight-bold);
+  border: 2px solid var(--ucl-primary);
+  box-shadow: 0 2px 4px rgba(0, 61, 122, 0.2);
+  min-width: 60px;
+  text-align: center;
   background: rgba(255, 255, 255, 0.2);
   padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
   border-radius: var(--ucl-border-radius-sm);
@@ -10168,5 +10181,55 @@ ponsive pour la largeur fixe du calendrier */
     right: 10px;
     left: 10px;
     min-width: auto;
+  }
+}
+
+/* Amélioration de la visibilité du compteur d'événements dans la vue Agenda */
+.agenda-date-header .events-count {
+  background: var(--ucl-white);
+  color: var(--ucl-primary);
+  font-weight: var(--ucl-font-weight-bold);
+  font-size: var(--ucl-font-size-base);
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-md);
+  border-radius: var(--ucl-border-radius-lg);
+  border: 2px solid var(--ucl-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  min-width: 70px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  animation: countBadge 0.3s ease-out;
+}
+
+@keyframes countBadge {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Hover effect pour le compteur */
+.agenda-date-header .events-count:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+/* Version alternative avec fond coloré pour plus de contraste */
+.agenda-date-header .events-count.highlighted {
+  background: var(--ucl-warning);
+  color: var(--ucl-white);
+  border-color: var(--ucl-warning);
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+  .agenda-date-header .events-count {
+    font-size: var(--ucl-font-size-sm);
+    padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
+    min-width: 50px;
   }
 }

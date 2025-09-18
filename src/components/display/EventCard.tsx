@@ -38,7 +38,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
     }
   };
 
-  const truncateTitle = (title: string, maxLength: number = 450): string => {
+  const truncateTitle = (title: string, maxLength: number = 600): string => {
     if (title.length <= maxLength) return title;
     return title.substring(0, maxLength).trim() + '...';
   };

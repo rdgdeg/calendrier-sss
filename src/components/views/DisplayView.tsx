@@ -123,24 +123,27 @@ export const DisplayView: React.FC<DisplayViewProps> = ({
                   </div>
 
                   <div className="display-event-content">
-                    <div className="display-event-time-compact">
-                      🕐 {formatEventTime(event)}
-                    </div>
-                    
-                    <div className="display-event-title-compact">
-                      {formatTitle(event.title, 60)}
-                    </div>
-                    
-                    {event.location && (
-                      <div className="display-event-location-compact">
-                        📍 {formatLocation(event.location, 30)}
+                    <div className="display-event-header">
+                      <div className="display-event-time-compact">
+                        🕐 {formatEventTime(event)}
                       </div>
-                    )}
-
-                    <div className="display-event-source-compact">
-                      <span className={`source-badge-compact ${event.source}`}>
-                        {event.source === 'icloud' ? '🏢 Duve' : '🎓 SSS'}
-                      </span>
+                      <div className="display-event-source-compact">
+                        <span className={`source-badge-compact ${event.source}`}>
+                          {event.source === 'icloud' ? 'DUVE' : 'SSS'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="display-event-body">
+                      <div className="display-event-title-compact">
+                        {formatTitle(event.title, 55)}
+                      </div>
+                      
+                      {event.location && (
+                        <div className="display-event-location-compact">
+                          📍 {formatLocation(event.location, 25)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

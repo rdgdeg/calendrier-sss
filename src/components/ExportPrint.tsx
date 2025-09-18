@@ -45,14 +45,31 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
       endDate.setHours(23, 59, 59, 999); // Fin de journée
     }
 
-    return events.filter(event => 
-      event.start >= startDate && event.start <= endDate
-    ).sort((a, b) => a.start.getTime() - b.start.getTime());
+    const filteredEvents = events.filter(event => {
+      const eventDate = new Date(event.start);
+      return eventDate >= startDate && eventDate <= endDate;
+    }).sort((a, b) => a.start.getTime() - b.start.getTime());
+
+    console.log('Export debug:', {
+      totalEvents: events.length,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      filteredEvents: filteredEvents.length,
+      exportOptions
+    });
+
+    return filteredEvents;
   };
 
   // Fonction d'impression
   const handlePrint = () => {
     const eventsToExport = getEventsForExport();
+    
+    if (eventsToExport.length === 0) {
+      alert('Aucun événement à exporter pour la période sélectionnée.');
+      return;
+    }
+    
     const printWindow = window.open('', '_blank');
     
     if (!printWindow) {
@@ -65,10 +82,10 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
     printWindow.document.close();
     
     // Attendre que le contenu soit chargé avant d'imprimer
-    printWindow.onload = () => {
+    setTimeout(() => {
       printWindow.print();
-      printWindow.close();
-    };
+      // Ne pas fermer automatiquement pour permettre la prévisualisation
+    }, 500);
   };
 
   // Fonction d'export CSV

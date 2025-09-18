@@ -337,6 +337,10 @@ body {
   overflow: hidden;
   border: 1px solid var(--ucl-gray-200);
   position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-width: 1200px;
 }
 
 .calendar-grid::before {
@@ -10142,4 +10146,26 @@ nteneur amélioré pour l'affichage du mois */
 
 .month-year:hover::before {
   left: 100%;
+}/* Res
+ponsive pour la largeur fixe du calendrier */
+@media (max-width: 1250px) {
+  .calendar-grid {
+    min-width: auto;
+    max-width: 100%;
+    margin: 0 var(--ucl-spacing-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    margin: 0;
+    border-radius: 0;
+  }
+  
+  .toast-notification {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+  }
 }

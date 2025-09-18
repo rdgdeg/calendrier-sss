@@ -128,7 +128,7 @@
 /* === NOTIFICATIONS TOAST === */
 .toast-notification {
   position: fixed;
-  top: 80px;
+  bottom: 20px;
   right: 20px;
   background: var(--ucl-white);
   border-radius: var(--ucl-border-radius);

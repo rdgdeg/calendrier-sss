@@ -889,4 +889,30 @@ mélioration de la lisibilité des options d'export */
 
 .export-option-group:last-child {
   margin-bottom: var(--ucl-spacing-lg);
+}/*
+ Aperçu amélioré dans la modal d'export */
+.export-preview-events {
+  margin-top: var(--ucl-spacing-sm);
+  padding: var(--ucl-spacing-sm);
+  background: var(--ucl-gray-100);
+  border-radius: var(--ucl-border-radius-sm);
+}
+
+.export-preview-events ul {
+  margin: var(--ucl-spacing-xs) 0 0 var(--ucl-spacing-md);
+  padding: 0;
+}
+
+.export-preview-events li {
+  font-size: var(--ucl-font-size-sm);
+  color: var(--ucl-text-secondary);
+  margin-bottom: 2px;
+}
+
+.export-preview-empty {
+  margin-top: var(--ucl-spacing-sm);
+  padding: var(--ucl-spacing-sm);
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--ucl-border-radius-sm);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }

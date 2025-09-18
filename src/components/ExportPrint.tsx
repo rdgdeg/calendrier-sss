@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CalendarEvent } from '../types';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface ExportPrintProps {
@@ -31,14 +31,8 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
     let endDate: Date;
 
     if (exportOptions.dateRange === 'current') {
-      if (currentView === 'month') {
-        startDate = startOfMonth(currentDate);
-        endDate = endOfMonth(currentDate);
-      } else {
-        // Pour la vue agenda, prendre le mois courant par défaut
-        startDate = startOfMonth(currentDate);
-        endDate = endOfMonth(currentDate);
-      }
+      startDate = startOfMonth(currentDate);
+      endDate = endOfMonth(currentDate);
     } else {
       startDate = new Date(exportOptions.startDate);
       endDate = new Date(exportOptions.endDate);
@@ -46,31 +40,52 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
     }
 
     const filteredEvents = events.filter(event => {
-      const eventDate = new Date(event.start);
-      return eventDate >= startDate && eventDate <= endDate;
+      const eventStart = new Date(event.start);
+      const isInRange = eventStart >= startDate && eventStart <= endDate;
+      return isInRange;
     }).sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    console.log('Export debug:', {
-      totalEvents: events.length,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      filteredEvents: filteredEvents.length,
-      exportOptions
+    // Debug détaillé
+    console.log('=== EXPORT DEBUG ===');
+    console.log('Total events available:', events.length);
+    console.log('Current date:', currentDate);
+    console.log('Export options:', exportOptions);
+    console.log('Date range:', {
+      start: startDate.toLocaleDateString('fr-FR'),
+      end: endDate.toLocaleDateString('fr-FR')
     });
+    console.log('Filtered events:', filteredEvents.length);
+    
+    if (filteredEvents.length > 0) {
+      console.log('First few events:');
+      filteredEvents.slice(0, 3).forEach((event, index) => {
+        console.log(`${index + 1}. ${event.title} - ${event.start.toLocaleDateString('fr-FR')}`);
+      });
+    } else {
+      console.log('No events found in date range');
+      console.log('Available events dates:');
+      events.slice(0, 5).forEach((event, index) => {
+        console.log(`${index + 1}. ${event.title} - ${event.start.toLocaleDateString('fr-FR')}`);
+      });
+    }
+    console.log('===================');
 
     return filteredEvents;
   };
 
   // Fonction d'impression
   const handlePrint = () => {
+    console.log('Starting print process...');
     const eventsToExport = getEventsForExport();
     
     if (eventsToExport.length === 0) {
-      alert('Aucun événement à exporter pour la période sélectionnée.');
+      alert(`Aucun événement trouvé pour la période sélectionnée.\n\nVérifiez :\n- La période choisie\n- Que des événements existent dans cette période\n\nTotal d'événements disponibles : ${events.length}`);
       return;
     }
     
-    const printWindow = window.open('', '_blank');
+    console.log(`Generating print content for ${eventsToExport.length} events...`);
+    
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
     
     if (!printWindow) {
       alert('Veuillez autoriser les pop-ups pour imprimer');
@@ -78,14 +93,27 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
     }
 
     const printContent = generatePrintHTML(eventsToExport);
+    console.log('Print content generated, writing to window...');
+    
+    printWindow.document.open();
     printWindow.document.write(printContent);
     printWindow.document.close();
     
-    // Attendre que le contenu soit chargé avant d'imprimer
+    // Attendre que le contenu soit chargé
+    printWindow.onload = () => {
+      console.log('Print window loaded successfully');
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 1000);
+    };
+    
+    // Fallback si onload ne fonctionne pas
     setTimeout(() => {
-      printWindow.print();
-      // Ne pas fermer automatiquement pour permettre la prévisualisation
-    }, 500);
+      if (printWindow && !printWindow.closed) {
+        printWindow.focus();
+      }
+    }, 1500);
   };
 
   // Fonction d'export CSV
@@ -112,106 +140,150 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
       ? `Calendrier SSS - ${format(currentDate, 'MMMM yyyy', { locale: fr })}`
       : `Calendrier SSS - ${format(new Date(exportOptions.startDate), 'dd/MM/yyyy')} au ${format(new Date(exportOptions.endDate), 'dd/MM/yyyy')}`;
 
-    let content = '';
+    // Trier les événements par date croissante
+    const sortedEvents = [...eventsToExport].sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    if (exportOptions.groupByDay) {
-      // Grouper par jour
-      const days = eachDayOfInterval({
-        start: new Date(exportOptions.startDate),
-        end: new Date(exportOptions.endDate)
-      });
-
-      content = days.map(day => {
-        const dayEvents = eventsToExport.filter(event => isSameDay(event.start, day));
-        
-        if (dayEvents.length === 0) return '';
-
-        return `
-          <div class="print-day-section">
-            <h3 class="print-day-title">${format(day, 'EEEE d MMMM yyyy', { locale: fr })}</h3>
-            <div class="print-events">
-              ${dayEvents.map(event => `
-                <div class="print-event">
-                  <div class="print-event-header">
-                    <span class="print-event-time">${event.allDay ? 'Toute la journée' : format(event.start, 'HH:mm')}</span>
-                    <span class="print-event-title">${event.title}</span>
-                    <span class="print-event-source">[${event.source === 'icloud' ? 'de Duve' : 'SSS'}]</span>
-                  </div>
-                  ${exportOptions.includeLocation && event.location ? `
-                    <div class="print-event-location">📍 ${event.location}</div>
-                  ` : ''}
-                  ${exportOptions.includeDescription && event.description ? `
-                    <div class="print-event-description">${event.description.replace(/<[^>]*>/g, '').substring(0, 200)}${event.description.length > 200 ? '...' : ''}</div>
-                  ` : ''}
-                </div>
-              `).join('')}
-            </div>
+    // Générer le contenu des événements
+    const eventsHTML = sortedEvents.map(event => {
+      const eventDate = format(event.start, 'EEEE d MMMM yyyy', { locale: fr });
+      const eventTime = event.allDay ? 'Toute la journée' : format(event.start, 'HH:mm');
+      const eventEndTime = event.allDay ? '' : ` - ${format(event.end, 'HH:mm')}`;
+      const source = event.source === 'icloud' ? 'de Duve' : 'SSS';
+      
+      return `
+        <div class="print-event">
+          <div class="print-event-header">
+            <div class="print-event-date">${eventDate}</div>
+            <div class="print-event-time">${eventTime}${eventEndTime}</div>
           </div>
-        `;
-      }).join('');
-    } else {
-      // Liste simple
-      content = `
-        <div class="print-events-list">
-          ${eventsToExport.map(event => `
-            <div class="print-event">
-              <div class="print-event-header">
-                <span class="print-event-date">${format(event.start, 'dd/MM/yyyy')}</span>
-                <span class="print-event-time">${event.allDay ? 'Toute la journée' : format(event.start, 'HH:mm')}</span>
-                <span class="print-event-title">${event.title}</span>
-                <span class="print-event-source">[${event.source === 'icloud' ? 'de Duve' : 'SSS'}]</span>
+          <div class="print-event-content">
+            <h4 class="print-event-title">${event.title}</h4>
+            <div class="print-event-source">Source: ${source}</div>
+            ${exportOptions.includeLocation && event.location ? `
+              <div class="print-event-location"><strong>📍 Lieu:</strong> ${event.location}</div>
+            ` : ''}
+            ${exportOptions.includeDescription && event.description ? `
+              <div class="print-event-description">
+                <strong>📝 Description:</strong> 
+                ${event.description.replace(/<[^>]*>/g, '').substring(0, 300)}${event.description.length > 300 ? '...' : ''}
               </div>
-              ${exportOptions.includeLocation && event.location ? `
-                <div class="print-event-location">📍 ${event.location}</div>
-              ` : ''}
-              ${exportOptions.includeDescription && event.description ? `
-                <div class="print-event-description">${event.description.replace(/<[^>]*>/g, '').substring(0, 200)}${event.description.length > 200 ? '...' : ''}</div>
-              ` : ''}
-            </div>
-          `).join('')}
+            ` : ''}
+          </div>
         </div>
       `;
-    }
+    }).join('');
 
     return `
       <!DOCTYPE html>
-      <html>
+      <html lang="fr">
         <head>
           <meta charset="utf-8">
           <title>${title}</title>
           <style>
             @media print {
               @page { margin: 2cm; }
-              body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; }
+              body { font-family: Arial, sans-serif; font-size: 11px; line-height: 1.3; }
+              .print-event { page-break-inside: avoid; }
             }
-            body { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4; margin: 20px; }
-            .print-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #003d7a; padding-bottom: 15px; }
-            .print-title { color: #003d7a; font-size: 24px; font-weight: bold; margin: 0; }
-            .print-subtitle { color: #666; font-size: 14px; margin: 5px 0 0 0; }
-            .print-day-section { margin-bottom: 25px; page-break-inside: avoid; }
-            .print-day-title { color: #003d7a; font-size: 18px; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
-            .print-event { margin-bottom: 15px; padding: 10px; border-left: 3px solid #003d7a; background: #f8f9fa; }
-            .print-event-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-            .print-event-time { font-weight: bold; color: #003d7a; min-width: 80px; }
-            .print-event-date { font-weight: bold; color: #003d7a; min-width: 80px; }
-            .print-event-title { font-weight: bold; flex: 1; }
-            .print-event-source { font-size: 12px; color: #666; font-style: italic; }
-            .print-event-location { color: #666; font-size: 12px; margin-bottom: 5px; }
-            .print-event-description { color: #333; font-size: 12px; }
-            .print-footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #ccc; padding-top: 15px; }
+            body { 
+              font-family: Arial, sans-serif; 
+              font-size: 13px; 
+              line-height: 1.4; 
+              margin: 20px; 
+              color: #000;
+            }
+            .print-header { 
+              text-align: center; 
+              margin-bottom: 30px; 
+              border-bottom: 3px solid #003d7a; 
+              padding-bottom: 15px; 
+            }
+            .print-title { 
+              color: #003d7a; 
+              font-size: 26px; 
+              font-weight: bold; 
+              margin: 0 0 10px 0; 
+            }
+            .print-subtitle { 
+              color: #666; 
+              font-size: 14px; 
+              margin: 5px 0; 
+            }
+            .print-event { 
+              margin-bottom: 20px; 
+              padding: 15px; 
+              border: 1px solid #ddd;
+              border-left: 4px solid #003d7a; 
+              background: #f9f9f9;
+              page-break-inside: avoid;
+            }
+            .print-event-header {
+              margin-bottom: 10px;
+              border-bottom: 1px solid #eee;
+              padding-bottom: 8px;
+            }
+            .print-event-date { 
+              font-weight: bold; 
+              color: #003d7a; 
+              font-size: 15px;
+              text-transform: capitalize;
+            }
+            .print-event-time { 
+              color: #666; 
+              font-size: 13px; 
+              margin-top: 3px;
+            }
+            .print-event-title { 
+              font-size: 16px;
+              font-weight: bold; 
+              color: #000;
+              margin: 8px 0;
+            }
+            .print-event-source { 
+              font-size: 12px; 
+              color: #666; 
+              font-style: italic; 
+              margin-bottom: 8px;
+            }
+            .print-event-location { 
+              color: #333; 
+              font-size: 12px; 
+              margin: 5px 0; 
+            }
+            .print-event-description { 
+              color: #333; 
+              font-size: 12px; 
+              margin: 8px 0;
+              line-height: 1.4;
+            }
+            .print-footer { 
+              margin-top: 40px; 
+              text-align: center; 
+              font-size: 11px; 
+              color: #666; 
+              border-top: 2px solid #003d7a; 
+              padding-top: 15px; 
+            }
+            .print-footer p {
+              margin: 3px 0;
+            }
           </style>
         </head>
         <body>
           <div class="print-header">
             <h1 class="print-title">${title}</h1>
             <p class="print-subtitle">Généré le ${format(new Date(), 'dd/MM/yyyy à HH:mm', { locale: fr })}</p>
-            <p class="print-subtitle">${eventsToExport.length} événement(s)</p>
+            <p class="print-subtitle">${sortedEvents.length} événement(s) trouvé(s)</p>
           </div>
-          ${content}
+          
+          <div class="print-events-container">
+            ${eventsHTML}
+          </div>
+          
           <div class="print-footer">
             <p><strong>Secteur des Sciences de la Santé - UCLouvain</strong></p>
             <p>Rue Martin V 40, Bâtiments Les Arches, 1200 Woluwe-Saint-Lambert</p>
-            <p>${eventsToExport.length} événement(s) | Généré le ${format(new Date(), 'dd/MM/yyyy à HH:mm', { locale: fr })}</p>
+            <p>${sortedEvents.length} événement(s) | Généré le ${format(new Date(), 'dd/MM/yyyy à HH:mm', { locale: fr })}</p>
           </div>
         </body>
       </html>
@@ -403,6 +475,29 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
 
               <div className="export-preview">
                 <p><strong>Aperçu :</strong> {getEventsForExport().length} événement(s) seront exportés</p>
+                {getEventsForExport().length > 0 && (
+                  <div className="export-preview-events">
+                    <p><strong>Premiers événements :</strong></p>
+                    <ul>
+                      {getEventsForExport().slice(0, 3).map((event, index) => (
+                        <li key={index}>
+                          {format(event.start, 'dd/MM/yyyy')} - {event.title}
+                        </li>
+                      ))}
+                      {getEventsForExport().length > 3 && (
+                        <li>... et {getEventsForExport().length - 3} autres</li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+                {getEventsForExport().length === 0 && (
+                  <div className="export-preview-empty">
+                    <p style={{color: '#ef4444'}}>⚠️ Aucun événement trouvé pour cette période</p>
+                    <p style={{fontSize: '12px', color: '#666'}}>
+                      Total disponible : {events.length} événements
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

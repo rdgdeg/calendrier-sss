@@ -228,13 +228,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--ucl-spacing-sm) var(--ucl-spacing-lg);
-  background: var(--ucl-white);
-  border-bottom: 1px solid var(--ucl-gray-200);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: var(--ucl-spacing-lg) var(--ucl-spacing-lg);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 2px solid var(--ucl-gray-200);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(10px);
 }
 
 .calendar-nav {
@@ -297,11 +298,29 @@ body {
 }
 
 .month-year {
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: var(--ucl-font-weight-bold);
   color: var(--ucl-primary);
   text-transform: capitalize;
   margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 61, 122, 0.2);
+  background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.month-year::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ucl-primary), var(--ucl-secondary));
+  border-radius: 2px;
 }
 
 .calendar-grid {
@@ -10035,4 +10054,84 @@ méliorations du sidebar pour une meilleure lisibilité */
   background: rgba(0, 61, 122, 0.1);
   color: var(--ucl-primary);
   border: 1px solid rgba(0, 61, 122, 0.3);
+}/* Co
+nteneur amélioré pour l'affichage du mois */
+.month-year-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ucl-spacing-xs);
+  position: relative;
+}
+
+.month-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-badge {
+  background: rgba(0, 61, 122, 0.1);
+  color: var(--ucl-primary);
+  font-size: var(--ucl-font-size-sm);
+  font-weight: var(--ucl-font-weight-medium);
+  padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
+  border-radius: var(--ucl-border-radius-lg);
+  border: 1px solid rgba(0, 61, 122, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Amélioration responsive pour le mois */
+@media (max-width: 768px) {
+  .month-year {
+    font-size: 1.4rem;
+  }
+  
+  .month-year-container {
+    gap: var(--ucl-spacing-xs);
+  }
+  
+  .month-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+}
+
+/* Animation au changement de mois */
+.month-year {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.month-year:hover {
+  transform: scale(1.02);
+}
+
+/* Effet de brillance sur le mois */
+.month-year::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+  pointer-events: none;
+}
+
+.month-year:hover::before {
+  left: 100%;
 }

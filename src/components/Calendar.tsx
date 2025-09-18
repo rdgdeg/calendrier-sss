@@ -643,9 +643,16 @@ export const Calendar: React.FC = () => {
           )}
         </div>
         
-        <h2 className="month-year">
-          {getNavigationLabel()}
-        </h2>
+        <div className="month-year-container">
+          <h2 className="month-year">
+            {getNavigationLabel()}
+          </h2>
+          {currentView === 'month' && (
+            <div className="month-indicator">
+              <span className="month-badge">Vue mensuelle</span>
+            </div>
+          )}
+        </div>
         
         <div className="header-controls">
           <ViewSelector 

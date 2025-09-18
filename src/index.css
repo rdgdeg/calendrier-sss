@@ -6,6 +6,7 @@
 @import './styles/accessibility-improvements.css';
 @import './styles/micro-interactions.css';
 @import './styles/new-components.css';
+@import './styles/loading-screen.css';
 
 /* UCLouvain Color Palette - Charte officielle */
 :root {

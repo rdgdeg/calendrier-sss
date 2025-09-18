@@ -14,8 +14,7 @@ import { EventLegend } from './EventLegend';
 import { SearchBar } from './SearchBar';
 import { UniversalSidebar } from './UniversalSidebar';
 import { SearchResults } from './SearchResults';
-import { SkeletonLoader } from './SkeletonLoader';
-import { ProgressBar } from './ProgressBar';
+
 import { useSearch } from '../hooks/useSearch';
 import { EVENT_TYPES } from '../utils/eventCategories';
 import { KeyboardNavigation, KeyboardShortcutsHelp } from './KeyboardNavigation';
@@ -23,6 +22,7 @@ import { HelpSystem, FAQSection } from './HelpSystem';
 
 import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
 import { ExportPrint } from './ExportPrint';
+import { LoadingScreen } from './LoadingScreen';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
@@ -162,7 +162,7 @@ export const Calendar: React.FC = () => {
     setToast(prev => ({ ...prev, isVisible: false }));
   };
 
-  const loadEvents = async (forceRefresh = false) => {
+  const loadEvents = async () => {
     setLoading(true);
     setError(null);
     setLoadingProgress(0);
@@ -179,41 +179,44 @@ export const Calendar: React.FC = () => {
       }
       setLoadingProgress(10);
       
-      // Essayer de charger depuis le cache d'abord pour un affichage rapide (seulement si pas de forceRefresh)
-      if (!forceRefresh) {
-        setLoadingMessage('Vérification du cache...');
-        try {
-          const cachedEvents = await getCachedEvents();
-          setLoadingProgress(20);
-          
-          if (cachedEvents.length > 0) {
-            const eventsWithColors = cachedEvents.map(cached => ({
-              id: cached.event_id,
-              title: cached.title,
-              start: new Date(cached.start_date),
-              end: new Date(cached.end_date),
-              description: cached.description || '',
-              location: cached.location || '',
-              source: cached.source as 'icloud' | 'outlook',
+      // Toujours essayer de charger depuis le cache d'abord pour un affichage rapide
+      setLoadingMessage('Vérification du cache...');
+      try {
+        const cachedEvents = await getCachedEvents();
+        setLoadingProgress(20);
+        
+        if (cachedEvents.length > 0) {
+          const eventsWithColors = cachedEvents.map(cached => ({
+            id: cached.event_id,
+            title: cached.title,
+            start: new Date(cached.start_date),
+            end: new Date(cached.end_date),
+            description: cached.description || '',
+            location: cached.location || '',
+            source: cached.source as 'icloud' | 'outlook',
+            color: cached.color || '#6c757d',
+            allDay: false,
+            category: {
+              id: `${cached.source}-${cached.category || 'default'}`,
+              name: cached.category || 'default',
               color: cached.color || '#6c757d',
-              allDay: false,
-              category: {
-                id: `${cached.source}-${cached.category || 'default'}`,
-                name: cached.category || 'default',
-                color: cached.color || '#6c757d',
-                source: cached.source as 'icloud' | 'outlook'
-              }
-            }));
-            
-            // Afficher immédiatement les événements en cache
-            setEvents(eventsWithColors);
+              source: cached.source as 'icloud' | 'outlook'
+            }
+          }));
+          
+          // Afficher immédiatement les événements en cache
+          setEvents(eventsWithColors);
+          setLoadingMessage('Événements en cache chargés, actualisation...');
+          
+          // Continuer le chargement en arrière-plan pour actualiser
+          setTimeout(() => {
             setLoading(false);
-            setLoadingMessage('Événements en cache affichés');
-          }
-        } catch (error) {
-          console.warn('Cache non disponible, chargement direct des calendriers');
-          setLoadingProgress(20);
+            setIsRealTimeLoading(false);
+          }, 1000);
         }
+      } catch (error) {
+        console.warn('Cache non disponible, chargement direct des calendriers');
+        setLoadingProgress(20);
       }
 
       // Charger les événements frais en arrière-plan (en parallèle pour plus de rapidité)
@@ -469,20 +472,10 @@ export const Calendar: React.FC = () => {
 
   if (loading && events.length === 0) {
     return (
-      <div className="calendar-container fade-in">
-        {/* Header principal compact */}
-        <div className="calendar-main-header-compact">
-          <h1 className="calendar-main-title-compact">
-            📅 Calendrier SSS - UCLouvain
-          </h1>
-        </div>
-        <ProgressBar 
-          progress={loadingProgress} 
-          message={loadingMessage}
-          isIndeterminate={loadingProgress === 0}
-        />
-        <SkeletonLoader />
-      </div>
+      <LoadingScreen 
+        progress={loadingProgress} 
+        message={loadingMessage}
+      />
     );
   }
 

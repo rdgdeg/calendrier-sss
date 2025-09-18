@@ -1,0 +1,237 @@
+/* Écran de chargement amélioré */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #003d7a 0%, #0066cc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: white;
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  padding: var(--ucl-spacing-xl);
+}
+
+/* Logo et titre */
+.loading-logo {
+  margin-bottom: var(--ucl-spacing-xl);
+}
+
+.ucl-logo {
+  font-size: 4rem;
+  margin-bottom: var(--ucl-spacing-md);
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.loading-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 var(--ucl-spacing-sm) 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-subtitle {
+  font-size: 1.1rem;
+  margin: 0 0 var(--ucl-spacing-xl) 0;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+/* Barre de progression */
+.loading-progress-container {
+  margin-bottom: var(--ucl-spacing-xl);
+}
+
+.loading-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--ucl-spacing-sm);
+}
+
+.loading-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffffff, #e0f2fe);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  animation: progressShimmer 2s ease-in-out infinite;
+}
+
+@keyframes progressShimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+.loading-percentage {
+  font-size: var(--ucl-font-size-sm);
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* Message de chargement */
+.loading-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ucl-spacing-sm);
+  margin-bottom: var(--ucl-spacing-xl);
+}
+
+.loading-text {
+  font-size: var(--ucl-font-size-base);
+  font-weight: 500;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  animation: loadingDots 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes loadingDots {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Conseils utiles */
+.loading-tips {
+  margin-bottom: var(--ucl-spacing-xl);
+}
+
+.loading-tip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--ucl-spacing-sm);
+  margin-bottom: var(--ucl-spacing-md);
+  padding: var(--ucl-spacing-sm);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--ucl-border-radius);
+  backdrop-filter: blur(10px);
+  animation: tipSlideIn 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.loading-tip:nth-child(1) { animation-delay: 1s; }
+.loading-tip:nth-child(2) { animation-delay: 1.5s; }
+.loading-tip:nth-child(3) { animation-delay: 2s; }
+
+@keyframes tipSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.tip-icon {
+  font-size: 1.2em;
+  flex-shrink: 0;
+}
+
+.loading-tip span:last-child {
+  font-size: var(--ucl-font-size-sm);
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* Footer */
+.loading-footer {
+  opacity: 0.7;
+  font-size: var(--ucl-font-size-sm);
+  animation: fadeInUp 1s ease-out 2.5s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .loading-content {
+    padding: var(--ucl-spacing-lg);
+  }
+
+  .loading-title {
+    font-size: 2rem;
+  }
+
+  .ucl-logo {
+    font-size: 3rem;
+  }
+
+  .loading-tip {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--ucl-spacing-xs);
+  }
+}
+
+/* Animation d'entrée pour l'écran de chargement */
+.loading-screen {
+  animation: loadingScreenFadeIn 0.5s ease-out;
+}
+
+@keyframes loadingScreenFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animation de sortie */
+.loading-screen.fade-out {
+  animation: loadingScreenFadeOut 0.5s ease-out forwards;
+}
+
+@keyframes loadingScreenFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

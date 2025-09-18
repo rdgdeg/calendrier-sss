@@ -2773,29 +2773,40 @@ HEME CLAIR MODERNE ===== */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.description-sentence {
-  margin-bottom: 12px;
+.description-paragraph {
+  margin-bottom: 16px;
   line-height: 1.7;
   color: #374151;
   font-size: 15px;
-  padding: 8px 0;
-  border-bottom: 1px solid #f3f4f6;
+  text-align: justify;
 }
 
-.description-sentence:last-child {
+.description-paragraph:last-child {
   margin-bottom: 0;
-  border-bottom: none;
 }
 
-.description-sentence.important-info {
+.description-paragraph.important-info {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
-  padding: 12px 16px;
+  padding: 16px 20px;
   border-radius: 8px;
   border-left: 4px solid #f59e0b;
   font-weight: 500;
   color: #92400e;
-  margin: 16px 0;
-  border-bottom: none;
+  margin: 20px 0;
+}
+
+.description-paragraph.paragraph-title {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 16px;
+  margin-bottom: 8px;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.description-paragraph.paragraph-title:first-child {
+  margin-top: 0;
 }
 
 .description-line {

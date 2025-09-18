@@ -100,56 +100,65 @@ export const Calendar: React.FC = () => {
     setTooltip(prev => ({ ...prev, visible: false }));
   };
 
-  // Fonction améliorée pour formater la description avec retours à la ligne après chaque phrase
+  // Fonction intelligente pour formater la description en préservant la structure HTML originale
   const formatDescription = (description: string): JSX.Element[] => {
     if (!description) return [];
     
-    // Préserver les retours à la ligne HTML avant le nettoyage
-    let processedText = description
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/p>/gi, '\n\n')
-      .replace(/<p[^>]*>/gi, '')
-      .replace(/<\/div>/gi, '\n')
-      .replace(/<div[^>]*>/gi, '');
+    // Étape 1: Identifier et préserver les structures HTML importantes
+    let processedText = description;
     
-    const cleanText = cleanHtmlContent(processedText);
+    // Préserver les paragraphes HTML réels
+    const paragraphs: string[] = [];
     
-    // Diviser le texte en phrases (après chaque point suivi d'un espace ou fin de ligne)
-    const sentences = cleanText
-      .split(/\.(?:\s+|$)/)
-      .map(sentence => sentence.trim())
-      .filter(sentence => sentence.length > 0)
-      .map(sentence => sentence.endsWith('.') ? sentence : sentence + '.');
+    // Si le contenu contient des balises <p>, les utiliser comme séparateurs naturels
+    if (processedText.includes('<p>') || processedText.includes('<P>')) {
+      paragraphs.push(...processedText
+        .split(/<\/?p[^>]*>/gi)
+        .map(p => p.trim())
+        .filter(p => p.length > 0));
+    }
+    // Sinon, chercher les doubles retours à la ligne ou les <br><br>
+    else if (processedText.includes('<br>') || processedText.includes('<BR>')) {
+      paragraphs.push(...processedText
+        .split(/<br\s*\/?>\s*<br\s*\/?>/gi)
+        .map(p => p.replace(/<br\s*\/?>/gi, '\n').trim())
+        .filter(p => p.length > 0));
+    }
+    // Sinon, chercher les doubles retours à la ligne naturels
+    else if (processedText.includes('\n\n')) {
+      paragraphs.push(...processedText
+        .split(/\n\s*\n/)
+        .map(p => p.trim())
+        .filter(p => p.length > 0));
+    }
+    // En dernier recours, traiter comme un seul bloc
+    else {
+      paragraphs.push(processedText);
+    }
     
-    // Regrouper les phrases courtes ensemble (moins de 50 caractères)
-    const groupedSentences: string[] = [];
-    let currentGroup = '';
-    
-    sentences.forEach((sentence, index) => {
-      if (sentence.length < 50 && currentGroup.length < 100) {
-        currentGroup += (currentGroup ? ' ' : '') + sentence;
-      } else {
-        if (currentGroup) {
-          groupedSentences.push(currentGroup);
-          currentGroup = '';
-        }
-        groupedSentences.push(sentence);
-      }
+    return paragraphs.map((paragraph, index) => {
+      // Nettoyer le HTML du paragraphe
+      let cleanParagraph = cleanHtmlContent(paragraph);
       
-      // Ajouter le dernier groupe s'il existe
-      if (index === sentences.length - 1 && currentGroup) {
-        groupedSentences.push(currentGroup);
-      }
-    });
-    
-    return groupedSentences.map((sentence, index) => {
-      // Détecter les informations importantes (contenant des mots-clés)
-      const isImportant = /(?:date|heure|lieu|contact|inscription|programme|horaire|adresse|public|catégories)/i.test(sentence);
+      // Remplacer les <br> simples par des retours à la ligne
+      cleanParagraph = cleanParagraph.replace(/\n/g, ' ').trim();
       
-      // Détecter les listes (contenant des puces ou des énumérations)
-      if (sentence.includes('*') || sentence.includes('•') || sentence.includes('-') || /^\d+\./.test(sentence.trim())) {
-        const listItems = sentence
-          .split(/[*•-]|\d+\./)
+      // Détecter les informations importantes
+      const isImportant = /(?:date|heure|lieu|contact|inscription|programme|horaire|adresse|public|catégories|attention|important|note)/i.test(cleanParagraph);
+      
+      // Détecter les listes (lignes avec puces ou numéros)
+      const listPatterns = [
+        /^\s*[*•-]\s+/gm,  // Puces
+        /^\s*\d+[\.)]\s+/gm, // Numéros
+        /^\s*[a-zA-Z][\.)]\s+/gm // Lettres
+      ];
+      
+      const isListContent = listPatterns.some(pattern => pattern.test(paragraph));
+      
+      if (isListContent) {
+        // Traiter comme une liste
+        const listItems = cleanParagraph
+          .split(/(?:^|\n)\s*(?:[*•-]|\d+[\.)]|[a-zA-Z][\.)])\s+/)
           .map(item => item.trim())
           .filter(item => item.length > 0);
         
@@ -164,12 +173,20 @@ export const Calendar: React.FC = () => {
         }
       }
       
+      // Détecter les titres (texte court en majuscules ou avec des mots-clés)
+      const isTitle = (
+        cleanParagraph.length < 80 && 
+        (cleanParagraph === cleanParagraph.toUpperCase() || 
+         /^(programme|horaire|lieu|contact|inscription|objectif|public)/i.test(cleanParagraph))
+      );
+      
+      // Traiter comme un paragraphe normal
       return (
         <div 
           key={index} 
-          className={`description-sentence ${isImportant ? 'important-info' : ''}`}
+          className={`description-paragraph ${isImportant ? 'important-info' : ''} ${isTitle ? 'paragraph-title' : ''}`}
         >
-          {sentence}
+          {cleanParagraph}
         </div>
       );
     });

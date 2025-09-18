@@ -34,11 +34,11 @@ export const UniversalSidebar: React.FC<UniversalSidebarProps> = ({
             <div className="sidebar-event-content">
                 <div className="sidebar-event-header">
                     <h4 className="sidebar-event-title">
-                        {event.title}
+                        {event.title.length > 50 ? `${event.title.substring(0, 47)}...` : event.title}
                     </h4>
                     <div className="sidebar-event-source">
                         <span className={`source-badge ${event.source}`}>
-                            {event.source === 'icloud' ? 'de Duve' : '📧 SSS'}
+                            {event.source === 'icloud' ? '🏥' : '📧'}
                         </span>
                     </div>
                 </div>
@@ -57,14 +57,14 @@ export const UniversalSidebar: React.FC<UniversalSidebarProps> = ({
 
                 {event.location && (
                     <div className="sidebar-event-location">
-                        📍 {event.location}
+                        📍 {event.location.length > 30 ? `${event.location.substring(0, 27)}...` : event.location}
                     </div>
                 )}
 
                 {event.description && (
                     <div className="sidebar-event-description">
-                        {event.description.length > 100
-                            ? `${event.description.substring(0, 100)}...`
+                        {event.description.length > 60
+                            ? `${event.description.substring(0, 57)}...`
                             : event.description
                         }
                     </div>

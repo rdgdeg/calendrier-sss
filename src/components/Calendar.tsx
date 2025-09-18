@@ -20,7 +20,7 @@ import { useSearch } from '../hooks/useSearch';
 import { EVENT_TYPES } from '../utils/eventCategories';
 import { KeyboardNavigation, KeyboardShortcutsHelp } from './KeyboardNavigation';
 import { HelpSystem, FAQSection } from './HelpSystem';
-import { AdvancedSearch } from './AdvancedSearch';
+
 import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
@@ -613,16 +613,6 @@ export const Calendar: React.FC = () => {
         </div>
 
         <div className="calendar-search-section">
-          <AdvancedSearch
-            events={events}
-            onSearchResults={(_, query) => {
-              setQuery(query);
-            }}
-            onClearSearch={() => {
-              clearSearch();
-            }}
-          />
-          
           <SearchBar
             events={events}
             onSearchResults={(_, query) => {
@@ -631,7 +621,7 @@ export const Calendar: React.FC = () => {
             onClearSearch={() => {
               clearSearch();
             }}
-            placeholder="Recherche rapide dans les événements..."
+            placeholder="Rechercher dans les événements..."
           />
           
           {/* Bouton pour aller aux résultats ou message si aucun résultat */}

@@ -170,8 +170,10 @@ export const Calendar: React.FC = () => {
             color: cached.color || '#6c757d',
             allDay: false,
             category: {
+              id: `${cached.source}-${cached.category || 'default'}`,
               name: cached.category || 'default',
-              color: cached.color || '#6c757d'
+              color: cached.color || '#6c757d',
+              source: cached.source as 'icloud' | 'outlook'
             }
           }));
           
@@ -186,7 +188,7 @@ export const Calendar: React.FC = () => {
       setLoadingMessage('Chargement des calendriers...');
       setLoadingProgress(30);
       
-      const sourcePromises = CALENDAR_SOURCES.map(async (source, index) => {
+      const sourcePromises = CALENDAR_SOURCES.map(async (source) => {
         try {
           setLoadingMessage(`Chargement ${source.name}...`);
           const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
@@ -238,7 +240,9 @@ export const Calendar: React.FC = () => {
             color: sourceConfig?.color || (event.source === 'icloud' ? '#ff6b6b' : '#4ecdc4'),
             category: {
               ...event.category,
-              color: sourceConfig?.color || (event.source === 'icloud' ? '#ff6b6b' : '#4ecdc4')
+              id: event.category.id || `${event.source}-${event.category.name}`,
+              color: sourceConfig?.color || (event.source === 'icloud' ? '#ff6b6b' : '#4ecdc4'),
+              source: event.source
             }
           };
         });

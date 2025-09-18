@@ -4322,7 +4322,7 @@ SPONSIVE DESIGN ===== */
   }
 }
 
-/ *=====STYLES POUR LES NOUVELLES SOURCES=====*/
+/*=====STYLES POUR LES NOUVELLES SOURCES=====*/
 /* Indicateurs de source avec nouvelles icônes */
 .source-indicator.icloud::before {
   content: "🧬";
@@ -5337,7 +5337,8 @@ HEME CLAIR MODERNE ===== */
   font-size: 16px;
 }
 
-/ *=====STYLES POUR VUE AGENDA=====*/ .agenda-view {
+/*=====STYLES POUR VUE AGENDA=====*/
+.agenda-view {
   background: #ffffff;
   padding: 20px;
 }
@@ -6597,7 +6598,8 @@ Styles pour les événements de la vue semaine */
   margin-top: 2px;
 }
 
-/ * Correction pour le numéro du jour d'aujourd' hui */ .day-number {
+/* Correction pour le numéro du jour d'aujourd'hui */
+.day-number {
   font-weight: var(--ucl-font-weight-semibold);
   margin-bottom: var(--ucl-spacing-xs);
   font-size: var(--ucl-font-size-sm);
@@ -6860,7 +6862,8 @@ vent Legend */
   }
 }
 
-/ * Agenda event category colors */ .agenda-event.category-colloque .time-dot {
+/* Agenda event category colors */
+.agenda-event.category-colloque .time-dot {
   background-color: #003d7a !important;
 }
 
@@ -8502,7 +8505,8 @@ méliorations supplémentaires pour la lisibilité des événements */
   }
 }
 
-/ *=====FILTRES COMPACTS EN LIGNE=====*/ .calendar-filters-section {
+/*=====FILTRES COMPACTS EN LIGNE=====*/
+.calendar-filters-section {
   background: var(--ucl-white);
   border-bottom: 1px solid var(--ucl-gray-200);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);

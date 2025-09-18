@@ -6,15 +6,13 @@ interface KeyboardNavigationProps {
   onGoToToday: () => void;
   onViewChange: (view: CalendarView) => void;
   onRefresh: () => void;
-  currentView: CalendarView;
 }
 
 export const KeyboardNavigation: React.FC<KeyboardNavigationProps> = ({
   onNavigateDate,
   onGoToToday,
   onViewChange,
-  onRefresh,
-  currentView
+  onRefresh
 }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

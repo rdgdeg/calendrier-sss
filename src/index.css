@@ -9896,8 +9896,8 @@ Calendar Header Styles */
     text-align: center;
   }
 }
-/* 
-Styles pour les nouveaux éléments du header */
+
+/* Styles pour les nouveaux éléments du header */
 .calendar-main-header-compact {
   display: flex;
   justify-content: space-between;
@@ -9905,9 +9905,27 @@ Styles pour les nouveaux éléments du header */
   padding: var(--ucl-spacing-sm) var(--ucl-spacing-lg);
 }
 
+.header-actions-group {
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-lg);
+}
+
+.header-refresh-actions {
+  display: flex;
+  gap: var(--ucl-spacing-sm);
+}
+
 .header-help-actions {
   display: flex;
   gap: var(--ucl-spacing-sm);
+}
+
+/* Boutons compacts dans le header */
+.nav-button.compact {
+  padding: var(--ucl-spacing-xs) var(--ucl-spacing-md);
+  font-size: var(--ucl-font-size-sm);
+  min-height: 32px;
 }
 
 .help-shortcut-btn,
@@ -9947,6 +9965,15 @@ Styles pour les nouveaux éléments du header */
     flex-direction: column;
     gap: var(--ucl-spacing-sm);
     text-align: center;
+  }
+
+  .header-actions-group {
+    flex-direction: column;
+    gap: var(--ucl-spacing-sm);
+  }
+
+  .header-refresh-actions {
+    justify-content: center;
   }
 
   .header-help-actions {

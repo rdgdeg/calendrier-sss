@@ -507,7 +507,6 @@ export const Calendar: React.FC = () => {
         onGoToToday={goToToday}
         onViewChange={setCurrentView}
         onRefresh={() => loadEvents(true)}
-        currentView={currentView}
       />
       
       <NetworkStatus />
@@ -530,21 +529,41 @@ export const Calendar: React.FC = () => {
           <h1 className="calendar-main-title-compact">
             📅 Calendrier SSS - UCLouvain
           </h1>
-          <div className="header-help-actions">
-            <button
-              className="help-shortcut-btn"
-              onClick={() => setShowKeyboardHelp(true)}
-              title="Raccourcis clavier (Ctrl+?)"
-            >
-              ⌨️
-            </button>
-            <button
-              className="faq-btn"
-              onClick={() => setShowFAQ(true)}
-              title="Questions fréquentes"
-            >
-              ❓
-            </button>
+          <div className="header-actions-group">
+            <div className="header-refresh-actions">
+              <button 
+                onClick={() => loadEvents()} 
+                className="nav-button refresh-button compact"
+                aria-label="Actualiser les calendriers"
+                title="Actualiser les calendriers (rechargement complet)"
+              >
+                🔄 Actualiser
+              </button>
+              <button 
+                onClick={() => loadEvents(true)} 
+                className="nav-button clear-cache-button compact"
+                aria-label="Forcer le rechargement"
+                title="Vider le cache et recharger complètement"
+              >
+                🗑️ Vider cache
+              </button>
+            </div>
+            <div className="header-help-actions">
+              <button
+                className="help-shortcut-btn"
+                onClick={() => setShowKeyboardHelp(true)}
+                title="Raccourcis clavier (Ctrl+?)"
+              >
+                ⌨️
+              </button>
+              <button
+                className="faq-btn"
+                onClick={() => setShowFAQ(true)}
+                title="Questions fréquentes"
+              >
+                ❓
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -596,7 +615,7 @@ export const Calendar: React.FC = () => {
         <div className="calendar-search-section">
           <AdvancedSearch
             events={events}
-            onSearchResults={(results, query) => {
+            onSearchResults={(_, query) => {
               setQuery(query);
             }}
             onClearSearch={() => {
@@ -651,24 +670,7 @@ export const Calendar: React.FC = () => {
           />
         </div>
         
-        <div className="header-actions">
-          <button 
-            onClick={() => loadEvents()} 
-            className="nav-button refresh-button"
-            aria-label="Actualiser les calendriers"
-            title="Actualiser les calendriers (rechargement complet)"
-          >
-            🔄 Actualiser
-          </button>
-          <button 
-            onClick={() => loadEvents(true)} 
-            className="nav-button clear-cache-button"
-            aria-label="Forcer le rechargement"
-            title="Vider le cache et recharger complètement"
-          >
-            🗑️ Vider cache
-          </button>
-        </div>
+
       </div>
       )}
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { CalendarEvent } from '../../types';
 import { format, isToday } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { getHighContrastBackgroundColor, getOptimalTextColor, darkenColor } from '../../utils/colorUtils';
+
 
 interface DisplayViewProps {
   currentDate: Date;
@@ -25,17 +25,7 @@ export const DisplayView: React.FC<DisplayViewProps> = ({
       .slice(0, daysToShow); // Utiliser daysToShow comme nombre d'événements
   };
 
-  // Grouper les événements par date
-  const groupEventsByDate = (events: CalendarEvent[]): Record<string, CalendarEvent[]> => {
-    return events.reduce((groups, event) => {
-      const dateKey = format(event.start, 'yyyy-MM-dd');
-      if (!groups[dateKey]) {
-        groups[dateKey] = [];
-      }
-      groups[dateKey].push(event);
-      return groups;
-    }, {} as Record<string, CalendarEvent[]>);
-  };
+
 
 
 

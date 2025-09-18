@@ -143,43 +143,9 @@ export const Calendar: React.FC = () => {
     try {
       console.log('🚀 Starting calendar load...');
       
-      // Si on force le rechargement, vider le cache d'abord
-      if (forceRefresh) {
-        console.log('🗑️ Clearing cache for fresh reload...');
-        await clearCache();
-      }
-      
-      // Essayer de charger depuis le cache d'abord (seulement si pas de force refresh)
-      if (!forceRefresh) {
-        const cachedEvents = await getCachedEvents();
-        if (cachedEvents.length > 0) {
-          console.log('📦 Loading from cache:', cachedEvents.length, 'events');
-          const convertedEvents: CalendarEvent[] = cachedEvents.map(cached => {
-            const sourceConfig = CALENDAR_SOURCES.find(s => s.source === cached.source);
-            const sourceColor = sourceConfig?.color || (cached.source === 'icloud' ? '#ff6b6b' : '#003d7a');
-            
-            return {
-              id: cached.event_id,
-              title: cached.title,
-              start: new Date(cached.start_date),
-              end: new Date(cached.end_date),
-              description: cached.description || '',
-              location: cached.location || '',
-              source: cached.source as 'icloud' | 'outlook',
-              allDay: false,
-              category: {
-                id: cached.category,
-                name: cached.category,
-                color: sourceColor,
-                source: cached.source as 'icloud' | 'outlook'
-              },
-              color: sourceColor
-            };
-          });
-          setEvents(convertedEvents);
-          setDebugInfo(`Cache: ${convertedEvents.length} événements chargés`);
-        }
-      }
+      // Toujours vider le cache pour s'assurer d'avoir les données les plus récentes
+      console.log('🗑️ Clearing cache to ensure fresh data...');
+      await clearCache();
 
       // Charger les événements frais en arrière-plan
       const allEvents: CalendarEvent[] = [];
@@ -268,7 +234,8 @@ export const Calendar: React.FC = () => {
   };
 
   useEffect(() => {
-    loadEvents();
+    // Toujours forcer le rechargement au démarrage pour avoir les données les plus récentes
+    loadEvents(true);
   }, []);
 
 
@@ -547,7 +514,7 @@ export const Calendar: React.FC = () => {
                   className="filter-select-compact"
                 >
                   <option value="all">Tous</option>
-                  <option value="icloud">🍎 Duve</option>
+                  <option value="icloud">🍎 de Duve</option>
                   <option value="outlook">📧 SSS</option>
                 </select>
               </div>

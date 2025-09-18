@@ -39,7 +39,7 @@ export const UniversalSidebar: React.FC<UniversalSidebarProps> = ({
                     <div className="sidebar-event-source">
                         <span className={`source-badge ${event.source}`}>
                             {event.source === 'icloud' ? '🍎' : '📧'}
-                            {event.source === 'icloud' ? 'Duve' : 'SSS'}
+                            {event.source === 'icloud' ? 'de Duve' : 'SSS'}
                         </span>
                     </div>
                 </div>

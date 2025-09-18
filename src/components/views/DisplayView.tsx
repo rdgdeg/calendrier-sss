@@ -129,14 +129,14 @@ export const DisplayView: React.FC<DisplayViewProps> = ({
                       </div>
                       <div className="display-event-source-compact">
                         <span className={`source-badge-compact ${event.source}`}>
-                          {event.source === 'icloud' ? 'DUVE' : 'SSS'}
+                          {event.source === 'icloud' ? 'de Duve' : 'SSS'}
                         </span>
                       </div>
                     </div>
                     
                     <div className="display-event-body">
                       <div className="display-event-title-compact">
-                        {formatTitle(event.title, 55)}
+                        {formatTitle(event.title, 250)}
                       </div>
                       
                       {event.location && (

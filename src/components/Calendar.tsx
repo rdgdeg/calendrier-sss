@@ -271,6 +271,8 @@ export const Calendar: React.FC = () => {
     loadEvents();
   }, []);
 
+
+
   const navigateDate = (direction: 'prev' | 'next') => {
     setCurrentDate(prev => {
       switch (currentView) {
@@ -479,23 +481,28 @@ export const Calendar: React.FC = () => {
             events={events}
             onSearchResults={(results, query) => {
               setQuery(query);
-              // Scroller vers les résultats après un court délai
-              if (query.trim() && searchResultsRef.current) {
-                setTimeout(() => {
-                  searchResultsRef.current?.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                  });
-                }, 100);
-              }
             }}
             onClearSearch={() => {
               clearSearch();
-              // Remonter vers le calendrier quand on efface la recherche
-              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             placeholder="Rechercher dans les événements..."
           />
+          
+          {/* Bouton pour aller aux résultats */}
+          {searchState.isSearching && searchState.results.length > 0 && (
+            <button
+              className="scroll-to-results-btn"
+              onClick={() => {
+                searchResultsRef.current?.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'start' 
+                });
+              }}
+              title="Voir les résultats de recherche"
+            >
+              📍 Voir les {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} ↓
+            </button>
+          )}
         </div>
         
         <h2 className="month-year">

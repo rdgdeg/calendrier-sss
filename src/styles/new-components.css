@@ -638,26 +638,31 @@ RT/PRINT MODAL === */
   font-weight: var(--ucl-font-weight-semibold);
   color: var(--ucl-primary);
   margin-bottom: var(--ucl-spacing-sm);
+  text-align: left;
+  font-size: var(--ucl-font-size-base);
 }
 
 .export-format-options {
   display: flex;
   flex-direction: column;
   gap: var(--ucl-spacing-sm);
+  text-align: left;
 }
 
 .export-radio-option,
 .export-checkbox-option {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--ucl-spacing-sm);
   cursor: pointer;
-  padding: var(--ucl-spacing-sm);
+  padding: var(--ucl-spacing-md);
   border-radius: var(--ucl-border-radius);
   transition: all var(--ucl-transition);
   background: var(--ucl-white);
-  border: 1px solid var(--ucl-gray-200);
-  margin-bottom: var(--ucl-spacing-xs);
+  border: 1px solid var(--ucl-gray-300);
+  margin-bottom: var(--ucl-spacing-sm);
+  text-align: left;
+  color: var(--ucl-text-primary);
 }
 
 .export-radio-option:hover,
@@ -670,9 +675,11 @@ RT/PRINT MODAL === */
 
 .export-radio-option input,
 .export-checkbox-option input {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   accent-color: var(--ucl-primary);
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .export-date-range {
@@ -693,8 +700,9 @@ RT/PRINT MODAL === */
 
 .export-date-field label {
   font-weight: var(--ucl-font-weight-medium);
-  color: var(--ucl-text-secondary);
+  color: var(--ucl-text-primary);
   font-size: var(--ucl-font-size-sm);
+  text-align: left;
 }
 
 .export-date-field input {
@@ -714,6 +722,7 @@ RT/PRINT MODAL === */
   display: flex;
   flex-direction: column;
   gap: var(--ucl-spacing-sm);
+  text-align: left;
 }
 
 .export-preview {
@@ -721,11 +730,13 @@ RT/PRINT MODAL === */
   padding: var(--ucl-spacing-md);
   border-radius: var(--ucl-border-radius);
   border-left: 3px solid var(--ucl-primary);
+  text-align: left;
 }
 
 .export-preview p {
   margin: 0;
-  color: var(--ucl-text-secondary);
+  color: var(--ucl-text-primary);
+  font-weight: var(--ucl-font-weight-medium);
 }
 
 .export-modal-footer {
@@ -786,13 +797,16 @@ RT/PRINT MODAL === */
   .export-btn-confirm {
     width: 100%;
   }
-}/* 
-Descriptions des options d'export */
+}
+
+/* Descriptions des options d'export */
 .export-option-description {
   font-size: var(--ucl-font-size-sm);
-  color: var(--ucl-text-secondary);
-  margin-top: 2px;
+  color: var(--ucl-gray-600);
+  margin-top: 4px;
   font-style: italic;
+  line-height: 1.4;
+  text-align: left;
 }
 
 /* Amélioration de la lisibilité des labels */
@@ -829,4 +843,50 @@ Descriptions des options d'export */
     left: 10px;
     min-width: auto;
   }
+}/* A
+mélioration de la lisibilité des options d'export */
+.export-option-content {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  width: 100%;
+}
+
+.export-option-title {
+  font-weight: var(--ucl-font-weight-semibold);
+  color: var(--ucl-text-primary);
+  font-size: var(--ucl-font-size-base);
+  margin-bottom: 4px;
+}
+
+/* Correction générale des couleurs de texte dans la modal */
+.export-modal * {
+  color: var(--ucl-text-primary);
+}
+
+.export-modal label,
+.export-modal span:not(.export-option-description) {
+  color: var(--ucl-text-primary) !important;
+}
+
+/* Amélioration des contrastes */
+.export-radio-option:hover .export-option-title,
+.export-checkbox-option:hover span {
+  color: var(--ucl-primary);
+}
+
+/* Correction spécifique pour les inputs de date */
+.export-date-field input {
+  color: var(--ucl-text-primary);
+  background: var(--ucl-white);
+}
+
+/* Amélioration de l'option group */
+.export-option-group {
+  margin-bottom: var(--ucl-spacing-xl);
+  text-align: left;
+}
+
+.export-option-group:last-child {
+  margin-bottom: var(--ucl-spacing-lg);
 }

@@ -279,8 +279,8 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
                       checked={exportOptions.format === 'print'}
                       onChange={(e) => setExportOptions(prev => ({ ...prev, format: e.target.value as any }))}
                     />
-                    <div>
-                      <span>🖨️ Imprimer / PDF</span>
+                    <div className="export-option-content">
+                      <span className="export-option-title">🖨️ Imprimer / PDF</span>
                       <div className="export-option-description">Génère une version imprimable avec mise en page professionnelle</div>
                     </div>
                   </label>
@@ -292,8 +292,8 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
                       checked={exportOptions.format === 'csv'}
                       onChange={(e) => setExportOptions(prev => ({ ...prev, format: e.target.value as any }))}
                     />
-                    <div>
-                      <span>📊 Fichier CSV</span>
+                    <div className="export-option-content">
+                      <span className="export-option-title">📊 Fichier CSV</span>
                       <div className="export-option-description">Exporte les données pour Excel ou Google Sheets</div>
                     </div>
                   </label>

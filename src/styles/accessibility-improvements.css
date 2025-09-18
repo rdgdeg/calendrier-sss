@@ -1,0 +1,242 @@
+/* Améliorations d'accessibilité pour le calendrier SSS */
+
+/* Focus visible amélioré */
+*:focus {
+  outline: 2px solid var(--ucl-primary);
+  outline-offset: 2px;
+  border-radius: var(--ucl-border-radius-sm);
+}
+
+/* Navigation au clavier */
+.calendar-day:focus {
+  background: rgba(0, 61, 122, 0.1);
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.event-item:focus {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 20;
+}
+
+/* Contraste amélioré pour les textes */
+.event-item {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  font-weight: 600;
+}
+
+/* Indicateurs visuels pour les états */
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--ucl-gray-400);
+}
+
+.loading-state {
+  position: relative;
+}
+
+.loading-state::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--ucl-gray-300);
+  border-top: 2px solid var(--ucl-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Amélioration des messages d'erreur */
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--ucl-danger);
+  border-radius: var(--ucl-border-radius);
+  padding: var(--ucl-spacing-md);
+  color: var(--ucl-danger);
+  margin: var(--ucl-spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-sm);
+}
+
+.error-message::before {
+  content: "⚠️";
+  font-size: 1.2em;
+}
+
+/* Messages de succès */
+.success-message {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid var(--ucl-success);
+  border-radius: var(--ucl-border-radius);
+  padding: var(--ucl-spacing-md);
+  color: var(--ucl-success);
+  margin: var(--ucl-spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-sm);
+}
+
+.success-message::before {
+  content: "✅";
+  font-size: 1.2em;
+}
+
+/* Amélioration des tooltips pour l'accessibilité */
+.event-tooltip {
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: var(--ucl-spacing-sm);
+  border-radius: var(--ucl-border-radius);
+  font-size: var(--ucl-font-size-sm);
+  max-width: 300px;
+  white-space: pre-line;
+  z-index: 1000;
+  position: fixed;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Styles pour les raccourcis clavier */
+.shortcuts-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.shortcuts-modal {
+  background: white;
+  border-radius: var(--ucl-border-radius-lg);
+  padding: var(--ucl-spacing-xl);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--ucl-shadow-xl);
+}
+
+.shortcuts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--ucl-spacing-lg);
+  border-bottom: 1px solid var(--ucl-gray-200);
+  padding-bottom: var(--ucl-spacing-md);
+}
+
+.shortcuts-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--ucl-gray-500);
+  padding: var(--ucl-spacing-xs);
+  border-radius: var(--ucl-border-radius);
+}
+
+.shortcuts-close:hover {
+  background: var(--ucl-gray-100);
+  color: var(--ucl-gray-700);
+}
+
+.shortcuts-section {
+  margin-bottom: var(--ucl-spacing-lg);
+}
+
+.shortcuts-section h4 {
+  color: var(--ucl-primary);
+  margin-bottom: var(--ucl-spacing-md);
+  font-weight: var(--ucl-font-weight-semibold);
+}
+
+.shortcut-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--ucl-spacing-sm) 0;
+  border-bottom: 1px solid var(--ucl-gray-100);
+}
+
+.shortcut-item:last-child {
+  border-bottom: none;
+}
+
+kbd {
+  background: var(--ucl-gray-100);
+  border: 1px solid var(--ucl-gray-300);
+  border-radius: var(--ucl-border-radius-sm);
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: var(--ucl-gray-700);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Mode sombre pour les préférences système */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ucl-bg-primary: #1e293b;
+    --ucl-bg-secondary: #334155;
+    --ucl-text-primary: #f1f5f9;
+    --ucl-text-secondary: #cbd5e1;
+    --ucl-border: #475569;
+  }
+
+  .calendar-container {
+    background: var(--ucl-bg-primary);
+    color: var(--ucl-text-primary);
+  }
+
+  .calendar-grid {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border);
+  }
+
+  .calendar-day {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border);
+  }
+
+  .calendar-day:hover {
+    background: #475569;
+  }
+}
+
+/* Réduction des animations pour les utilisateurs sensibles */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Amélioration du contraste pour les daltoniens */
+@media (prefers-contrast: high) {
+  .event-item {
+    border-width: 2px;
+    font-weight: 700;
+  }
+
+  .nav-button {
+    border-width: 2px;
+  }
+}

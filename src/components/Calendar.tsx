@@ -18,6 +18,10 @@ import { SkeletonLoader } from './SkeletonLoader';
 import { ProgressBar } from './ProgressBar';
 import { useSearch } from '../hooks/useSearch';
 import { EVENT_TYPES } from '../utils/eventCategories';
+import { KeyboardNavigation, KeyboardShortcutsHelp } from './KeyboardNavigation';
+import { HelpSystem, FAQSection } from './HelpSystem';
+import { AdvancedSearch } from './AdvancedSearch';
+import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
@@ -44,6 +48,16 @@ export const Calendar: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('Initialisation...');
+  
+  // États pour les nouvelles fonctionnalités UX
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
+  const [showFAQ, setShowFAQ] = useState(false);
+  const [toast, setToast] = useState<{
+    type: 'success' | 'error' | 'info';
+    message: string;
+    isVisible: boolean;
+  }>({ type: 'info', message: '', isVisible: false });
+  const [isRealTimeLoading, setIsRealTimeLoading] = useState(false);
 
   
   // Hook de recherche
@@ -138,11 +152,21 @@ export const Calendar: React.FC = () => {
 
 
 
+  // Fonction pour afficher les notifications
+  const showToast = (type: 'success' | 'error' | 'info', message: string) => {
+    setToast({ type, message, isVisible: true });
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
+  };
+
   const loadEvents = async (forceRefresh = false) => {
     setLoading(true);
     setError(null);
     setLoadingProgress(0);
     setLoadingMessage('Initialisation...');
+    setIsRealTimeLoading(true);
     
     try {
       // Si forceRefresh est true, vider le cache d'abord
@@ -291,14 +315,19 @@ export const Calendar: React.FC = () => {
       
       setLoadingMessage('Terminé !');
       setLoadingProgress(100);
-
-
+      
+      // Notification de succès
+      if (forceRefresh) {
+        showToast('success', 'Calendriers actualisés avec succès !');
+      }
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
       setError(errorMessage);
+      showToast('error', `Erreur lors du chargement : ${errorMessage}`);
     } finally {
       setLoading(false);
+      setIsRealTimeLoading(false);
     }
   };
 
@@ -472,12 +501,51 @@ export const Calendar: React.FC = () => {
 
   return (
     <div className="calendar-container fade-in">
+      {/* Composants système */}
+      <KeyboardNavigation
+        onNavigateDate={navigateDate}
+        onGoToToday={goToToday}
+        onViewChange={setCurrentView}
+        onRefresh={() => loadEvents(true)}
+        currentView={currentView}
+      />
+      
+      <NetworkStatus />
+      
+      <RealTimeLoadingIndicator 
+        isLoading={isRealTimeLoading}
+        message="Synchronisation en cours..."
+      />
+      
+      <ToastNotification
+        type={toast.type}
+        message={toast.message}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
+
       {/* Header principal compact */}
       {currentView !== 'display' && (
         <div className="calendar-main-header-compact">
           <h1 className="calendar-main-title-compact">
             📅 Calendrier SSS - UCLouvain
           </h1>
+          <div className="header-help-actions">
+            <button
+              className="help-shortcut-btn"
+              onClick={() => setShowKeyboardHelp(true)}
+              title="Raccourcis clavier (Ctrl+?)"
+            >
+              ⌨️
+            </button>
+            <button
+              className="faq-btn"
+              onClick={() => setShowFAQ(true)}
+              title="Questions fréquentes"
+            >
+              ❓
+            </button>
+          </div>
         </div>
       )}
 
@@ -526,6 +594,16 @@ export const Calendar: React.FC = () => {
         </div>
 
         <div className="calendar-search-section">
+          <AdvancedSearch
+            events={events}
+            onSearchResults={(results, query) => {
+              setQuery(query);
+            }}
+            onClearSearch={() => {
+              clearSearch();
+            }}
+          />
+          
           <SearchBar
             events={events}
             onSearchResults={(_, query) => {
@@ -534,7 +612,7 @@ export const Calendar: React.FC = () => {
             onClearSearch={() => {
               clearSearch();
             }}
-            placeholder="Rechercher dans les événements..."
+            placeholder="Recherche rapide dans les événements..."
           />
           
           {/* Bouton pour aller aux résultats ou message si aucun résultat */}
@@ -732,6 +810,20 @@ export const Calendar: React.FC = () => {
       )}
 
       <Footer />
+      
+      {/* Système d'aide */}
+      <HelpSystem />
+      
+      {/* Modales d'aide */}
+      <KeyboardShortcutsHelp 
+        isVisible={showKeyboardHelp}
+        onClose={() => setShowKeyboardHelp(false)}
+      />
+      
+      <FAQSection
+        isVisible={showFAQ}
+        onClose={() => setShowFAQ(false)}
+      />
     </div>
   );
 };

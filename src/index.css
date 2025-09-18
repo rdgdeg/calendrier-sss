@@ -1,6 +1,12 @@
 /* Import Montserrat font */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap');
 
+/* Import des améliorations UX */
+@import './styles/mobile-improvements.css';
+@import './styles/accessibility-improvements.css';
+@import './styles/micro-interactions.css';
+@import './styles/new-components.css';
+
 /* UCLouvain Color Palette - Charte officielle */
 :root {
   /* Primary UCLouvain Colors - Couleurs officielles */
@@ -9888,5 +9894,66 @@ Calendar Header Styles */
   
   .month-year {
     text-align: center;
+  }
+}
+/* 
+Styles pour les nouveaux éléments du header */
+.calendar-main-header-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-lg);
+}
+
+.header-help-actions {
+  display: flex;
+  gap: var(--ucl-spacing-sm);
+}
+
+.help-shortcut-btn,
+.faq-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: var(--ucl-spacing-xs);
+  border-radius: var(--ucl-border-radius);
+  cursor: pointer;
+  font-size: 1.2em;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--ucl-transition);
+}
+
+.help-shortcut-btn:hover,
+.faq-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Amélioration de la section de recherche */
+.calendar-search-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ucl-spacing-sm);
+  width: 100%;
+}
+
+/* Responsive pour les nouveaux éléments */
+@media (max-width: 768px) {
+  .calendar-main-header-compact {
+    flex-direction: column;
+    gap: var(--ucl-spacing-sm);
+    text-align: center;
+  }
+
+  .header-help-actions {
+    justify-content: center;
+  }
+
+  .calendar-search-section {
+    padding: 0 var(--ucl-spacing-sm);
   }
 }

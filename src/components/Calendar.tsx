@@ -154,13 +154,28 @@ export const Calendar: React.FC = () => {
       for (const source of CALENDAR_SOURCES) {
         try {
           console.log(`📅 Loading ${source.name}...`);
+          console.log(`🔗 URL: ${source.url}`);
           debugMessages.push(`Loading ${source.name}...`);
+          debugMessages.push(`URL: ${source.url.substring(0, 50)}...`);
           
+          const startTime = Date.now();
           const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
+          const loadTime = Date.now() - startTime;
+          
           allEvents.push(...sourceEvents);
           
-          debugMessages.push(`${source.name}: ${sourceEvents.length} événements trouvés`);
-          console.log(`${source.name}: ${sourceEvents.length} événements trouvés`);
+          debugMessages.push(`${source.name}: ${sourceEvents.length} événements trouvés en ${loadTime}ms`);
+          console.log(`${source.name}: ${sourceEvents.length} événements trouvés en ${loadTime}ms`);
+          
+          // Log détaillé pour Outlook
+          if (source.source === 'outlook') {
+            console.log('📧 Outlook events details:', sourceEvents.map(e => ({
+              title: e.title,
+              start: e.start,
+              end: e.end,
+              id: e.id
+            })));
+          }
 
           // Synchroniser le statut avec Supabase
           await syncCalendarStatus({
@@ -496,6 +511,29 @@ export const Calendar: React.FC = () => {
             title="Actualiser les calendriers (rechargement complet)"
           >
             🔄 Actualiser
+          </button>
+          <button 
+            onClick={async () => {
+              console.log('🧪 Testing Outlook URL...');
+              const outlookSource = CALENDAR_SOURCES.find(s => s.source === 'outlook');
+              if (outlookSource) {
+                try {
+                  const response = await fetch(outlookSource.url);
+                  const text = await response.text();
+                  console.log('📧 Outlook response status:', response.status);
+                  console.log('📧 Outlook response length:', text.length);
+                  console.log('📧 Outlook response sample:', text.substring(0, 200));
+                  alert(`Outlook test: ${response.status} - ${text.length} chars`);
+                } catch (error) {
+                  console.error('📧 Outlook test error:', error);
+                  alert(`Outlook test error: ${error}`);
+                }
+              }
+            }} 
+            className="nav-button"
+            title="Tester l'URL Outlook"
+          >
+            🧪 Test Outlook
           </button>
         </div>
       </div>

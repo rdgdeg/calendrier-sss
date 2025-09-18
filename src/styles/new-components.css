@@ -817,7 +817,6 @@ RT/PRINT MODAL === */
 
 /* Correction du z-index pour tous les éléments de modal */
 .help-overlay,
-.shortcuts-modal-backdrop,
 .faq-modal-backdrop {
   z-index: 1150;
 }

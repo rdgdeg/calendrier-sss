@@ -17,7 +17,7 @@ import { SearchResults } from './SearchResults';
 
 import { useSearch } from '../hooks/useSearch';
 import { EVENT_TYPES } from '../utils/eventCategories';
-import { KeyboardNavigation, KeyboardShortcutsHelp } from './KeyboardNavigation';
+
 import { HelpSystem, FAQSection } from './HelpSystem';
 
 import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
@@ -51,7 +51,6 @@ export const Calendar: React.FC = () => {
   const [loadingMessage, setLoadingMessage] = useState('Initialisation...');
   
   // États pour les nouvelles fonctionnalités UX
-  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
   const [toast, setToast] = useState<{
     type: 'success' | 'error' | 'info';
@@ -507,12 +506,6 @@ export const Calendar: React.FC = () => {
   return (
     <div className="calendar-container fade-in">
       {/* Composants système */}
-      <KeyboardNavigation
-        onNavigateDate={navigateDate}
-        onGoToToday={goToToday}
-        onViewChange={setCurrentView}
-        onRefresh={() => loadEvents()}
-      />
       
       <NetworkStatus />
       
@@ -551,13 +544,6 @@ export const Calendar: React.FC = () => {
               />
             </div>
             <div className="header-help-actions">
-              <button
-                className="help-shortcut-btn"
-                onClick={() => setShowKeyboardHelp(true)}
-                title="Raccourcis clavier (Ctrl+?)"
-              >
-                ⌨️
-              </button>
               <button
                 className="faq-btn"
                 onClick={() => setShowFAQ(true)}
@@ -816,11 +802,6 @@ export const Calendar: React.FC = () => {
       <HelpSystem />
       
       {/* Modales d'aide */}
-      <KeyboardShortcutsHelp 
-        isVisible={showKeyboardHelp}
-        onClose={() => setShowKeyboardHelp(false)}
-      />
-      
       <FAQSection
         isVisible={showFAQ}
         onClose={() => setShowFAQ(false)}

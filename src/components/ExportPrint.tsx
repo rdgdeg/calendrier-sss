@@ -282,7 +282,7 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
           
           <div class="print-footer">
             <p><strong>Secteur des Sciences de la Santé - UCLouvain</strong></p>
-            <p>Rue Martin V 40, Bâtiments Les Arches, 1200 Woluwe-Saint-Lambert</p>
+            <p>Rue Martin V 40, Bâtiment Les Arches, 1200 Woluwe-Saint-Lambert</p>
             <p>${sortedEvents.length} événement(s) | Généré le ${format(new Date(), 'dd/MM/yyyy à HH:mm', { locale: fr })}</p>
           </div>
         </body>

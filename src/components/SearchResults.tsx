@@ -38,8 +38,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           </h4>
           <div className="search-result-source">
             <span className={`source-badge ${event.source}`}>
-              {event.source === 'icloud' ? '🍎' : '📧'}
-              {event.source === 'icloud' ? 'de Duve' : 'SSS'}
+              {event.source === 'icloud' ? 'de Duve' : '📧 SSS'}
             </span>
           </div>
         </div>

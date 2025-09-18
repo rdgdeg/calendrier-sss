@@ -481,7 +481,7 @@ export const Calendar: React.FC = () => {
                   className="filter-select-compact"
                 >
                   <option value="all">Tous</option>
-                  <option value="icloud">🍎 de Duve</option>
+                  <option value="icloud">de Duve</option>
                   <option value="outlook">📧 SSS</option>
                 </select>
               </div>

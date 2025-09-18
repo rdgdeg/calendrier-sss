@@ -6,7 +6,7 @@ const CALENDAR_SOURCES = [
     name: 'de Duve',
     source: 'icloud',
     color: '#ff6b6b',
-    icon: '🍎'
+    icon: ''
   },
   {
     name: 'Secteur SSS',

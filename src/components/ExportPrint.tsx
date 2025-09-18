@@ -55,7 +55,7 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
       end: endDate.toLocaleDateString('fr-FR')
     });
     console.log('Filtered events:', filteredEvents.length);
-    
+
     if (filteredEvents.length > 0) {
       console.log('First few events:');
       filteredEvents.slice(0, 3).forEach((event, index) => {
@@ -77,16 +77,16 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
   const handlePrint = () => {
     console.log('Starting print process...');
     const eventsToExport = getEventsForExport();
-    
+
     if (eventsToExport.length === 0) {
       alert(`Aucun événement trouvé pour la période sélectionnée.\n\nVérifiez :\n- La période choisie\n- Que des événements existent dans cette période\n\nTotal d'événements disponibles : ${events.length}`);
       return;
     }
-    
+
     console.log(`Generating print content for ${eventsToExport.length} events...`);
-    
+
     const printWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
     if (!printWindow) {
       alert('Veuillez autoriser les pop-ups pour imprimer');
       return;
@@ -94,11 +94,11 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
 
     const printContent = generatePrintHTML(eventsToExport);
     console.log('Print content generated, writing to window...');
-    
+
     printWindow.document.open();
     printWindow.document.write(printContent);
     printWindow.document.close();
-    
+
     // Attendre que le contenu soit chargé
     printWindow.onload = () => {
       console.log('Print window loaded successfully');
@@ -107,7 +107,7 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
         printWindow.print();
       }, 1000);
     };
-    
+
     // Fallback si onload ne fonctionne pas
     setTimeout(() => {
       if (printWindow && !printWindow.closed) {
@@ -120,15 +120,15 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
   const handleCSVExport = () => {
     const eventsToExport = getEventsForExport();
     const csvContent = generateCSV(eventsToExport);
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', `calendrier-sss-${format(currentDate, 'yyyy-MM')}.csv`);
     link.style.visibility = 'hidden';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -136,7 +136,7 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
 
   // Génération du HTML pour l'impression
   const generatePrintHTML = (eventsToExport: CalendarEvent[]) => {
-    const title = exportOptions.dateRange === 'current' 
+    const title = exportOptions.dateRange === 'current'
       ? `Calendrier SSS - ${format(currentDate, 'MMMM yyyy', { locale: fr })}`
       : `Calendrier SSS - ${format(new Date(exportOptions.startDate), 'dd/MM/yyyy')} au ${format(new Date(exportOptions.endDate), 'dd/MM/yyyy')}`;
 
@@ -149,7 +149,7 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
       const eventTime = event.allDay ? 'Toute la journée' : format(event.start, 'HH:mm');
       const eventEndTime = event.allDay ? '' : ` - ${format(event.end, 'HH:mm')}`;
       const source = event.source === 'icloud' ? 'de Duve' : 'SSS';
-      
+
       return `
         <div class="print-event">
           <div class="print-event-header">
@@ -401,7 +401,7 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
                       onChange={(e) => setExportOptions(prev => ({ ...prev, dateRange: e.target.value as any }))}
                     />
                     <span>
-                      {currentView === 'month' 
+                      {currentView === 'month'
                         ? `📅 Mois courant (${format(currentDate, 'MMMM yyyy', { locale: fr })})`
                         : `📅 Mois courant (${format(currentDate, 'MMMM yyyy', { locale: fr })})`
                       }
@@ -492,8 +492,8 @@ export const ExportPrint: React.FC<ExportPrintProps> = ({
                 )}
                 {getEventsForExport().length === 0 && (
                   <div className="export-preview-empty">
-                    <p style={{color: '#ef4444'}}>⚠️ Aucun événement trouvé pour cette période</p>
-                    <p style={{fontSize: '12px', color: '#666'}}>
+                    <p style={{ color: '#ef4444' }}>⚠️ Aucun événement trouvé pour cette période</p>
+                    <p style={{ fontSize: '12px', color: '#666' }}>
                       Total disponible : {events.length} événements
                     </p>
                   </div>

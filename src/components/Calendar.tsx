@@ -3,7 +3,7 @@ import { CalendarEvent, CalendarSource, CalendarView } from '../types';
 import { ICalParser } from '../utils/icalParser';
 import { format, addMonths, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { syncCalendarStatus, cacheEvents, getCachedEvents, clearCache } from '../lib/supabase';
+import { syncCalendarStatus } from '../lib/supabase';
 import { ViewSelector } from './ViewSelector';
 import { MonthView } from './views/MonthView';
 import { AgendaView } from './views/AgendaView';
@@ -15,8 +15,7 @@ import { SearchBar } from './SearchBar';
 import { UniversalSidebar } from './UniversalSidebar';
 import { SearchResults } from './SearchResults';
 import { useSearch } from '../hooks/useSearch';
-import { detectEventType, EVENT_TYPES } from '../utils/eventCategories';
-import { EventType } from '../types';
+import { EVENT_TYPES } from '../utils/eventCategories';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
@@ -135,7 +134,7 @@ export const Calendar: React.FC = () => {
 
 
 
-  const loadEvents = async (forceRefresh = false) => {
+  const loadEvents = async () => {
     setLoading(true);
     setError(null);
     setDebugInfo('');
@@ -256,12 +255,12 @@ export const Calendar: React.FC = () => {
 
   useEffect(() => {
     // Toujours forcer le rechargement au démarrage pour avoir les données les plus récentes
-    loadEvents(true);
+    loadEvents();
     
     // Actualisation automatique toutes les 5 minutes
     const autoRefreshInterval = setInterval(() => {
       console.log('🔄 Actualisation automatique des données...');
-      loadEvents(true);
+      loadEvents();
     }, 5 * 60 * 1000); // 5 minutes
     
     // Nettoyer l'intervalle au démontage du composant
@@ -403,7 +402,7 @@ export const Calendar: React.FC = () => {
       <div className="error">
         <h3>Erreur de chargement</h3>
         <p>{error}</p>
-        <button onClick={() => loadEvents(true)} className="nav-button">Réessayer</button>
+        <button onClick={() => loadEvents()} className="nav-button">Réessayer</button>
       </div>
     );
   }
@@ -478,7 +477,7 @@ export const Calendar: React.FC = () => {
         <div className="calendar-search-section">
           <SearchBar
             events={events}
-            onSearchResults={(results, query) => {
+            onSearchResults={(_, query) => {
               setQuery(query);
             }}
             onClearSearch={() => {
@@ -522,7 +521,7 @@ export const Calendar: React.FC = () => {
             onViewChange={setCurrentView} 
           />
           <button 
-            onClick={() => loadEvents(true)} 
+            onClick={() => loadEvents()} 
             className="nav-button"
             aria-label="Actualiser les calendriers"
             title="Actualiser les calendriers (rechargement complet)"

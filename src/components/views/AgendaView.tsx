@@ -28,7 +28,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
   const [showPastEvents, setShowPastEvents] = useState(true);
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+
   const eventsPerPage = 20;
   const selectedEventRef = useRef<HTMLDivElement>(null);
 

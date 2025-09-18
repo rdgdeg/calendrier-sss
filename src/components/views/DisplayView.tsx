@@ -1,6 +1,6 @@
 import React from 'react';
 import { CalendarEvent } from '../../types';
-import { format, isToday, isTomorrow, isYesterday, startOfDay, addDays } from 'date-fns';
+import { format, isToday, isTomorrow, isYesterday } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getHighContrastBackgroundColor, getOptimalTextColor, darkenColor } from '../../utils/colorUtils';
 
@@ -12,7 +12,6 @@ interface DisplayViewProps {
 }
 
 export const DisplayView: React.FC<DisplayViewProps> = ({
-  currentDate,
   events,
   onEventClick,
   daysToShow = 5
@@ -38,18 +37,7 @@ export const DisplayView: React.FC<DisplayViewProps> = ({
     }, {} as Record<string, CalendarEvent[]>);
   };
 
-  // Formater la date de manière lisible
-  const formatDateHeader = (date: Date): string => {
-    if (isToday(date)) {
-      return `Aujourd'hui - ${format(date, 'EEEE d MMMM yyyy', { locale: fr })}`;
-    } else if (isTomorrow(date)) {
-      return `Demain - ${format(date, 'EEEE d MMMM yyyy', { locale: fr })}`;
-    } else if (isYesterday(date)) {
-      return `Hier - ${format(date, 'EEEE d MMMM yyyy', { locale: fr })}`;
-    } else {
-      return format(date, 'EEEE d MMMM yyyy', { locale: fr });
-    }
-  };
+
 
   // Formater l'heure
   const formatEventTime = (event: CalendarEvent): string => {
@@ -78,7 +66,7 @@ export const DisplayView: React.FC<DisplayViewProps> = ({
 
   const upcomingEvents = getUpcomingEvents();
   const groupedEvents = groupEventsByDate(upcomingEvents);
-  const dateKeys = Object.keys(groupedEvents).sort();
+
 
   return (
     <div className="display-view">

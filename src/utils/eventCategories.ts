@@ -39,7 +39,6 @@ export const EVENT_TYPES: EventTypeConfig[] = [
 ];
 
 export const detectEventType = (title: string, description?: string): EventType => {
-  const titleLower = title.toLowerCase();
   const text = `${title} ${description || ''}`.toLowerCase();
   
   // Détecter par codes entre crochets (priorité haute)

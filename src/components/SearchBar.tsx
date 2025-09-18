@@ -16,8 +16,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [isActive, setIsActive] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -50,34 +49,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     });
   };
 
-  // Générer des suggestions basées sur les événements
-  const generateSuggestions = (searchQuery: string): string[] => {
-    if (!searchQuery.trim() || searchQuery.length < 2) {
-      return [];
-    }
 
-    const normalizedQuery = searchQuery.toLowerCase();
-    const suggestions = new Set<string>();
-
-    events.forEach(event => {
-      // Suggestions basées sur les titres
-      if (event.title.toLowerCase().includes(normalizedQuery)) {
-        suggestions.add(event.title);
-      }
-
-      // Suggestions basées sur les catégories
-      if (event.category.name.toLowerCase().includes(normalizedQuery)) {
-        suggestions.add(event.category.name);
-      }
-
-      // Suggestions basées sur les lieux
-      if (event.location && event.location.toLowerCase().includes(normalizedQuery)) {
-        suggestions.add(event.location);
-      }
-    });
-
-    return Array.from(suggestions).slice(0, 5);
-  };
 
   // Effet pour la recherche en temps réel
   useEffect(() => {
@@ -132,11 +104,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     // }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setQuery(suggestion);
-    setShowSuggestions(false);
-    inputRef.current?.focus();
-  };
+
 
   const handleClear = () => {
     setQuery('');

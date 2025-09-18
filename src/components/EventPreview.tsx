@@ -1,7 +1,6 @@
 import React from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { EventDescription } from './EventDescription';
 
 interface EventPreviewProps {

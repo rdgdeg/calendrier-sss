@@ -5,8 +5,6 @@ import {
   GraduationCap, 
   Presentation, 
   BookOpen,
-  MapPin,
-  Clock,
   Star,
   Briefcase,
   Coffee
@@ -26,7 +24,6 @@ const EventIconComponent: React.FC<EventIconProps> = ({
 }) => {
   const getEventIcon = () => {
     const title = event.title.toLowerCase();
-    const description = event.description?.toLowerCase() || '';
     const category = event.category?.name?.toLowerCase() || '';
     
     // Mapping based on keywords in title, description, or category

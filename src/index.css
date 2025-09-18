@@ -200,11 +200,29 @@ body {
   z-index: 1;
 }
 
+/* Header compact pour production */
+.calendar-main-header-compact {
+  background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
+  color: white;
+  padding: var(--ucl-spacing-sm) 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 61, 122, 0.2);
+  position: relative;
+}
+
+.calendar-main-title-compact {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--ucl-spacing-lg) var(--ucl-spacing-xl);
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-lg);
   background: var(--ucl-white);
   border-bottom: 1px solid var(--ucl-gray-200);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -273,7 +291,7 @@ body {
 }
 
 .month-year {
-  font-size: 1.75rem;
+  font-size: 1.4rem;
   font-weight: var(--ucl-font-weight-bold);
   color: var(--ucl-primary);
   text-transform: capitalize;
@@ -8024,7 +8042,7 @@ méliorations supplémentaires pour la lisibilité des événements */
 .calendar-filters-section {
   background: linear-gradient(135deg, var(--ucl-gray-50) 0%, var(--ucl-white) 100%);
   border-bottom: 1px solid var(--ucl-gray-200);
-  padding: var(--ucl-spacing-md) var(--ucl-spacing-xl);
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-lg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 

@@ -409,24 +409,12 @@ export const Calendar: React.FC = () => {
 
   return (
     <div className="calendar-container fade-in">
-      {/* Header principal avec titre UCLouvain */}
+      {/* Header principal compact */}
       {currentView !== 'display' && (
-        <div className="calendar-main-header">
-          <h1 className="calendar-main-title">
-            Calendrier des Événements
+        <div className="calendar-main-header-compact">
+          <h1 className="calendar-main-title-compact">
+            📅 Calendrier SSS - UCLouvain
           </h1>
-          <p className="calendar-main-subtitle">
-            Secteur des Sciences de la Santé - UCLouvain
-          </p>
-          <div className="display-mode-toggle">
-            <button
-              onClick={() => setCurrentView('display')}
-              className="display-mode-button"
-              title="Basculer vers la vue d'affichage public"
-            >
-              📺 Vue Affichage Public
-            </button>
-          </div>
         </div>
       )}
 

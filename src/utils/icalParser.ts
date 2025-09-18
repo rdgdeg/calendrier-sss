@@ -51,11 +51,18 @@ export class ICalParser {
 
       for (const proxyUrl of proxyUrls) {
         try {
+          // Ajouter un timeout de 10 secondes pour éviter les blocages
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          
           const response = await fetch(proxyUrl, {
             headers: {
               'User-Agent': 'CalendrierUnifie/1.0'
-            }
+            },
+            signal: controller.signal
           });
+          
+          clearTimeout(timeoutId);
           
           if (response.ok) {
             icsData = await response.text();

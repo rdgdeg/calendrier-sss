@@ -3,7 +3,7 @@ import { CalendarEvent, CalendarSource, CalendarView } from '../types';
 import { ICalParser } from '../utils/icalParser';
 import { format, addMonths, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { syncCalendarStatus } from '../lib/supabase';
+import { syncCalendarStatus, cacheEvents, getCachedEvents } from '../lib/supabase';
 import { ViewSelector } from './ViewSelector';
 import { MonthView } from './views/MonthView';
 import { AgendaView } from './views/AgendaView';
@@ -14,6 +14,7 @@ import { EventLegend } from './EventLegend';
 import { SearchBar } from './SearchBar';
 import { UniversalSidebar } from './UniversalSidebar';
 import { SearchResults } from './SearchResults';
+import { SkeletonLoader } from './SkeletonLoader';
 import { useSearch } from '../hooks/useSearch';
 import { EVENT_TYPES } from '../utils/eventCategories';
 
@@ -139,17 +140,35 @@ export const Calendar: React.FC = () => {
     setError(null);
     
     try {
+      // Essayer de charger depuis le cache d'abord pour un affichage rapide
+      const cachedEvents = await getCachedEvents();
+      if (cachedEvents.length > 0) {
+        const eventsWithColors = cachedEvents.map(cached => ({
+          id: cached.event_id,
+          title: cached.title,
+          start: new Date(cached.start_date),
+          end: new Date(cached.end_date),
+          description: cached.description || '',
+          location: cached.location || '',
+          source: cached.source as 'icloud' | 'outlook',
+          color: cached.color || '#6c757d',
+          allDay: false,
+          category: {
+            name: cached.category || 'default',
+            color: cached.color || '#6c757d'
+          }
+        }));
+        
+        // Afficher immédiatement les événements en cache
+        setEvents(eventsWithColors);
+        setLoading(false);
+      }
 
-      // Charger les événements frais en arrière-plan
-      const allEvents: CalendarEvent[] = [];
-
-      for (const source of CALENDAR_SOURCES) {
+      // Charger les événements frais en arrière-plan (en parallèle pour plus de rapidité)
+      const sourcePromises = CALENDAR_SOURCES.map(async (source) => {
         try {
-          
           const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
           
-          allEvents.push(...sourceEvents);
-
           // Synchroniser le statut avec Supabase
           await syncCalendarStatus({
             source_name: source.name,
@@ -158,9 +177,9 @@ export const Calendar: React.FC = () => {
             events_count: sourceEvents.length,
             status: 'success'
           });
-
-        } catch (sourceError) {
           
+          return sourceEvents;
+        } catch (sourceError) {
           // Enregistrer l'erreur dans Supabase
           await syncCalendarStatus({
             source_name: source.name,
@@ -170,8 +189,13 @@ export const Calendar: React.FC = () => {
             status: 'error',
             error_message: sourceError instanceof Error ? sourceError.message : 'Erreur inconnue'
           });
+          return [];
         }
-      }
+      });
+
+      // Attendre tous les calendriers en parallèle
+      const allSourceEvents = await Promise.all(sourcePromises);
+      const allEvents: CalendarEvent[] = allSourceEvents.flat();
 
       if (allEvents.length > 0) {
         // Utiliser les couleurs par source pour une meilleure visibilité
@@ -189,7 +213,20 @@ export const Calendar: React.FC = () => {
         
         setEvents(eventsWithSourceColors);
         
-
+        // Mettre en cache les nouveaux événements
+        const eventsToCache = eventsWithSourceColors.map(event => ({
+          event_id: event.id,
+          title: event.title,
+          start_date: event.start.toISOString(),
+          end_date: event.end.toISOString(),
+          description: event.description,
+          location: event.location,
+          source: event.source,
+          color: event.color,
+          category: event.category.name
+        }));
+        
+        await cacheEvents(eventsToCache);
       }
 
 
@@ -206,10 +243,10 @@ export const Calendar: React.FC = () => {
     // Toujours forcer le rechargement au démarrage pour avoir les données les plus récentes
     loadEvents();
     
-    // Actualisation automatique toutes les 5 minutes
+    // Actualisation automatique toutes les 10 minutes (moins fréquent pour économiser les ressources)
     const autoRefreshInterval = setInterval(() => {
       loadEvents();
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 10 * 60 * 1000); // 10 minutes
     
     // Nettoyer l'intervalle au démontage du composant
     return () => {
@@ -341,8 +378,18 @@ export const Calendar: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <div className="loading">Chargement des calendriers...</div>;
+  if (loading && events.length === 0) {
+    return (
+      <div className="calendar-container fade-in">
+        {/* Header principal compact */}
+        <div className="calendar-main-header-compact">
+          <h1 className="calendar-main-title-compact">
+            📅 Calendrier SSS - UCLouvain
+          </h1>
+        </div>
+        <SkeletonLoader />
+      </div>
+    );
   }
 
   if (error) {

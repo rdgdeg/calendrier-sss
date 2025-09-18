@@ -9922,10 +9922,21 @@ Calendar Header Styles */
 }
 
 /* Boutons compacts dans le header */
-.nav-button.compact {
+.nav-button.compact,
+.export-button.compact {
   padding: var(--ucl-spacing-xs) var(--ucl-spacing-md);
   font-size: var(--ucl-font-size-sm);
   min-height: 32px;
+}
+
+.export-button.compact {
+  background: var(--ucl-success);
+  border-color: var(--ucl-success);
+}
+
+.export-button.compact:hover {
+  background: #059669;
+  border-color: #059669;
 }
 
 .help-shortcut-btn,

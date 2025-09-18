@@ -22,6 +22,7 @@ import { KeyboardNavigation, KeyboardShortcutsHelp } from './KeyboardNavigation'
 import { HelpSystem, FAQSection } from './HelpSystem';
 
 import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
+import { ExportPrint } from './ExportPrint';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
@@ -169,16 +170,14 @@ export const Calendar: React.FC = () => {
     setIsRealTimeLoading(true);
     
     try {
-      // Si forceRefresh est true, vider le cache d'abord
-      if (forceRefresh) {
-        setLoadingMessage('Vidage du cache...');
-        try {
-          await clearCache();
-        } catch (error) {
-          console.warn('Cache non disponible, continuons sans cache');
-        }
-        setLoadingProgress(10);
+      // Toujours vider le cache lors de l'actualisation (fusion des fonctionnalités)
+      setLoadingMessage('Vidage du cache...');
+      try {
+        await clearCache();
+      } catch (error) {
+        console.warn('Cache non disponible, continuons sans cache');
       }
+      setLoadingProgress(10);
       
       // Essayer de charger depuis le cache d'abord pour un affichage rapide (seulement si pas de forceRefresh)
       if (!forceRefresh) {
@@ -317,9 +316,7 @@ export const Calendar: React.FC = () => {
       setLoadingProgress(100);
       
       // Notification de succès
-      if (forceRefresh) {
-        showToast('success', 'Calendriers actualisés avec succès !');
-      }
+      showToast('success', 'Calendriers actualisés avec succès !');
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
@@ -506,7 +503,7 @@ export const Calendar: React.FC = () => {
         onNavigateDate={navigateDate}
         onGoToToday={goToToday}
         onViewChange={setCurrentView}
-        onRefresh={() => loadEvents(true)}
+        onRefresh={() => loadEvents()}
       />
       
       <NetworkStatus />
@@ -535,18 +532,15 @@ export const Calendar: React.FC = () => {
                 onClick={() => loadEvents()} 
                 className="nav-button refresh-button compact"
                 aria-label="Actualiser les calendriers"
-                title="Actualiser les calendriers (rechargement complet)"
+                title="Actualiser les calendriers (vide automatiquement le cache)"
               >
                 🔄 Actualiser
               </button>
-              <button 
-                onClick={() => loadEvents(true)} 
-                className="nav-button clear-cache-button compact"
-                aria-label="Forcer le rechargement"
-                title="Vider le cache et recharger complètement"
-              >
-                🗑️ Vider cache
-              </button>
+              <ExportPrint 
+                events={filteredEvents}
+                currentDate={currentDate}
+                currentView={currentView}
+              />
             </div>
             <div className="header-help-actions">
               <button

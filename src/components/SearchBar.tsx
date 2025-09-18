@@ -59,15 +59,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         onSearchResults(results, query);
         
         // Désactiver les suggestions pour éviter de cacher le bouton "Voir les résultats"
-        // const newSuggestions = generateSuggestions(query);
-        // setSuggestions(newSuggestions);
-        // setShowSuggestions(newSuggestions.length > 0 && isActive);
-        setSuggestions([]);
-        setShowSuggestions(false);
       } else {
         onClearSearch();
-        setSuggestions([]);
-        setShowSuggestions(false);
       }
     }, 300); // Debounce de 300ms
 
@@ -83,7 +76,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         suggestionsRef.current &&
         !suggestionsRef.current.contains(event.target as Node)
       ) {
-        setShowSuggestions(false);
         setIsActive(false);
       }
     };
@@ -108,14 +100,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleClear = () => {
     setQuery('');
-    setShowSuggestions(false);
     onClearSearch();
     inputRef.current?.focus();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      setShowSuggestions(false);
       setIsActive(false);
       inputRef.current?.blur();
     }

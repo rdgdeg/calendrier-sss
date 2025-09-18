@@ -244,7 +244,6 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                           onMouseEnter={(e) => onEventHover(e, event)}
                           onMouseLeave={onEventLeave}
                           onClick={() => {
-                            setSelectedEvent(event);
                             onEventClick(event);
                           }}
                         >

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CalendarEvent } from '../../types';
-import { format, isToday, isTomorrow, isYesterday } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getHighContrastBackgroundColor, getOptimalTextColor, darkenColor } from '../../utils/colorUtils';
 
@@ -65,7 +65,6 @@ export const DisplayView: React.FC<DisplayViewProps> = ({
   };
 
   const upcomingEvents = getUpcomingEvents();
-  const groupedEvents = groupEventsByDate(upcomingEvents);
 
 
   return (

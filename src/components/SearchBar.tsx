@@ -86,9 +86,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         const results = searchEvents(query);
         onSearchResults(results, query);
         
-        const newSuggestions = generateSuggestions(query);
-        setSuggestions(newSuggestions);
-        setShowSuggestions(newSuggestions.length > 0 && isActive);
+        // Désactiver les suggestions pour éviter de cacher le bouton "Voir les résultats"
+        // const newSuggestions = generateSuggestions(query);
+        // setSuggestions(newSuggestions);
+        // setShowSuggestions(newSuggestions.length > 0 && isActive);
+        setSuggestions([]);
+        setShowSuggestions(false);
       } else {
         onClearSearch();
         setSuggestions([]);
@@ -123,9 +126,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleInputFocus = () => {
     setIsActive(true);
-    if (suggestions.length > 0) {
-      setShowSuggestions(true);
-    }
+    // Désactiver les suggestions pour éviter de cacher le bouton "Voir les résultats"
+    // if (suggestions.length > 0) {
+    //   setShowSuggestions(true);
+    // }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -177,7 +181,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       </div>
 
-      {showSuggestions && suggestions.length > 0 && (
+      {/* Suggestions désactivées pour éviter de cacher le bouton "Voir les résultats" */}
+      {/* {showSuggestions && suggestions.length > 0 && (
         <div ref={suggestionsRef} className="search-suggestions">
           {suggestions.map((suggestion, index) => (
             <div
@@ -190,7 +195,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

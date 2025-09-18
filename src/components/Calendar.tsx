@@ -488,20 +488,28 @@ export const Calendar: React.FC = () => {
             placeholder="Rechercher dans les événements..."
           />
           
-          {/* Bouton pour aller aux résultats */}
-          {searchState.isSearching && searchState.results.length > 0 && (
-            <button
-              className="scroll-to-results-btn"
-              onClick={() => {
-                searchResultsRef.current?.scrollIntoView({ 
-                  behavior: 'smooth', 
-                  block: 'start' 
-                });
-              }}
-              title="Voir les résultats de recherche"
-            >
-              📍 Voir les {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} ↓
-            </button>
+          {/* Bouton pour aller aux résultats ou message si aucun résultat */}
+          {searchState.isSearching && (
+            <>
+              {searchState.results.length > 0 ? (
+                <button
+                  className="scroll-to-results-btn"
+                  onClick={() => {
+                    searchResultsRef.current?.scrollIntoView({ 
+                      behavior: 'smooth', 
+                      block: 'start' 
+                    });
+                  }}
+                  title="Voir les résultats de recherche"
+                >
+                  📍 {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} trouvé{searchState.results.length !== 1 ? 's' : ''} • Voir ↓
+                </button>
+              ) : (
+                <div className="no-results-message-inline">
+                  🔍 Aucun résultat pour "{searchState.query}"
+                </div>
+              )}
+            </>
           )}
         </div>
         

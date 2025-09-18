@@ -166,6 +166,13 @@ body {
   background: #f8fafc;
 }
 
+/* Largeur fixe pour éviter les variations selon le mois */
+.calendar-grid {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 /* Header principal avec titre UCLouvain */
 .calendar-main-header {
   background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
@@ -367,8 +374,9 @@ body {
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 140px);
   gap: 0;
+  width: 100%;
 }
 
 .calendar-day {

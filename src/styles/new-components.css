@@ -128,7 +128,7 @@
 /* === NOTIFICATIONS TOAST === */
 .toast-notification {
   position: fixed;
-  top: 20px;
+  top: 80px;
   right: 20px;
   background: var(--ucl-white);
   border-radius: var(--ucl-border-radius);
@@ -137,7 +137,7 @@
   display: flex;
   align-items: center;
   gap: var(--ucl-spacing-sm);
-  z-index: 1000;
+  z-index: 1100;
   min-width: 300px;
   border-left: 4px solid;
 }
@@ -562,11 +562,11 @@ RT/PRINT MODAL === */
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1200;
   padding: var(--ucl-spacing-lg);
 }
 
@@ -578,6 +578,19 @@ RT/PRINT MODAL === */
   max-height: 90vh;
   overflow: hidden;
   box-shadow: var(--ucl-shadow-xl);
+  border: 2px solid var(--ucl-primary);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .export-modal-header {
@@ -612,6 +625,8 @@ RT/PRINT MODAL === */
   padding: var(--ucl-spacing-lg);
   max-height: 60vh;
   overflow-y: auto;
+  background: var(--ucl-white);
+  position: relative;
 }
 
 .export-option-group {
@@ -640,11 +655,17 @@ RT/PRINT MODAL === */
   padding: var(--ucl-spacing-sm);
   border-radius: var(--ucl-border-radius);
   transition: all var(--ucl-transition);
+  background: var(--ucl-white);
+  border: 1px solid var(--ucl-gray-200);
+  margin-bottom: var(--ucl-spacing-xs);
 }
 
 .export-radio-option:hover,
 .export-checkbox-option:hover {
   background: var(--ucl-gray-50);
+  border-color: var(--ucl-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .export-radio-option input,
@@ -764,5 +785,48 @@ RT/PRINT MODAL === */
   .export-btn-cancel,
   .export-btn-confirm {
     width: 100%;
+  }
+}/* 
+Descriptions des options d'export */
+.export-option-description {
+  font-size: var(--ucl-font-size-sm);
+  color: var(--ucl-text-secondary);
+  margin-top: 2px;
+  font-style: italic;
+}
+
+/* Amélioration de la lisibilité des labels */
+.export-option-group > label {
+  font-size: var(--ucl-font-size-base);
+  font-weight: var(--ucl-font-weight-bold);
+}
+
+/* Correction du z-index pour tous les éléments de modal */
+.help-overlay,
+.shortcuts-modal-backdrop,
+.faq-modal-backdrop {
+  z-index: 1150;
+}
+
+.export-modal-backdrop {
+  z-index: 1200;
+}
+
+/* Amélioration responsive pour la modal d'export */
+@media (max-width: 768px) {
+  .export-modal {
+    margin: var(--ucl-spacing-md);
+    max-width: calc(100vw - 2 * var(--ucl-spacing-md));
+  }
+  
+  .export-modal-content {
+    padding: var(--ucl-spacing-md);
+  }
+  
+  .toast-notification {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
   }
 }

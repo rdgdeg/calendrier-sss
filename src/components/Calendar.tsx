@@ -143,9 +143,9 @@ export const Calendar: React.FC = () => {
     try {
       console.log('🚀 Starting calendar load...');
       
-      // Toujours vider le cache pour s'assurer d'avoir les données les plus récentes
-      console.log('🗑️ Clearing cache to ensure fresh data...');
-      await clearCache();
+      // Désactiver temporairement le cache pour debugging
+      console.log('🗑️ Cache disabled for debugging - forcing fresh reload...');
+      // await clearCache();
 
       // Charger les événements frais en arrière-plan
       const allEvents: CalendarEvent[] = [];
@@ -167,14 +167,20 @@ export const Calendar: React.FC = () => {
           debugMessages.push(`${source.name}: ${sourceEvents.length} événements trouvés en ${loadTime}ms`);
           console.log(`${source.name}: ${sourceEvents.length} événements trouvés en ${loadTime}ms`);
           
-          // Log détaillé pour Outlook
+          // Log détaillé pour chaque source
+          console.log(`📊 ${source.name} events:`, sourceEvents.map(e => ({
+            title: e.title.substring(0, 50),
+            start: e.start.toISOString().split('T')[0],
+            source: e.source
+          })));
+          
           if (source.source === 'outlook') {
-            console.log('📧 Outlook events details:', sourceEvents.map(e => ({
-              title: e.title,
-              start: e.start,
-              end: e.end,
-              id: e.id
-            })));
+            console.log('📧 Outlook events count:', sourceEvents.length);
+            console.log('📧 Recent Outlook events:', sourceEvents
+              .filter(e => e.start >= new Date())
+              .slice(0, 5)
+              .map(e => ({ title: e.title, start: e.start }))
+            );
           }
 
           // Synchroniser le statut avec Supabase
@@ -218,20 +224,20 @@ export const Calendar: React.FC = () => {
         
         setEvents(eventsWithSourceColors);
         
-        // Mettre en cache les nouveaux événements
-        const eventsToCache = eventsWithSourceColors.map(event => ({
-          event_id: event.id,
-          title: event.title,
-          start_date: event.start.toISOString(),
-          end_date: event.end.toISOString(),
-          description: event.description,
-          location: event.location,
-          source: event.source,
-          color: event.color,
-          category: event.category.name
-        }));
-        
-        await cacheEvents(eventsToCache);
+        // Cache désactivé temporairement pour debugging
+        // const eventsToCache = eventsWithSourceColors.map(event => ({
+        //   event_id: event.id,
+        //   title: event.title,
+        //   start_date: event.start.toISOString(),
+        //   end_date: event.end.toISOString(),
+        //   description: event.description,
+        //   location: event.location,
+        //   source: event.source,
+        //   color: event.color,
+        //   category: event.category.name
+        // }));
+        // 
+        // await cacheEvents(eventsToCache);
       }
 
       debugMessages.push(`Total: ${allEvents.length} événements chargés`);
@@ -514,26 +520,31 @@ export const Calendar: React.FC = () => {
           </button>
           <button 
             onClick={async () => {
-              console.log('🧪 Testing Outlook URL...');
-              const outlookSource = CALENDAR_SOURCES.find(s => s.source === 'outlook');
-              if (outlookSource) {
-                try {
-                  const response = await fetch(outlookSource.url);
-                  const text = await response.text();
-                  console.log('📧 Outlook response status:', response.status);
-                  console.log('📧 Outlook response length:', text.length);
-                  console.log('📧 Outlook response sample:', text.substring(0, 200));
-                  alert(`Outlook test: ${response.status} - ${text.length} chars`);
-                } catch (error) {
-                  console.error('📧 Outlook test error:', error);
-                  alert(`Outlook test error: ${error}`);
-                }
-              }
+              console.log('🔍 Analyzing current events by source...');
+              const outlookEvents = events.filter(e => e.source === 'outlook');
+              const icloudEvents = events.filter(e => e.source === 'icloud');
+              
+              console.log(`📊 Total events: ${events.length}`);
+              console.log(`📧 Outlook events: ${outlookEvents.length}`);
+              console.log(`🍎 iCloud events: ${icloudEvents.length}`);
+              
+              const recentOutlook = outlookEvents
+                .filter(e => e.start >= new Date())
+                .sort((a, b) => a.start.getTime() - b.start.getTime())
+                .slice(0, 10);
+                
+              console.log('📧 Recent Outlook events:', recentOutlook.map(e => ({
+                title: e.title,
+                start: e.start.toLocaleDateString('fr-FR'),
+                id: e.id
+              })));
+              
+              alert(`Events: ${events.length} total\nOutlook: ${outlookEvents.length}\niCloud: ${icloudEvents.length}\n\nCheck console for details`);
             }} 
             className="nav-button"
-            title="Tester l'URL Outlook"
+            title="Analyser les événements par source"
           >
-            🧪 Test Outlook
+            📊 Analyser
           </button>
         </div>
       </div>

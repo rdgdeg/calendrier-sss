@@ -37,18 +37,6 @@ const shouldExcludeEvent = (title: string, description: string = ''): boolean =>
 export class ICalParser {
   static async fetchAndParse(url: string, source: 'icloud' | 'outlook'): Promise<CalendarEvent[]> {
     try {
-      console.log(`🔍 Fetching ${source} calendar from:`, url);
-      
-      // Test spécial pour Outlook
-      if (source === 'outlook') {
-        console.log('📧 Testing Outlook URL accessibility...');
-        try {
-          const testResponse = await fetch(url, { method: 'HEAD' });
-          console.log('📧 Outlook URL test response:', testResponse.status, testResponse.statusText);
-        } catch (testError) {
-          console.log('📧 Outlook URL direct test failed:', testError);
-        }
-      }
       
       // Utiliser un proxy CORS pour éviter les blocages
       const proxyUrls = [
@@ -71,22 +59,10 @@ export class ICalParser {
           
           if (response.ok) {
             icsData = await response.text();
-            console.log(`✅ Successfully fetched ${source} via proxy`);
-            
-            // Log des headers pour debugging
-            if (source === 'outlook') {
-              console.log('📧 Outlook response headers:');
-              response.headers.forEach((value, key) => {
-                console.log(`  ${key}: ${value}`);
-              });
-            }
             break;
-          } else {
-            console.log(`❌ Response not OK for ${source}: ${response.status} ${response.statusText}`);
           }
         } catch (error) {
           lastError = error;
-          console.log(`❌ Proxy failed for ${source}:`, error);
           continue;
         }
       }
@@ -95,20 +71,12 @@ export class ICalParser {
         throw lastError || new Error('Tous les proxies ont échoué');
       }
 
-      console.log(`📄 Raw iCal data length for ${source}:`, icsData.length);
-      
-      // Debug pour Outlook - afficher un échantillon des données
-      if (source === 'outlook') {
-        console.log('📧 Outlook raw data sample:', icsData.substring(0, 500));
-        console.log('📧 Outlook data contains VEVENT?', icsData.includes('VEVENT'));
-      }
+
 
       // Parser avec ical.js
       const jcalData = ICAL.parse(icsData);
       const comp = new ICAL.Component(jcalData);
       const vevents = comp.getAllSubcomponents('vevent');
-
-      console.log(`📝 Found ${vevents.length} VEVENT components for ${source}`);
 
       const events: CalendarEvent[] = [];
       const now = new Date();
@@ -197,16 +165,6 @@ export class ICalParser {
 
       // Trier par date de début
       events.sort((a, b) => a.start.getTime() - b.start.getTime());
-
-      console.log(`✅ Parsed ${events.length} events from ${source}`);
-      
-      // Log des événements de septembre 2025 pour debug
-      const sept2025Events = events.filter(e => 
-        e.start.getFullYear() === 2025 && e.start.getMonth() === 8
-      );
-      console.log(`🗓️ September 2025 events for ${source} (${sept2025Events.length}):`, 
-        sept2025Events.map(e => ({ title: e.title, date: e.start.toLocaleDateString('fr-FR') }))
-      );
 
       return events;
 

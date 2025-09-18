@@ -126,7 +126,7 @@ export const clearCache = async () => {
       return false
     }
 
-    console.log('Cache vidé avec succès')
+
     return true
   } catch (error) {
     console.warn('Supabase non disponible, impossible de vider le cache:', error)

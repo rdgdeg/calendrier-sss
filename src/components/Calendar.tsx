@@ -40,7 +40,7 @@ export const Calendar: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>('');
+
   
   // Hook de recherche
   const {
@@ -137,50 +137,20 @@ export const Calendar: React.FC = () => {
   const loadEvents = async () => {
     setLoading(true);
     setError(null);
-    setDebugInfo('');
     
     try {
-      console.log('🚀 Starting calendar load...');
-      
-      // Désactiver temporairement le cache pour debugging
-      console.log('🗑️ Cache disabled for debugging - forcing fresh reload...');
-      // await clearCache();
 
       // Charger les événements frais en arrière-plan
       const allEvents: CalendarEvent[] = [];
-      const debugMessages: string[] = [];
 
       for (const source of CALENDAR_SOURCES) {
         try {
-          console.log(`📅 Loading ${source.name}...`);
-          console.log(`🔗 URL: ${source.url}`);
-          debugMessages.push(`Loading ${source.name}...`);
-          debugMessages.push(`URL: ${source.url.substring(0, 50)}...`);
           
           const startTime = Date.now();
           const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
           const loadTime = Date.now() - startTime;
           
           allEvents.push(...sourceEvents);
-          
-          debugMessages.push(`${source.name}: ${sourceEvents.length} événements trouvés en ${loadTime}ms`);
-          console.log(`${source.name}: ${sourceEvents.length} événements trouvés en ${loadTime}ms`);
-          
-          // Log détaillé pour chaque source
-          console.log(`📊 ${source.name} events:`, sourceEvents.map(e => ({
-            title: e.title.substring(0, 50),
-            start: e.start.toISOString().split('T')[0],
-            source: e.source
-          })));
-          
-          if (source.source === 'outlook') {
-            console.log('📧 Outlook events count:', sourceEvents.length);
-            console.log('📧 Recent Outlook events:', sourceEvents
-              .filter(e => e.start >= new Date())
-              .slice(0, 5)
-              .map(e => ({ title: e.title, start: e.start }))
-            );
-          }
 
           // Synchroniser le statut avec Supabase
           await syncCalendarStatus({
@@ -192,8 +162,6 @@ export const Calendar: React.FC = () => {
           });
 
         } catch (sourceError) {
-          console.error(`❌ Error loading ${source.name}:`, sourceError);
-          debugMessages.push(`${source.name}: Erreur - ${sourceError}`);
           
           // Enregistrer l'erreur dans Supabase
           await syncCalendarStatus({
@@ -223,31 +191,14 @@ export const Calendar: React.FC = () => {
         
         setEvents(eventsWithSourceColors);
         
-        // Cache désactivé temporairement pour debugging
-        // const eventsToCache = eventsWithSourceColors.map(event => ({
-        //   event_id: event.id,
-        //   title: event.title,
-        //   start_date: event.start.toISOString(),
-        //   end_date: event.end.toISOString(),
-        //   description: event.description,
-        //   location: event.location,
-        //   source: event.source,
-        //   color: event.color,
-        //   category: event.category.name
-        // }));
-        // 
-        // await cacheEvents(eventsToCache);
+
       }
 
-      debugMessages.push(`Total: ${allEvents.length} événements chargés`);
-      setDebugInfo(debugMessages.join('\n'));
-      
-      console.log('✅ Calendar load complete:', allEvents.length, 'events');
+
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
       setError(errorMessage);
-      console.error('❌ Calendar load failed:', err);
     } finally {
       setLoading(false);
     }
@@ -259,7 +210,6 @@ export const Calendar: React.FC = () => {
     
     // Actualisation automatique toutes les 5 minutes
     const autoRefreshInterval = setInterval(() => {
-      console.log('🔄 Actualisation automatique des données...');
       loadEvents();
     }, 5 * 60 * 1000); // 5 minutes
     
@@ -642,12 +592,7 @@ export const Calendar: React.FC = () => {
         onExportToICS={exportToICS}
       />
 
-      {debugInfo && (
-        <div className="debug-section">
-          <h4>Informations de debug:</h4>
-          <pre>{debugInfo}</pre>
-        </div>
-      )}
+
 
       {/* Tooltip personnalisée */}
       {tooltip.visible && (

@@ -43,42 +43,49 @@ export const syncCalendarStatus = async (syncData: Omit<CalendarSync, 'id'>) => 
       .select()
 
     if (error) {
+      // Si la table n'existe pas, on ignore silencieusement l'erreur
+      if (error.code === 'PGRST205') {
+        console.warn('Table calendar_syncs non trouvée, synchronisation ignorée')
+        return null
+      }
       console.error('Erreur lors de la synchronisation du statut:', error)
       return null
     }
 
     return data
   } catch (error) {
-    console.error('Erreur Supabase:', error)
+    console.warn('Supabase non disponible, synchronisation ignorée:', error)
     return null
   }
 }
 
 export const cacheEvents = async (events: Omit<EventCache, 'id' | 'created_at' | 'updated_at'>[]) => {
   try {
-    // Supprimer les anciens événements
+    // Supprimer TOUS les événements en cache pour éviter les doublons lors de modifications
     await supabase
       .from('event_cache')
       .delete()
-      .lt('start_date', new Date().toISOString())
+      .neq('id', 0) // Supprimer tous les enregistrements
 
     // Insérer les nouveaux événements
     const { data, error } = await supabase
       .from('event_cache')
-      .upsert(events, { 
-        onConflict: 'event_id',
-        ignoreDuplicates: false 
-      })
+      .insert(events)
       .select()
 
     if (error) {
+      // Si la table n'existe pas, on ignore silencieusement l'erreur
+      if (error.code === 'PGRST205') {
+        console.warn('Table event_cache non trouvée, mise en cache ignorée')
+        return null
+      }
       console.error('Erreur lors de la mise en cache des événements:', error)
       return null
     }
 
     return data
   } catch (error) {
-    console.error('Erreur Supabase:', error)
+    console.warn('Supabase non disponible, mise en cache ignorée:', error)
     return null
   }
 }
@@ -88,17 +95,41 @@ export const getCachedEvents = async () => {
     const { data, error } = await supabase
       .from('event_cache')
       .select('*')
-      .gte('start_date', new Date().toISOString())
       .order('start_date', { ascending: true })
 
     if (error) {
+      // Si la table n'existe pas, on retourne un tableau vide
+      if (error.code === 'PGRST205') {
+        console.warn('Table event_cache non trouvée, aucun cache disponible')
+        return []
+      }
       console.error('Erreur lors de la récupération des événements en cache:', error)
       return []
     }
 
     return data || []
   } catch (error) {
-    console.error('Erreur Supabase:', error)
+    console.warn('Supabase non disponible, aucun cache disponible:', error)
     return []
+  }
+}
+
+export const clearCache = async () => {
+  try {
+    const { error } = await supabase
+      .from('event_cache')
+      .delete()
+      .neq('id', 0) // Supprimer tous les enregistrements
+
+    if (error && error.code !== 'PGRST205') {
+      console.error('Erreur lors de la suppression du cache:', error)
+      return false
+    }
+
+    console.log('Cache vidé avec succès')
+    return true
+  } catch (error) {
+    console.warn('Supabase non disponible, impossible de vider le cache:', error)
+    return false
   }
 }

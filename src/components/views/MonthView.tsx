@@ -1,13 +1,15 @@
 import React from 'react';
 import { CalendarEvent } from '../../types';
 import { startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
+import { darkenColor } from '../../utils/colorUtils';
 
 interface MonthViewProps {
   currentDate: Date;
   events: CalendarEvent[];
   onEventClick: (event: CalendarEvent) => void;
-  onEventHover: (event: React.MouseEvent, content: string) => void;
+  onEventHover: (event: React.MouseEvent, eventData: CalendarEvent) => void;
   onEventLeave: () => void;
+  isEventHighlighted?: (eventId: string) => boolean;
 }
 
 export const MonthView: React.FC<MonthViewProps> = ({
@@ -15,15 +17,16 @@ export const MonthView: React.FC<MonthViewProps> = ({
   events,
   onEventClick,
   onEventHover,
-  onEventLeave
+  onEventLeave,
+  isEventHighlighted = () => false
 }) => {
   const generateCalendarDays = () => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
-    
+
     const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
     const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-    
+
     return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   };
 
@@ -46,7 +49,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
             const dayEvents = getEventsForDay(day);
             const isCurrentMonth = isSameMonth(day, currentDate);
             const isCurrentDay = isToday(day);
-            
+
             return (
               <div
                 key={`${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`}
@@ -56,25 +59,55 @@ export const MonthView: React.FC<MonthViewProps> = ({
                   {day.getDate()}
                 </div>
                 <div className="day-events">
-                  {dayEvents.slice(0, 3).map((event, eventIndex) => (
+                  {dayEvents.slice(0, 2).map((event, eventIndex) => {
+                    // Raccourcir le titre pour une meilleure lisibilité
+                    const shortTitle = event.title.length > 25
+                      ? `${event.title.substring(0, 22)}...`
+                      : event.title;
+
+                    const isHighlighted = isEventHighlighted(event.id);
+
+                    return (
+                      <div
+                        key={`${event.id}-${event.start.getTime()}-${eventIndex}`}
+                        className={`event-item ${event.source} ${isHighlighted ? 'highlighted' : ''}`}
+                        style={{
+                          backgroundColor: event.color,
+                          color: '#ffffff',
+                          borderColor: darkenColor(event.color, 0.6),
+                          borderWidth: isHighlighted ? '3px' : '2px',
+                          borderStyle: 'solid',
+                          boxShadow: isHighlighted 
+                            ? `0 0 0 2px rgba(0, 61, 122, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2)`
+                            : `0 2px 6px rgba(0, 0, 0, 0.2)`,
+                          transform: isHighlighted ? 'scale(1.02)' : 'scale(1)',
+                          zIndex: isHighlighted ? 10 : 1,
+                          fontWeight: '600',
+                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                        }}
+                        onClick={() => onEventClick(event)}
+                        onMouseEnter={(e) => onEventHover(e, event)}
+                        onMouseLeave={onEventLeave}
+                        title={event.title} // Afficher le titre complet au survol
+                      >
+                        {isHighlighted && <span className="highlight-indicator">🔍</span>}
+                        {shortTitle}
+                      </div>
+                    );
+                  })}
+                  {dayEvents.length > 2 && (
                     <div
-                      key={`${event.id}-${event.start.getTime()}-${eventIndex}`}
-                      className={`event-item ${event.source}`}
-                      style={{ 
-                        backgroundColor: event.color, 
-                        borderLeftColor: `rgba(255, 255, 255, 0.4)`,
-                        boxShadow: `0 1px 3px rgba(0, 0, 0, 0.2)`
+                      className="event-item more-events"
+                      style={{
+                        background: 'linear-gradient(135deg, #6c757d, #495057)',
+                        color: '#fff',
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        textAlign: 'center'
                       }}
-                      onClick={() => onEventClick(event)}
-                      onMouseEnter={(e) => onEventHover(e, event.title)}
-                      onMouseLeave={onEventLeave}
+                      title={`${dayEvents.length - 2} autres événements ce jour`}
                     >
-                      {event.title}
-                    </div>
-                  ))}
-                  {dayEvents.length > 3 && (
-                    <div className="event-item more-events" style={{ background: '#999' }}>
-                      +{dayEvents.length - 3} autres
+                      +{dayEvents.length - 2} autres
                     </div>
                   )}
                 </div>

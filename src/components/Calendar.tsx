@@ -1,27 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { CalendarEvent, CalendarSource, CalendarView } from '../types';
 import { ICalParser } from '../utils/icalParser';
-import { format, addMonths, subMonths, addWeeks, subWeeks } from 'date-fns';
+import { format, addMonths, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { syncCalendarStatus, cacheEvents, getCachedEvents } from '../lib/supabase';
+import { syncCalendarStatus, cacheEvents, getCachedEvents, clearCache } from '../lib/supabase';
 import { ViewSelector } from './ViewSelector';
 import { MonthView } from './views/MonthView';
-import { WeekView } from './views/WeekView';
 import { AgendaView } from './views/AgendaView';
-import { CompactView } from './views/CompactView';
+import { DisplayView } from './views/DisplayView';
+import { EventModal } from './EventModal';
+import { Footer } from './Footer';
+import { EventLegend } from './EventLegend';
+import { SearchBar } from './SearchBar';
+import { UniversalSidebar } from './UniversalSidebar';
+import { SearchResults } from './SearchResults';
+import { useSearch } from '../hooks/useSearch';
+import { detectEventType, EVENT_TYPES } from '../utils/eventCategories';
+import { EventType } from '../types';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
     name: 'Calendrier de Duve',
     url: 'https://p25-caldav.icloud.com/published/2/MjE3MzIxMzkxMTYyMTczMtrwrElZXGcjHRcJohH3ZTG9v2l4po1v88R9tID706X9RxGohLKxmB8cXu3SUYxqWQyqiN7dN3ZkiPAFAAQE2b8',
     source: 'icloud',
-    color: '#ff9999'
+    color: '#ff6b6b'  // Rouge clair plus visible
   },
   {
     name: 'Calendrier Secteur SSS',
     url: 'https://outlook.office365.com/owa/calendar/7442b8c05d40441795e06a2f0b095720@uclouvain.be/32bcbe6b269b4cf78cd02da934b381c215406410938849709841/calendar.ics',
     source: 'outlook',
-    color: '#87ceeb'
+    color: '#003d7a'  // Bleu UCLouvain plus visible
   }
 ];
 
@@ -30,12 +38,24 @@ export const Calendar: React.FC = () => {
   const [currentView, setCurrentView] = useState<CalendarView>('month');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState(0);
-  const eventsPerPage = 5;
-  const [sourceFilter, setSourceFilter] = useState<'all' | 'icloud' | 'outlook'>('all');
+  
+  // Hook de recherche
+  const {
+    searchState,
+    filteredEvents,
+    searchStats,
+    setQuery,
+    updateFilters,
+    clearSearch,
+    isEventHighlighted
+  } = useSearch(events);
+  
+  // Référence pour scroller vers les résultats
+  const searchResultsRef = React.useRef<HTMLDivElement>(null);
   
   // État pour la tooltip
   const [tooltip, setTooltip] = useState<{
@@ -72,10 +92,23 @@ export const Calendar: React.FC = () => {
   };
 
   // Fonctions pour gérer la tooltip
-  const showTooltip = (event: React.MouseEvent, content: string) => {
+  const showTooltip = (event: React.MouseEvent, eventData: CalendarEvent) => {
     const rect = (event.target as HTMLElement).getBoundingClientRect();
     const windowWidth = window.innerWidth;
-    const tooltipWidth = Math.min(300, content.length * 8); // Estimation de la largeur
+    
+    // Créer un contenu enrichi pour la tooltip
+    let tooltipContent = eventData.title;
+    if (eventData.location) {
+      tooltipContent += `\n📍 ${eventData.location}`;
+    }
+    if (eventData.description && eventData.description.length > 0) {
+      const shortDescription = eventData.description.length > 100 
+        ? `${cleanHtmlContent(eventData.description).substring(0, 100)}...`
+        : cleanHtmlContent(eventData.description);
+      tooltipContent += `\n📝 ${shortDescription}`;
+    }
+    
+    const tooltipWidth = Math.min(350, tooltipContent.length * 6);
     
     let x = rect.left + rect.width / 2;
     let y = rect.top - 10;
@@ -90,7 +123,7 @@ export const Calendar: React.FC = () => {
     
     setTooltip({
       visible: true,
-      content,
+      content: tooltipContent,
       x,
       y
     });
@@ -100,99 +133,9 @@ export const Calendar: React.FC = () => {
     setTooltip(prev => ({ ...prev, visible: false }));
   };
 
-  // Fonction intelligente pour formater la description en préservant la structure HTML originale
-  const formatDescription = (description: string): JSX.Element[] => {
-    if (!description) return [];
-    
-    // Étape 1: Identifier et préserver les structures HTML importantes
-    let processedText = description;
-    
-    // Préserver les paragraphes HTML réels
-    const paragraphs: string[] = [];
-    
-    // Si le contenu contient des balises <p>, les utiliser comme séparateurs naturels
-    if (processedText.includes('<p>') || processedText.includes('<P>')) {
-      paragraphs.push(...processedText
-        .split(/<\/?p[^>]*>/gi)
-        .map(p => p.trim())
-        .filter(p => p.length > 0));
-    }
-    // Sinon, chercher les doubles retours à la ligne ou les <br><br>
-    else if (processedText.includes('<br>') || processedText.includes('<BR>')) {
-      paragraphs.push(...processedText
-        .split(/<br\s*\/?>\s*<br\s*\/?>/gi)
-        .map(p => p.replace(/<br\s*\/?>/gi, '\n').trim())
-        .filter(p => p.length > 0));
-    }
-    // Sinon, chercher les doubles retours à la ligne naturels
-    else if (processedText.includes('\n\n')) {
-      paragraphs.push(...processedText
-        .split(/\n\s*\n/)
-        .map(p => p.trim())
-        .filter(p => p.length > 0));
-    }
-    // En dernier recours, traiter comme un seul bloc
-    else {
-      paragraphs.push(processedText);
-    }
-    
-    return paragraphs.map((paragraph, index) => {
-      // Nettoyer le HTML du paragraphe
-      let cleanParagraph = cleanHtmlContent(paragraph);
-      
-      // Remplacer les <br> simples par des retours à la ligne
-      cleanParagraph = cleanParagraph.replace(/\n/g, ' ').trim();
-      
-      // Détecter les informations importantes
-      const isImportant = /(?:date|heure|lieu|contact|inscription|programme|horaire|adresse|public|catégories|attention|important|note)/i.test(cleanParagraph);
-      
-      // Détecter les listes (lignes avec puces ou numéros)
-      const listPatterns = [
-        /^\s*[*•-]\s+/gm,  // Puces
-        /^\s*\d+[\.)]\s+/gm, // Numéros
-        /^\s*[a-zA-Z][\.)]\s+/gm // Lettres
-      ];
-      
-      const isListContent = listPatterns.some(pattern => pattern.test(paragraph));
-      
-      if (isListContent) {
-        // Traiter comme une liste
-        const listItems = cleanParagraph
-          .split(/(?:^|\n)\s*(?:[*•-]|\d+[\.)]|[a-zA-Z][\.)])\s+/)
-          .map(item => item.trim())
-          .filter(item => item.length > 0);
-        
-        if (listItems.length > 1) {
-          return (
-            <ul key={index} className="description-list">
-              {listItems.map((item, itemIndex) => (
-                <li key={itemIndex}>{item}</li>
-              ))}
-            </ul>
-          );
-        }
-      }
-      
-      // Détecter les titres (texte court en majuscules ou avec des mots-clés)
-      const isTitle = (
-        cleanParagraph.length < 80 && 
-        (cleanParagraph === cleanParagraph.toUpperCase() || 
-         /^(programme|horaire|lieu|contact|inscription|objectif|public)/i.test(cleanParagraph))
-      );
-      
-      // Traiter comme un paragraphe normal
-      return (
-        <div 
-          key={index} 
-          className={`description-paragraph ${isImportant ? 'important-info' : ''} ${isTitle ? 'paragraph-title' : ''}`}
-        >
-          {cleanParagraph}
-        </div>
-      );
-    });
-  };
 
-  const loadEvents = async () => {
+
+  const loadEvents = async (forceRefresh = false) => {
     setLoading(true);
     setError(null);
     setDebugInfo('');
@@ -200,29 +143,42 @@ export const Calendar: React.FC = () => {
     try {
       console.log('🚀 Starting calendar load...');
       
-      // Essayer de charger depuis le cache d'abord
-      const cachedEvents = await getCachedEvents();
-      if (cachedEvents.length > 0) {
-        console.log('📦 Loading from cache:', cachedEvents.length, 'events');
-        const convertedEvents: CalendarEvent[] = cachedEvents.map(cached => ({
-          id: cached.event_id,
-          title: cached.title,
-          start: new Date(cached.start_date),
-          end: new Date(cached.end_date),
-          description: cached.description || '',
-          location: cached.location || '',
-          source: cached.source as 'icloud' | 'outlook',
-          allDay: false,
-          category: {
-            id: cached.category,
-            name: cached.category,
-            color: cached.color,
-            source: cached.source as 'icloud' | 'outlook'
-          },
-          color: cached.color
-        }));
-        setEvents(convertedEvents);
-        setDebugInfo(`Cache: ${convertedEvents.length} événements chargés`);
+      // Si on force le rechargement, vider le cache d'abord
+      if (forceRefresh) {
+        console.log('🗑️ Clearing cache for fresh reload...');
+        await clearCache();
+      }
+      
+      // Essayer de charger depuis le cache d'abord (seulement si pas de force refresh)
+      if (!forceRefresh) {
+        const cachedEvents = await getCachedEvents();
+        if (cachedEvents.length > 0) {
+          console.log('📦 Loading from cache:', cachedEvents.length, 'events');
+          const convertedEvents: CalendarEvent[] = cachedEvents.map(cached => {
+            const sourceConfig = CALENDAR_SOURCES.find(s => s.source === cached.source);
+            const sourceColor = sourceConfig?.color || (cached.source === 'icloud' ? '#ff6b6b' : '#003d7a');
+            
+            return {
+              id: cached.event_id,
+              title: cached.title,
+              start: new Date(cached.start_date),
+              end: new Date(cached.end_date),
+              description: cached.description || '',
+              location: cached.location || '',
+              source: cached.source as 'icloud' | 'outlook',
+              allDay: false,
+              category: {
+                id: cached.category,
+                name: cached.category,
+                color: sourceColor,
+                source: cached.source as 'icloud' | 'outlook'
+              },
+              color: sourceColor
+            };
+          });
+          setEvents(convertedEvents);
+          setDebugInfo(`Cache: ${convertedEvents.length} événements chargés`);
+        }
       }
 
       // Charger les événements frais en arrière-plan
@@ -266,10 +222,23 @@ export const Calendar: React.FC = () => {
       }
 
       if (allEvents.length > 0) {
-        setEvents(allEvents);
+        // Utiliser les couleurs par source pour une meilleure visibilité
+        const eventsWithSourceColors = allEvents.map(event => {
+          const sourceConfig = CALENDAR_SOURCES.find(s => s.source === event.source);
+          return {
+            ...event,
+            color: sourceConfig?.color || (event.source === 'icloud' ? '#ff6b6b' : '#4ecdc4'),
+            category: {
+              ...event.category,
+              color: sourceConfig?.color || (event.source === 'icloud' ? '#ff6b6b' : '#4ecdc4')
+            }
+          };
+        });
+        
+        setEvents(eventsWithSourceColors);
         
         // Mettre en cache les nouveaux événements
-        const eventsToCache = allEvents.map(event => ({
+        const eventsToCache = eventsWithSourceColors.map(event => ({
           event_id: event.id,
           title: event.title,
           start_date: event.start.toISOString(),
@@ -305,263 +274,123 @@ export const Calendar: React.FC = () => {
   const navigateDate = (direction: 'prev' | 'next') => {
     setCurrentDate(prev => {
       switch (currentView) {
-        case 'week':
-          return direction === 'prev' ? subWeeks(prev, 1) : addWeeks(prev, 1);
         case 'month':
-        case 'compact':
         default:
           return direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1);
       }
     });
-    setCurrentPage(0); // Réinitialiser la pagination
   };
 
   const goToToday = () => {
     setCurrentDate(new Date());
-    setCurrentPage(0); // Réinitialiser la pagination
   };
 
   const getNavigationLabel = (): string => {
     switch (currentView) {
-      case 'week':
-        return format(currentDate, "'Semaine du' d MMMM yyyy", { locale: fr });
       case 'month':
-      case 'compact':
         return format(currentDate, 'MMMM yyyy', { locale: fr });
       case 'agenda':
         return 'Vue Agenda';
+      case 'display':
+        return 'Vue Affichage Public';
       default:
         return format(currentDate, 'MMMM yyyy', { locale: fr });
     }
   };
 
-  const getFilteredEvents = (): CalendarEvent[] => {
-    if (sourceFilter === 'all') {
-      return events;
-    }
-    return events.filter(event => event.source === sourceFilter);
-  };
-
   const getUpcomingEvents = (): CalendarEvent[] => {
     const now = new Date();
-    const filteredEvents = getFilteredEvents();
     return filteredEvents
       .filter(event => new Date(event.start) >= now)
       .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   };
 
-  const getPaginatedEvents = (): CalendarEvent[] => {
-    const upcomingEvents = getUpcomingEvents();
-    const startIndex = currentPage * eventsPerPage;
-    return upcomingEvents.slice(startIndex, startIndex + eventsPerPage);
+  // Fonctions d'export vers les calendriers
+  const exportToGoogleCalendar = (event: CalendarEvent) => {
+    const startDate = event.start.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const endDate = event.end.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    const googleUrl = new URL('https://calendar.google.com/calendar/render');
+    googleUrl.searchParams.set('action', 'TEMPLATE');
+    googleUrl.searchParams.set('text', event.title);
+    googleUrl.searchParams.set('dates', `${startDate}/${endDate}`);
+    googleUrl.searchParams.set('details', event.description || '');
+    googleUrl.searchParams.set('location', event.location || '');
+    
+    window.open(googleUrl.toString(), '_blank');
   };
 
-  const getTotalPages = (): number => {
-    const upcomingEvents = getUpcomingEvents();
-    return Math.ceil(upcomingEvents.length / eventsPerPage);
+  const exportToOutlookCalendar = (event: CalendarEvent) => {
+    const startDate = event.start.toISOString();
+    const endDate = event.end.toISOString();
+    
+    const outlookUrl = new URL('https://outlook.live.com/calendar/0/deeplink/compose');
+    outlookUrl.searchParams.set('subject', event.title);
+    outlookUrl.searchParams.set('startdt', startDate);
+    outlookUrl.searchParams.set('enddt', endDate);
+    outlookUrl.searchParams.set('body', event.description || '');
+    outlookUrl.searchParams.set('location', event.location || '');
+    
+    window.open(outlookUrl.toString(), '_blank');
+  };
+
+  const exportToICS = (event: CalendarEvent) => {
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//UCLouvain//Calendar//FR',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@uclouvain.be`,
+      `DTSTART:${formatDate(event.start)}`,
+      `DTEND:${formatDate(event.end)}`,
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${(event.description || '').replace(/\n/g, '\\n')}`,
+      `LOCATION:${event.location || ''}`,
+      `DTSTAMP:${formatDate(new Date())}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const renderCurrentView = () => {
-    const filteredEvents = getFilteredEvents();
+    const handleEventClick = (event: CalendarEvent) => {
+      setSelectedEvent(event);
+      setIsModalOpen(true);
+    };
+
     const commonProps = {
       currentDate,
       events: filteredEvents,
-      onEventClick: setSelectedEvent,
+      onEventClick: handleEventClick,
       onEventHover: showTooltip,
-      onEventLeave: hideTooltip
+      onEventLeave: hideTooltip,
+      isEventHighlighted
     };
 
     switch (currentView) {
       case 'month':
         return <MonthView {...commonProps} />;
-      case 'week':
-        return <WeekView {...commonProps} />;
       case 'agenda':
-        return <AgendaView {...commonProps} />;
-      case 'compact':
-        return <CompactView {...commonProps} onDayClick={(date) => {
-          setCurrentDate(date);
-          setCurrentView('month');
-        }} />;
+        return <AgendaView {...commonProps} selectedEventId={selectedEvent?.id} />;
+      case 'display':
+        return <DisplayView {...commonProps} daysToShow={5} />;
       default:
         return <MonthView {...commonProps} />;
     }
-  };
-
-  const renderEventDetails = () => {
-    if (!selectedEvent) return null;
-
-    return (
-      <div className="event-details-inline">
-        <div className="event-details-header">
-          <h3 className="event-details-title">{selectedEvent.title}</h3>
-          <button 
-            className="close-details-btn"
-            onClick={() => setSelectedEvent(null)}
-            title="Fermer"
-          >
-            ✕
-          </button>
-        </div>
-        
-        <div className="event-details-content">
-          <div className="event-details-grid">
-            <div className="event-detail-row">
-              <span className="detail-icon">📅</span>
-              <div className="detail-content">
-                <strong>Date</strong>
-                <span>{format(selectedEvent.start, 'EEEE d MMMM yyyy', { locale: fr })}</span>
-              </div>
-            </div>
-
-            <div className="event-detail-row">
-              <span className="detail-icon">🕒</span>
-              <div className="detail-content">
-                <strong>Heure</strong>
-                <span>{
-                  selectedEvent.allDay 
-                    ? 'Toute la journée'
-                    : `${format(selectedEvent.start, 'HH:mm')} - ${format(selectedEvent.end, 'HH:mm')}`
-                }</span>
-              </div>
-            </div>
-
-            {selectedEvent.location && (
-              <div className="event-detail-row">
-                <span className="detail-icon">📍</span>
-                <div className="detail-content">
-                  <strong>Lieu</strong>
-                  <span>{selectedEvent.location}</span>
-                </div>
-              </div>
-            )}
-
-            <div className="event-detail-row">
-              <span className="detail-icon">📅</span>
-              <div className="detail-content">
-                <strong>Source</strong>
-                <span 
-                  className="source-tag"
-                  style={{ 
-                    backgroundColor: selectedEvent.source === 'icloud' ? '#ffe6e6' : '#e6f3ff',
-                    color: selectedEvent.source === 'icloud' ? '#cc4444' : '#4488cc',
-                    padding: '6px 14px',
-                    borderRadius: '20px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    border: `1px solid ${selectedEvent.source === 'icloud' ? '#ffcccc' : '#cce6ff'}`,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  {selectedEvent.source === 'icloud' ? 'Calendrier de Duve' : 'Secteur SSS'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {selectedEvent.description && (
-            <div className="event-description-section">
-              <div className="description-header">
-                <span className="detail-icon">📝</span>
-                <strong>Description</strong>
-              </div>
-              <div className="description-content">
-                {formatDescription(selectedEvent.description)}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const renderUpcomingEvents = () => {
-    const paginatedEvents = getPaginatedEvents();
-    const totalPages = getTotalPages();
-
-    if (paginatedEvents.length === 0) {
-      return (
-        <div className="upcoming-events">
-          <h2>Prochains événements</h2>
-          <p className="no-events">Aucun événement à venir</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="upcoming-events">
-        <h2>Prochains événements</h2>
-        <div className="events-list">
-          {paginatedEvents.map((event, _index) => (
-            <div
-              key={`${event.id}-${event.start.getTime()}`}
-              className={`event-card ${event.source}`}
-              style={{ '--event-color': event.color } as React.CSSProperties}
-              onClick={() => setSelectedEvent(event)}
-              onMouseEnter={(e) => showTooltip(e, event.title)}
-              onMouseLeave={hideTooltip}
-            >
-              <div className="event-card-header">
-                <h3 className="event-title">{event.title}</h3>
-              </div>
-              <div className="event-card-body">
-                <p className="event-date">
-                  <strong>{format(event.start, 'EEEE d MMMM yyyy', { locale: fr })}</strong>
-                </p>
-                <p className="event-time">
-                  {event.allDay 
-                    ? 'Toute la journée'
-                    : `${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`
-                  }
-                </p>
-                {event.location && (
-                  <p className="event-location">📍 {event.location}</p>
-                )}
-                <p className="event-source">
-                  <span 
-                    className="source-badge"
-                    style={{ 
-                      backgroundColor: event.source === 'icloud' ? '#ffe6e6' : '#e6f3ff',
-                      color: event.source === 'icloud' ? '#cc4444' : '#4488cc',
-                      padding: '4px 10px',
-                      borderRadius: '14px',
-                      fontSize: '11px',
-                      fontWeight: '500',
-                      border: `1px solid ${event.source === 'icloud' ? '#ffcccc' : '#cce6ff'}`,
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    {event.source === 'icloud' ? 'Duve' : 'SSS'}
-                  </span>
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {totalPages > 1 && (
-          <div className="pagination">
-            <button
-              className="nav-button"
-              onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-              disabled={currentPage === 0}
-            >
-              ← Précédent
-            </button>
-            <span className="page-info">
-              Page {currentPage + 1} sur {totalPages}
-            </span>
-            <button
-              className="nav-button"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
-              disabled={currentPage === totalPages - 1}
-            >
-              Suivant →
-            </button>
-          </div>
-        )}
-      </div>
-    );
   };
 
   if (loading) {
@@ -573,19 +402,59 @@ export const Calendar: React.FC = () => {
       <div className="error">
         <h3>Erreur de chargement</h3>
         <p>{error}</p>
-        <button onClick={loadEvents} className="nav-button">Réessayer</button>
+        <button onClick={() => loadEvents(true)} className="nav-button">Réessayer</button>
       </div>
     );
   }
 
   return (
     <div className="calendar-container fade-in">
-      <div className="calendar-header">
+      {/* Header principal avec titre UCLouvain */}
+      {currentView !== 'display' && (
+        <div className="calendar-main-header">
+          <h1 className="calendar-main-title">
+            Calendrier des Événements
+          </h1>
+          <p className="calendar-main-subtitle">
+            Secteur des Sciences de la Santé - UCLouvain
+          </p>
+          <div className="display-mode-toggle">
+            <button
+              onClick={() => setCurrentView('display')}
+              className="display-mode-button"
+              title="Basculer vers la vue d'affichage public"
+            >
+              📺 Vue Affichage Public
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Header spécial pour la vue d'affichage */}
+      {currentView === 'display' && (
+        <div className="display-mode-header">
+          <button
+            onClick={() => setCurrentView('month')}
+            className="back-to-calendar-button"
+            title="Retour au calendrier"
+          >
+            ← Retour au calendrier
+          </button>
+          <div className="display-mode-title">
+            <span className="live-indicator">🔴 LIVE</span>
+            <span>Vue Affichage Public</span>
+          </div>
+        </div>
+      )}
+
+      {/* Header de navigation avec recherche */}
+      {currentView !== 'display' && (
+        <div className="calendar-header">
         <div className="calendar-nav">
           <button 
             onClick={() => navigateDate('prev')} 
             className="nav-button"
-            aria-label="Mois précédent"
+            aria-label="Période précédente"
           >
             ← Précédent
           </button>
@@ -599,51 +468,178 @@ export const Calendar: React.FC = () => {
           <button 
             onClick={() => navigateDate('next')} 
             className="nav-button"
-            aria-label="Mois suivant"
+            aria-label="Période suivante"
           >
             Suivant →
           </button>
         </div>
+
+        <div className="calendar-search-section">
+          <SearchBar
+            events={events}
+            onSearchResults={(results, query) => {
+              setQuery(query);
+              // Scroller vers les résultats après un court délai
+              if (query.trim() && searchResultsRef.current) {
+                setTimeout(() => {
+                  searchResultsRef.current?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                  });
+                }, 100);
+              }
+            }}
+            onClearSearch={() => {
+              clearSearch();
+              // Remonter vers le calendrier quand on efface la recherche
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            placeholder="Rechercher dans les événements..."
+          />
+        </div>
         
-        <h1 className="month-year">
+        <h2 className="month-year">
           {getNavigationLabel()}
-        </h1>
+        </h2>
         
         <div className="header-controls">
-          <div className="source-filter">
-            <select 
-              value={sourceFilter} 
-              onChange={(e) => setSourceFilter(e.target.value as 'all' | 'icloud' | 'outlook')}
-              className="filter-select"
-            >
-              <option value="all">Tous les calendriers</option>
-              <option value="icloud">Calendrier de Duve</option>
-              <option value="outlook">Secteur SSS</option>
-            </select>
-          </div>
           <ViewSelector 
             currentView={currentView} 
             onViewChange={setCurrentView} 
           />
           <button 
-            onClick={loadEvents} 
+            onClick={() => loadEvents(true)} 
             className="nav-button"
             aria-label="Actualiser les calendriers"
-            title="Actualiser les calendriers"
+            title="Actualiser les calendriers (rechargement complet)"
           >
             🔄 Actualiser
           </button>
         </div>
       </div>
+      )}
 
-      <div className="calendar-content scale-in">
-        {renderCurrentView()}
+      {/* Section des filtres sous le header */}
+      {currentView !== 'display' && (
+        <div className="calendar-filters-section">
+          <div className="filters-container-inline">
+            <div className="filters-row">
+              <div className="filter-group-compact">
+                <label className="filter-label-compact">Source :</label>
+                <select 
+                  value={searchState.filters.source} 
+                  onChange={(e) => updateFilters({ source: e.target.value as any })}
+                  className="filter-select-compact"
+                >
+                  <option value="all">Tous</option>
+                  <option value="icloud">🍎 Duve</option>
+                  <option value="outlook">📧 SSS</option>
+                </select>
+              </div>
+
+              <div className="filter-group-compact">
+                <label className="filter-label-compact">Catégorie :</label>
+                <select 
+                  value={searchState.filters.category} 
+                  onChange={(e) => updateFilters({ category: e.target.value as any })}
+                  className="filter-select-compact"
+                >
+                  {EVENT_TYPES.map(eventType => (
+                    <option key={eventType.type} value={eventType.type}>
+                      {eventType.icon} {eventType.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group-compact">
+                <label className="filter-label-compact">Période :</label>
+                <select 
+                  value={searchState.filters.dateRange} 
+                  onChange={(e) => updateFilters({ dateRange: e.target.value as any })}
+                  className="filter-select-compact"
+                >
+                  <option value="all">Toutes</option>
+                  <option value="upcoming">À venir</option>
+                  <option value="thisWeek">Semaine</option>
+                  <option value="thisMonth">Mois</option>
+                </select>
+              </div>
+
+              <div className="filter-stats-compact">
+                <span className="stats-total">{searchStats.totalEvents} événements</span>
+                {searchStats.hasActiveFilters && (
+                  <span className="stats-filtered">• {searchStats.filteredCount} filtrés</span>
+                )}
+                {searchState.isSearching && (
+                  <span className="stats-found">• {searchStats.resultsCount} trouvés</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={`calendar-layout ${currentView === 'display' ? 'display-mode' : ''} ${searchState.isSearching ? 'search-active' : ''}`}>
+        <div className="calendar-main">
+          <div className="calendar-content scale-in">
+            {renderCurrentView()}
+          </div>
+          
+          {/* Résultats de recherche sous le calendrier */}
+          {currentView !== 'display' && (
+            <div ref={searchResultsRef}>
+              <SearchResults
+                searchResults={searchState.results}
+                searchQuery={searchState.query}
+                isVisible={searchState.isSearching}
+                onEventClick={(event) => {
+                  setSelectedEvent(event);
+                  setIsModalOpen(true);
+                }}
+                onExportToGoogle={exportToGoogleCalendar}
+                onExportToOutlook={exportToOutlookCalendar}
+                onExportToICS={exportToICS}
+              />
+            </div>
+          )}
+        </div>
+        
+        {currentView !== 'display' && !searchState.isSearching && (
+          <div className="calendar-sidebar">
+            <UniversalSidebar
+              searchResults={[]} // Plus de résultats dans le sidebar
+              upcomingEvents={getUpcomingEvents()}
+              isSearching={false} // Toujours afficher les événements à venir
+              searchQuery=""
+              onEventClick={(event) => {
+                setSelectedEvent(event);
+                setIsModalOpen(true);
+              }}
+              onExportToGoogle={exportToGoogleCalendar}
+              onExportToOutlook={exportToOutlookCalendar}
+              onExportToICS={exportToICS}
+            />
+          </div>
+        )}
       </div>
 
-      {renderEventDetails()}
-      
-      {/* Afficher les événements à venir seulement pour certaines vues */}
-      {(currentView === 'month' || currentView === 'compact') && renderUpcomingEvents()}
+      {/* Légende des événements sous le calendrier */}
+      <div className="calendar-legend-section">
+        <EventLegend />
+      </div>
+
+      <EventModal 
+        event={selectedEvent}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedEvent(null);
+        }}
+        onExportToGoogle={exportToGoogleCalendar}
+        onExportToOutlook={exportToOutlookCalendar}
+        onExportToICS={exportToICS}
+      />
 
       {debugInfo && (
         <div className="debug-section">
@@ -664,6 +660,8 @@ export const Calendar: React.FC = () => {
           {tooltip.content}
         </div>
       )}
+
+      <Footer />
     </div>
   );
 };

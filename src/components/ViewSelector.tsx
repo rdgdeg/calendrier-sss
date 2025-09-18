@@ -8,9 +8,8 @@ interface ViewSelectorProps {
 
 const VIEW_CONFIGS: CalendarViewConfig[] = [
   { view: 'month', title: 'Mois', icon: '📅' },
-  { view: 'week', title: 'Semaine', icon: '📊' },
   { view: 'agenda', title: 'Agenda', icon: '📋' },
-  { view: 'compact', title: 'Compact', icon: '🗓️' }
+  { view: 'display', title: 'Affichage', icon: '📺' }
 ];
 
 export const ViewSelector: React.FC<ViewSelectorProps> = ({

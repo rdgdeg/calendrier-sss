@@ -25,10 +25,20 @@ export interface CalendarSource {
   color: string;
 }
 
-export type CalendarView = 'month' | 'week' | 'agenda' | 'compact';
+export type CalendarView = 'month' | 'agenda' | 'display';
 
 export interface CalendarViewConfig {
   view: CalendarView;
   title: string;
+  icon: string;
+}
+
+export type EventType = 'all' | 'colloque' | 'these' | 'seminaire' | 'other';
+
+export interface EventTypeConfig {
+  type: EventType;
+  label: string;
+  code: string;
+  color: string;
   icon: string;
 }

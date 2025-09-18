@@ -2,6 +2,38 @@ import ICAL from 'ical.js';
 import { CalendarEvent } from '../types';
 import { determineEventCategoryWithColor } from './colorMapping';
 
+// Fonction pour filtrer les événements non pertinents
+const shouldExcludeEvent = (title: string, description: string = ''): boolean => {
+  const titleLower = title.toLowerCase();
+  const descLower = description.toLowerCase();
+  const content = `${titleLower} ${descLower}`;
+  
+  // Filtrer les événements automatiques/système
+  const excludePatterns = [
+    // Événements système
+    /^(busy|occupé|indisponible)$/i,
+    /^(free|libre|disponible)$/i,
+    /^(tentative|provisoire)$/i,
+    
+    // Événements répétitifs sans intérêt
+    /^(pause|break|lunch|déjeuner)$/i,
+    /^(meeting|réunion)\s*$/i, // Réunions sans titre spécifique
+    
+    // Événements de maintenance
+    /maintenance/i,
+    /test\s*$/i,
+    
+    // Événements privés génériques
+    /^(privé|private|personnel|personal)$/i,
+    
+    // Événements de blocage de temps
+    /^(blocked|bloqué|block)$/i,
+    /^(no meeting|pas de réunion)$/i,
+  ];
+  
+  return excludePatterns.some(pattern => pattern.test(content));
+};
+
 export class ICalParser {
   static async fetchAndParse(url: string, source: 'icloud' | 'outlook'): Promise<CalendarEvent[]> {
     try {
@@ -68,6 +100,12 @@ export class ICalParser {
             if (endDate >= sixMonthsAgo && startDate <= oneYearLater) {
               const title = event.summary || 'Sans titre';
               const description = event.description || '';
+              
+              // Filtrer les événements non pertinents
+              if (shouldExcludeEvent(title, description)) {
+                continue;
+              }
+              
               const category = determineEventCategoryWithColor(title, description, source);
               
               events.push({
@@ -101,6 +139,12 @@ export class ICalParser {
                 const occurrenceEnd = details.endDate.toJSDate();
                 const title = event.summary || 'Sans titre';
                 const description = event.description || '';
+                
+                // Filtrer les événements non pertinents
+                if (shouldExcludeEvent(title, description)) {
+                  continue;
+                }
+                
                 const category = determineEventCategoryWithColor(title, description, source);
                 
                 events.push({

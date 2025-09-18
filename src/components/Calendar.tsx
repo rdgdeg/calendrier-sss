@@ -571,9 +571,12 @@ export const Calendar: React.FC = () => {
             currentView={currentView} 
             onViewChange={setCurrentView} 
           />
+        </div>
+        
+        <div className="header-actions">
           <button 
             onClick={() => loadEvents()} 
-            className="nav-button"
+            className="nav-button refresh-button"
             aria-label="Actualiser les calendriers"
             title="Actualiser les calendriers (rechargement complet)"
           >
@@ -581,7 +584,7 @@ export const Calendar: React.FC = () => {
           </button>
           <button 
             onClick={() => loadEvents(true)} 
-            className="nav-button"
+            className="nav-button clear-cache-button"
             aria-label="Forcer le rechargement"
             title="Vider le cache et recharger complètement"
           >

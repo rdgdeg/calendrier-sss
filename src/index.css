@@ -9774,4 +9774,119 @@ lts-subtitle {
     opacity: 1;
     transform: translateY(0);
   }
+}/* 
+Calendar Header Styles */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ucl-spacing-lg);
+  padding: var(--ucl-spacing-md);
+  background: var(--ucl-white);
+  border-bottom: 1px solid var(--ucl-gray-200);
+  flex-wrap: wrap;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: var(--ucl-spacing-sm);
+}
+
+.calendar-search-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-sm);
+  min-width: 300px;
+}
+
+.month-year {
+  font-size: var(--ucl-font-size-xl);
+  font-weight: var(--ucl-font-weight-semibold);
+  color: var(--ucl-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-sm);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-sm);
+  margin-left: auto;
+}
+
+.refresh-button,
+.clear-cache-button {
+  background: var(--ucl-primary);
+  color: white;
+  border: none;
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-md);
+  border-radius: var(--ucl-border-radius);
+  font-size: var(--ucl-font-size-sm);
+  font-weight: var(--ucl-font-weight-medium);
+  cursor: pointer;
+  transition: var(--ucl-transition);
+  white-space: nowrap;
+}
+
+.refresh-button:hover {
+  background: var(--ucl-secondary);
+  transform: translateY(-1px);
+}
+
+.clear-cache-button {
+  background: var(--ucl-warning);
+}
+
+.clear-cache-button:hover {
+  background: #e08e0b;
+  transform: translateY(-1px);
+}
+
+.nav-button {
+  background: var(--ucl-gray-100);
+  color: var(--ucl-dark);
+  border: 1px solid var(--ucl-gray-300);
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-md);
+  border-radius: var(--ucl-border-radius);
+  font-size: var(--ucl-font-size-sm);
+  font-weight: var(--ucl-font-weight-medium);
+  cursor: pointer;
+  transition: var(--ucl-transition);
+  white-space: nowrap;
+}
+
+.nav-button:hover {
+  background: var(--ucl-gray-200);
+  border-color: var(--ucl-gray-400);
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .calendar-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--ucl-spacing-md);
+  }
+  
+  .calendar-nav,
+  .header-controls,
+  .header-actions {
+    justify-content: center;
+  }
+  
+  .calendar-search-section {
+    min-width: auto;
+  }
+  
+  .month-year {
+    text-align: center;
+  }
 }

@@ -146,9 +146,7 @@ export const Calendar: React.FC = () => {
       for (const source of CALENDAR_SOURCES) {
         try {
           
-          const startTime = Date.now();
           const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
-          const loadTime = Date.now() - startTime;
           
           allEvents.push(...sourceEvents);
 

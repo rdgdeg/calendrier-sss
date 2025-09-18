@@ -61,7 +61,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress, message 
 
         {/* Informations de contact */}
         <div className="loading-footer">
-          <p>Avenue Emmanuel Mounier 73, 1200 Woluwe-Saint-Lambert</p>
+          <p>Rue Martin V 40, Batiment Les Arches, 1200 Woluwe-Saint-Lambert</p>
         </div>
       </div>
     </div>

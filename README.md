@@ -15,7 +15,7 @@ L'application **Calendrier SSS** est une solution web complète qui agrège et a
 
 Développée pour le **Secteur des Sciences de la Santé de l'UCLouvain**, cette application centralise les événements académiques, administratifs et de recherche pour offrir une vue d'ensemble cohérente aux étudiants, professeurs et personnel administratif.
 
-**Adresse du secteur :** Avenue Emmanuel Mounier 73, 1200 Woluwe-Saint-Lambert
+**Adresse du secteur :** Rue Martin V 40, Batiment Les Arches, 1200 Woluwe-Saint-Lambert
 
 ## 🚀 Fonctionnalités principales
 

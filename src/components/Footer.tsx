@@ -7,7 +7,7 @@ export const Footer: React.FC = () => {
         <div className="footer-section">
           <h4>Secteur des Sciences de la Santé</h4>
           <p>Université catholique de Louvain</p>
-          <p>Avenue Emmanuel Mounier, 73</p>
+          <p>Rue Martin V 40, Batiment Les Arches</p>
           <p>1200 Woluwe-Saint-Lambert</p>
         </div>
         

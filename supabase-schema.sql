@@ -64,9 +64,11 @@ ALTER TABLE event_cache ENABLE ROW LEVEL SECURITY;
 ALTER TABLE calendar_syncs ENABLE ROW LEVEL SECURITY;
 
 -- Politique pour permettre toutes les opérations (à adapter selon vos besoins)
+DROP POLICY IF EXISTS "Allow all operations on event_cache" ON event_cache;
 CREATE POLICY "Allow all operations on event_cache" ON event_cache
     FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow all operations on calendar_syncs" ON calendar_syncs;
 CREATE POLICY "Allow all operations on calendar_syncs" ON calendar_syncs
     FOR ALL USING (true) WITH CHECK (true);
 

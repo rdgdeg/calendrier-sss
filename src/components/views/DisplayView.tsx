@@ -136,7 +136,7 @@ export const DisplayView: React.FC<DisplayViewProps> = ({
                     
                     <div className="display-event-body">
                       <div className="display-event-title-compact">
-                        {formatTitle(event.title, 250)}
+                        {formatTitle(event.title, 400)}
                       </div>
                       
                       {event.location && (

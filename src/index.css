@@ -9184,7 +9184,7 @@ méliorations supplémentaires pour la lisibilité des événements */
 .display-events-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: var(--ucl-spacing-lg);
+  gap: var(--ucl-spacing-xl);
   margin-bottom: var(--ucl-spacing-lg);
   align-items: stretch;
 }
@@ -9197,7 +9197,7 @@ méliorations supplémentaires pour la lisibilité des événements */
   transition: all var(--ucl-transition);
   cursor: pointer;
   border: 3px solid transparent;
-  height: 380px; /* Hauteur augmentée pour plus d'aération */
+  height: 420px; /* Hauteur encore augmentée pour plus de contenu */
   display: flex;
   flex-direction: column;
 }
@@ -9261,30 +9261,38 @@ méliorations supplémentaires pour la lisibilité des événements */
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: var(--ucl-spacing-sm);
 }
 
 .display-event-time-compact {
-  font-size: var(--ucl-font-size-sm);
+  font-size: var(--ucl-font-size-xs);
   color: var(--ucl-text-secondary);
-  font-weight: var(--ucl-font-weight-medium);
+  font-weight: var(--ucl-font-weight-semibold);
   flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .display-event-title-compact {
-  font-size: var(--ucl-font-size-lg);
+  font-size: var(--ucl-font-size-md);
   font-weight: var(--ucl-font-weight-bold);
   color: var(--ucl-text-primary);
   margin-bottom: var(--ucl-spacing-md);
-  line-height: 1.4;
+  line-height: 1.5;
   flex: 1;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 .display-event-location-compact {
-  font-size: var(--ucl-font-size-sm);
+  font-size: var(--ucl-font-size-xs);
   color: var(--ucl-text-secondary);
   margin-top: auto;
-  padding-top: var(--ucl-spacing-sm);
+  padding-top: var(--ucl-spacing-md);
+  font-weight: var(--ucl-font-weight-medium);
+  font-style: italic;
 }
 
 .display-event-source-compact {
@@ -9292,15 +9300,16 @@ méliorations supplémentaires pour la lisibilité des événements */
 }
 
 .source-badge-compact {
-  font-size: 10px;
-  padding: 4px 8px;
-  border-radius: var(--ucl-border-radius);
+  font-size: 9px;
+  padding: 6px 10px;
+  border-radius: var(--ucl-border-radius-lg);
   font-weight: var(--ucl-font-weight-bold);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   white-space: nowrap;
-  min-width: 45px;
+  min-width: 60px;
   text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .source-badge-compact.icloud {
@@ -9397,7 +9406,7 @@ méliorations supplémentaires pour la lisibilité des événements */
   }
   
   .display-event-card {
-    height: 340px;
+    height: 380px;
   }
 }
 
@@ -9407,7 +9416,7 @@ méliorations supplémentaires pour la lisibilité des événements */
   }
   
   .display-event-card {
-    height: 360px;
+    height: 400px;
   }
 }
 

@@ -257,6 +257,17 @@ export const Calendar: React.FC = () => {
   useEffect(() => {
     // Toujours forcer le rechargement au démarrage pour avoir les données les plus récentes
     loadEvents(true);
+    
+    // Actualisation automatique toutes les 5 minutes
+    const autoRefreshInterval = setInterval(() => {
+      console.log('🔄 Actualisation automatique des données...');
+      loadEvents(true);
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    // Nettoyer l'intervalle au démontage du composant
+    return () => {
+      clearInterval(autoRefreshInterval);
+    };
   }, []);
 
 
@@ -517,81 +528,6 @@ export const Calendar: React.FC = () => {
             title="Actualiser les calendriers (rechargement complet)"
           >
             🔄 Actualiser
-          </button>
-          <button 
-            onClick={async () => {
-              console.log('🔄 Force reloading Outlook only...');
-              const outlookSource = CALENDAR_SOURCES.find(s => s.source === 'outlook');
-              if (outlookSource) {
-                try {
-                  const { ICalParser } = await import('../utils/icalParser');
-                  const outlookEvents = await ICalParser.fetchAndParse(outlookSource.url, 'outlook');
-                  console.log('📧 Fresh Outlook events:', outlookEvents.length);
-                  console.log('📧 Fresh Outlook details:', outlookEvents.map(e => ({
-                    title: e.title,
-                    start: e.start.toLocaleString('fr-FR'),
-                    id: e.id
-                  })));
-                  alert(`Fresh Outlook reload: ${outlookEvents.length} events found`);
-                } catch (error) {
-                  console.error('❌ Outlook reload error:', error);
-                  alert(`Outlook reload error: ${error}`);
-                }
-              }
-            }} 
-            className="nav-button"
-            title="Recharger Outlook uniquement"
-          >
-            🔄 Outlook seul
-          </button>
-          <button 
-            onClick={async () => {
-              console.log('🔍 Analyzing current events by source...');
-              const outlookEvents = events.filter(e => e.source === 'outlook');
-              const icloudEvents = events.filter(e => e.source === 'icloud');
-              
-              console.log(`📊 Total events: ${events.length}`);
-              console.log(`📧 Outlook events: ${outlookEvents.length}`);
-              console.log(`🍎 iCloud events: ${icloudEvents.length}`);
-              
-              // Tous les événements Outlook (passés et futurs)
-              const allOutlook = outlookEvents
-                .sort((a, b) => a.start.getTime() - b.start.getTime());
-                
-              console.log('📧 ALL Outlook events (past & future):', allOutlook.map(e => ({
-                title: e.title,
-                start: e.start.toLocaleString('fr-FR'),
-                isPast: e.start < new Date(),
-                id: e.id
-              })));
-              
-              // Événements futurs seulement
-              const futureOutlook = outlookEvents
-                .filter(e => e.start >= new Date())
-                .sort((a, b) => a.start.getTime() - b.start.getTime());
-                
-              console.log('📧 Future Outlook events:', futureOutlook.map(e => ({
-                title: e.title,
-                start: e.start.toLocaleString('fr-FR'),
-                id: e.id
-              })));
-              
-              // Événements créés dans les dernières 24h
-              const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-              const recentEvents = outlookEvents.filter(e => e.start >= last24h);
-              
-              console.log('🆕 Outlook events in last 24h:', recentEvents.map(e => ({
-                title: e.title,
-                start: e.start.toLocaleString('fr-FR'),
-                created: 'recent'
-              })));
-              
-              alert(`Events: ${events.length} total\nOutlook: ${outlookEvents.length}\niCloud: ${icloudEvents.length}\nRecent Outlook: ${recentEvents.length}\n\nCheck console for ALL details`);
-            }} 
-            className="nav-button"
-            title="Analyser les événements par source"
-          >
-            📊 Analyser
           </button>
         </div>
       </div>

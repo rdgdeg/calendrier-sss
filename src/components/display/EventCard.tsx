@@ -37,12 +37,12 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
     }
   };
 
-  const truncateTitle = (title: string, maxLength: number = 120): string => {
+  const truncateTitle = (title: string, maxLength: number = 80): string => {
     if (title.length <= maxLength) return title;
     // Trouver le dernier espace avant la limite pour éviter de couper au milieu d'un mot
     const truncated = title.substring(0, maxLength);
     const lastSpace = truncated.lastIndexOf(' ');
-    if (lastSpace > maxLength * 0.8) {
+    if (lastSpace > maxLength * 0.7) {
       return truncated.substring(0, lastSpace).trim() + '...';
     }
     return truncated.trim() + '...';

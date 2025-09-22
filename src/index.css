@@ -380,23 +380,23 @@ body {
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, minmax(160px, auto));
+  grid-template-rows: repeat(6, minmax(120px, 140px));
   gap: 0;
   width: 100%;
 }
 
 .calendar-day {
-  min-height: 160px;
-  height: auto;
+  min-height: 120px;
+  max-height: 140px;
   border-right: 1px solid var(--ucl-gray-200);
   border-bottom: 1px solid var(--ucl-gray-200);
-  padding: 8px;
+  padding: 4px;
   position: relative;
   background: var(--ucl-white);
   transition: all var(--ucl-transition);
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow: hidden;
   cursor: pointer;
 }
 
@@ -463,18 +463,18 @@ body {
 .day-events {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   flex: 1;
-  overflow: visible;
-  margin-top: 4px;
+  overflow: hidden;
+  margin-top: 2px;
   min-height: 0;
 }
 
 .event-item {
   /* Les couleurs sont maintenant gérées par JavaScript avec getOptimalTextColor */
-  padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
-  border-radius: var(--ucl-border-radius);
-  font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 9px;
   font-weight: var(--ucl-font-weight-semibold);
   cursor: pointer;
   overflow: hidden;
@@ -483,14 +483,13 @@ body {
   transition: all var(--ucl-transition);
   position: relative;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  min-height: 20px;
+  min-height: 16px;
+  max-height: 18px;
   display: flex;
   align-items: center;
-  line-height: 1.2;
-  word-break: break-word;
-  hyphens: auto;
+  line-height: 1.1;
+  margin-bottom: 1px;
 }
 
 .event-item::before {

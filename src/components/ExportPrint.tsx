@@ -6,7 +6,7 @@ import { fr } from 'date-fns/locale';
 interface ExportPrintProps {
   events: CalendarEvent[];
   currentDate: Date;
-  currentView: 'month' | 'agenda' | 'display';
+  currentView: 'month' | 'agenda';
 }
 
 export const ExportPrint: React.FC<ExportPrintProps> = ({

@@ -25,7 +25,7 @@ export interface CalendarSource {
   color: string;
 }
 
-export type CalendarView = 'month' | 'agenda' | 'display';
+export type CalendarView = 'month' | 'agenda';
 
 export interface CalendarViewConfig {
   view: CalendarView;

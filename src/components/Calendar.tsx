@@ -7,7 +7,7 @@ import { syncCalendarStatus, cacheEvents, getCachedEvents, clearCache } from '..
 import { ViewSelector } from './ViewSelector';
 import { MonthView } from './views/MonthView';
 import { AgendaView } from './views/AgendaView';
-import { DisplayView } from './views/DisplayView';
+
 import { EventModal } from './EventModal';
 import { Footer } from './Footer';
 import { EventLegend } from './EventLegend';
@@ -495,8 +495,6 @@ export const Calendar: React.FC = () => {
         return <MonthView {...commonProps} />;
       case 'agenda':
         return <AgendaView {...commonProps} selectedEventId={selectedEvent?.id} />;
-      case 'display':
-        return <DisplayView {...commonProps} daysToShow={5} />;
       default:
         return <MonthView {...commonProps} />;
     }
@@ -540,60 +538,42 @@ export const Calendar: React.FC = () => {
       />
 
       {/* Header principal compact */}
-      {currentView !== 'display' && (
-        <div className="calendar-main-header-compact">
-          <h1 className="calendar-main-title-compact">
-            📅 Calendrier SSS - UCLouvain
-          </h1>
-          <div className="header-actions-group">
-            <div className="header-refresh-actions">
-              <button 
-                onClick={() => loadEvents()} 
-                className="nav-button refresh-button compact"
-                aria-label="Actualiser les calendriers"
-                title="Actualiser les calendriers (vide automatiquement le cache)"
-              >
-                🔄 Actualiser
-              </button>
-              <ExportPrint 
-                events={filteredEvents}
-                currentDate={currentDate}
-                currentView={currentView}
-              />
-            </div>
-            <div className="header-help-actions">
-              <button
-                className="faq-btn"
-                onClick={() => setShowFAQ(true)}
-                title="Questions fréquentes"
-              >
-                ❓
-              </button>
-            </div>
+      <div className="calendar-main-header-compact">
+        <h1 className="calendar-main-title-compact">
+          📅 Calendrier SSS - UCLouvain
+        </h1>
+        <div className="header-actions-group">
+          <div className="header-refresh-actions">
+            <button 
+              onClick={() => loadEvents()} 
+              className="nav-button refresh-button compact"
+              aria-label="Actualiser les calendriers"
+              title="Actualiser les calendriers (vide automatiquement le cache)"
+            >
+              🔄 Actualiser
+            </button>
+            <ExportPrint 
+              events={filteredEvents}
+              currentDate={currentDate}
+              currentView={currentView}
+            />
+          </div>
+          <div className="header-help-actions">
+            <button
+              className="faq-btn"
+              onClick={() => setShowFAQ(true)}
+              title="Questions fréquentes"
+            >
+              ❓
+            </button>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Header spécial pour la vue d'affichage */}
-      {currentView === 'display' && (
-        <div className="display-mode-header">
-          <button
-            onClick={() => setCurrentView('month')}
-            className="back-to-calendar-button"
-            title="Retour au calendrier"
-          >
-            ← Retour au calendrier
-          </button>
-          <div className="display-mode-title">
-            <span className="live-indicator">🔴 LIVE</span>
-            <span>Vue Affichage Public</span>
-          </div>
-        </div>
-      )}
+
 
       {/* Header de navigation avec recherche */}
-      {currentView !== 'display' && (
-        <div className="calendar-header">
+      <div className="calendar-header">
         <div className="calendar-nav">
           <button 
             onClick={() => navigateDate('prev')} 
@@ -678,92 +658,88 @@ export const Calendar: React.FC = () => {
       )}
 
       {/* Section des filtres sous le header */}
-      {currentView !== 'display' && (
-        <div className="calendar-filters-section">
-          <div className="filters-container-inline">
-            <div className="filters-row">
-              <div className="filter-group-compact">
-                <label className="filter-label-compact">Source :</label>
-                <select 
-                  value={searchState.filters.source} 
-                  onChange={(e) => updateFilters({ source: e.target.value as any })}
-                  className="filter-select-compact"
-                >
-                  <option value="all">Tous</option>
-                  <option value="icloud">de Duve</option>
-                  <option value="outlook">📧 SSS</option>
-                </select>
-              </div>
+      <div className="calendar-filters-section">
+        <div className="filters-container-inline">
+          <div className="filters-row">
+            <div className="filter-group-compact">
+              <label className="filter-label-compact">Source :</label>
+              <select 
+                value={searchState.filters.source} 
+                onChange={(e) => updateFilters({ source: e.target.value as any })}
+                className="filter-select-compact"
+              >
+                <option value="all">Tous</option>
+                <option value="icloud">de Duve</option>
+                <option value="outlook">📧 SSS</option>
+              </select>
+            </div>
 
-              <div className="filter-group-compact">
-                <label className="filter-label-compact">Catégorie :</label>
-                <select 
-                  value={searchState.filters.category} 
-                  onChange={(e) => updateFilters({ category: e.target.value as any })}
-                  className="filter-select-compact"
-                >
-                  {EVENT_TYPES.map(eventType => (
-                    <option key={eventType.type} value={eventType.type}>
-                      {eventType.icon} {eventType.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="filter-group-compact">
+              <label className="filter-label-compact">Catégorie :</label>
+              <select 
+                value={searchState.filters.category} 
+                onChange={(e) => updateFilters({ category: e.target.value as any })}
+                className="filter-select-compact"
+              >
+                {EVENT_TYPES.map(eventType => (
+                  <option key={eventType.type} value={eventType.type}>
+                    {eventType.icon} {eventType.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="filter-group-compact">
-                <label className="filter-label-compact">Période :</label>
-                <select 
-                  value={searchState.filters.dateRange} 
-                  onChange={(e) => updateFilters({ dateRange: e.target.value as any })}
-                  className="filter-select-compact"
-                >
-                  <option value="all">Toutes</option>
-                  <option value="upcoming">À venir</option>
-                  <option value="thisWeek">Semaine</option>
-                  <option value="thisMonth">Mois</option>
-                </select>
-              </div>
+            <div className="filter-group-compact">
+              <label className="filter-label-compact">Période :</label>
+              <select 
+                value={searchState.filters.dateRange} 
+                onChange={(e) => updateFilters({ dateRange: e.target.value as any })}
+                className="filter-select-compact"
+              >
+                <option value="all">Toutes</option>
+                <option value="upcoming">À venir</option>
+                <option value="thisWeek">Semaine</option>
+                <option value="thisMonth">Mois</option>
+              </select>
+            </div>
 
-              <div className="filter-stats-compact">
-                <span className="stats-total">{searchStats.totalEvents} événements</span>
-                {searchStats.hasActiveFilters && (
-                  <span className="stats-filtered">• {searchStats.filteredCount} filtrés</span>
-                )}
-                {searchState.isSearching && (
-                  <span className="stats-found">• {searchStats.resultsCount} trouvés</span>
-                )}
-              </div>
+            <div className="filter-stats-compact">
+              <span className="stats-total">{searchStats.totalEvents} événements</span>
+              {searchStats.hasActiveFilters && (
+                <span className="stats-filtered">• {searchStats.filteredCount} filtrés</span>
+              )}
+              {searchState.isSearching && (
+                <span className="stats-found">• {searchStats.resultsCount} trouvés</span>
+              )}
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      <div className={`calendar-layout-full ${currentView === 'display' ? 'display-mode' : ''} ${searchState.isSearching ? 'search-active' : ''}`}>
+      <div className={`calendar-layout-full ${searchState.isSearching ? 'search-active' : ''}`}>
         <div className="calendar-main-full">
           <div className="calendar-content scale-in">
             {renderCurrentView()}
           </div>
           
           {/* Résultats de recherche sous le calendrier */}
-          {currentView !== 'display' && (
-            <div ref={searchResultsRef}>
-              <SearchResults
-                searchResults={searchState.results}
-                searchQuery={searchState.query}
-                isVisible={searchState.isSearching}
-                onEventClick={(event) => {
-                  setSelectedEvent(event);
-                  setIsModalOpen(true);
-                }}
-                onExportToGoogle={exportToGoogleCalendar}
-                onExportToOutlook={exportToOutlookCalendar}
-                onExportToICS={exportToICS}
-              />
-            </div>
-          )}
+          <div ref={searchResultsRef}>
+            <SearchResults
+              searchResults={searchState.results}
+              searchQuery={searchState.query}
+              isVisible={searchState.isSearching}
+              onEventClick={(event) => {
+                setSelectedEvent(event);
+                setIsModalOpen(true);
+              }}
+              onExportToGoogle={exportToGoogleCalendar}
+              onExportToOutlook={exportToOutlookCalendar}
+              onExportToICS={exportToICS}
+            />
+          </div>
 
           {/* Section des événements à venir sous le calendrier */}
-          {currentView !== 'display' && !searchState.isSearching && (
+          {!searchState.isSearching && (
             <UpcomingEventsSection
               events={filteredEvents}
               onEventClick={(event) => {

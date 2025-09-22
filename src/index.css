@@ -7603,12 +7603,15 @@ méliorations supplémentaires pour la lisibilité des événements */
 }
 
 /* 
-===== DISPLAY VIEW - Vue d'affichage public ===== */
+===== DISPLAY VIEW - Vue d'affichage public ===== 
+TEMPORARILY DISABLED */
+/*
 .display-view {
   background: var(--ucl-white);
   min-height: 100vh;
   font-family: var(--ucl-font-family);
 }
+*/
 
 .display-header {
   background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
@@ -7945,10 +7948,12 @@ méliorations supplémentaires pour la lisibilité des événements */
   }
 }
 
-/* Animation d'entrée pour la vue d'affichage */
+/* Animation d'entrée pour la vue d'affichage - DISABLED */
+/*
 .display-view {
   animation: displayFadeIn 0.6s ease-out;
 }
+*/
 
 @keyframes displayFadeIn {
   from {
@@ -9470,9 +9475,11 @@ méliorations supplémentaires pour la lisibilité des événements */
 
 /* ===== STYLES POUR LA VUE DISPLAY COMPACTE ===== */
 
+/*
 .display-view {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+*/
   padding: var(--ucl-spacing-lg);
 }
 

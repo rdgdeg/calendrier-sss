@@ -403,8 +403,6 @@ export const Calendar: React.FC = () => {
         return format(currentDate, 'MMMM yyyy', { locale: fr });
       case 'agenda':
         return 'Vue Agenda';
-      case 'display':
-        return 'Vue Affichage Public';
       default:
         return format(currentDate, 'MMMM yyyy', { locale: fr });
     }

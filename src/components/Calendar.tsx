@@ -12,7 +12,7 @@ import { EventModal } from './EventModal';
 import { Footer } from './Footer';
 import { EventLegend } from './EventLegend';
 import { SearchBar } from './SearchBar';
-import { UniversalSidebar } from './UniversalSidebar';
+
 import { SearchResults } from './SearchResults';
 import { UpcomingEventsSection } from './UpcomingEventsSection';
 
@@ -390,12 +390,7 @@ export const Calendar: React.FC = () => {
     }
   };
 
-  const getUpcomingEvents = (): CalendarEvent[] => {
-    const now = new Date();
-    return filteredEvents
-      .filter(event => new Date(event.start) >= now)
-      .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
-  };
+
 
   // Fonctions d'export vers les calendriers
   const exportToGoogleCalendar = (event: CalendarEvent) => {

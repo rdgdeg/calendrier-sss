@@ -11,6 +11,24 @@ interface EventCardProps {
 
 const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [iconSize, setIconSize] = useState(24);
+
+  // Adjust icon size based on screen size
+  React.useEffect(() => {
+    const updateIconSize = () => {
+      if (window.innerWidth >= 1920) {
+        setIconSize(36);
+      } else if (window.innerWidth >= 1400) {
+        setIconSize(30);
+      } else {
+        setIconSize(24);
+      }
+    };
+
+    updateIconSize();
+    window.addEventListener('resize', updateIconSize);
+    return () => window.removeEventListener('resize', updateIconSize);
+  }, []);
 
   const formatEventDate = (start: Date) => {
     return format(start, 'EEEE d MMMM', { locale: fr });
@@ -37,12 +55,20 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
     }
   };
 
-  const truncateTitle = (title: string, maxLength: number = 80): string => {
-    if (title.length <= maxLength) return title;
+  const truncateTitle = (title: string, maxLength: number = 120): string => {
+    // Adjust max length based on screen size
+    let adjustedMaxLength = maxLength;
+    if (window.innerWidth >= 1920) {
+      adjustedMaxLength = 200;
+    } else if (window.innerWidth >= 1400) {
+      adjustedMaxLength = 150;
+    }
+    
+    if (title.length <= adjustedMaxLength) return title;
     // Trouver le dernier espace avant la limite pour éviter de couper au milieu d'un mot
-    const truncated = title.substring(0, maxLength);
+    const truncated = title.substring(0, adjustedMaxLength);
     const lastSpace = truncated.lastIndexOf(' ');
-    if (lastSpace > maxLength * 0.7) {
+    if (lastSpace > adjustedMaxLength * 0.7) {
       return truncated.substring(0, lastSpace).trim() + '...';
     }
     return truncated.trim() + '...';
@@ -79,12 +105,12 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
         
         {/* Titre avec icône */}
         <div className="event-title-section">
-          <EventIcon event={event} size={18} />
+          <EventIcon event={event} size={iconSize} />
           <h3 
             id={`event-title-${event.id}`}
             className="event-title"
           >
-            {truncateTitle(event.title)}
+            {truncateTitle(event.title, 120)}
           </h3>
         </div>
         

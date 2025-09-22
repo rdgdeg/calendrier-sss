@@ -90,7 +90,9 @@ const EventsGridComponent: React.FC<EventsGridProps> = ({
   const getGridLayoutClass = (eventCount: number): string => {
     if (eventCount === 1) return 'events-grid-single';
     if (eventCount === 2) return 'events-grid-dual';
-    if (eventCount <= 4) return 'events-grid-quad';
+    if (eventCount === 3) return 'events-grid-triple';
+    if (eventCount === 4) return 'events-grid-quad';
+    if (eventCount === 5) return 'events-grid-five';
     return 'events-grid-full';
   };
 

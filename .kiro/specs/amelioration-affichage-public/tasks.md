@@ -118,3 +118,16 @@
     - Optimiser l'affichage pour les écrans 16:9 (grilles adaptatives)
     - Corriger les problèmes de débordement et de positionnement (layouts spécifiques par nombre d'événements)
     - _Exigences: 1.1, 1.2, 3.1, 6.1_
+
+- [ ] 11. Optimiser la disposition des cartes pour écran de télé
+  - [x] 11.1 Perfectionner la grille 3x2 pour 6 événements
+    - Ajuster les dimensions des cartes pour utiliser tout l'espace écran sans scroll
+    - Optimiser les gaps et marges pour une disposition harmonieuse
+    - Améliorer la lisibilité du contenu des cartes à distance
+    - _Exigences: 7.1, 7.2, 7.4_
+
+  - [x] 11.2 Adapter les dispositions pour moins de 6 événements
+    - Créer des layouts optimisés pour 1, 2, 3, 4 et 5 événements
+    - Centrer et agrandir les cartes quand il y a moins d'événements
+    - Maintenir les proportions et la lisibilité dans tous les cas
+    - _Exigences: 7.3, 7.4_

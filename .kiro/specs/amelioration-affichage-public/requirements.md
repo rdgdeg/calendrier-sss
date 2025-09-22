@@ -71,3 +71,14 @@ Cette fonctionnalité vise à améliorer l'esthétisme et l'expérience visuelle
 2. WHEN les informations sont statiques THEN le système SHALL inclure des animations subtiles pour maintenir l'intérêt
 3. WHEN l'heure est affichée THEN le système SHALL la mettre à jour en temps réel avec des transitions fluides
 4. WHEN l'affichage est inactif THEN le système SHALL maintenir une présentation professionnelle et engageante
+
+### Exigence 7 - Disposition Optimisée pour Écran de Télé
+
+**User Story:** En tant qu'utilisateur visualisant l'affichage sur un écran de télé, je veux voir exactement 6 événements parfaitement disposés sans avoir besoin de scroller, afin d'avoir une vue d'ensemble complète et lisible.
+
+#### Critères d'Acceptation
+
+1. WHEN l'affichage est visualisé sur un écran 16:9 THEN le système SHALL afficher exactement 6 cartes d'événements dans une grille 3x2
+2. WHEN les cartes sont affichées THEN le système SHALL utiliser tout l'espace disponible sans débordement ni scroll
+3. WHEN il y a moins de 6 événements THEN le système SHALL adapter la disposition (1x1, 2x1, 2x2) pour optimiser l'utilisation de l'espace
+4. WHEN les cartes sont disposées THEN le système SHALL maintenir des proportions harmonieuses et une lisibilité optimale à distance

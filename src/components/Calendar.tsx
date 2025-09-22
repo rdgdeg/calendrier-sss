@@ -441,41 +441,7 @@ export const Calendar: React.FC = () => {
     window.open(outlookUrl.toString(), '_blank');
   };
 
-  const viewEventOnline = (event: CalendarEvent) => {
-    // Générer l'URL pour voir l'événement dans le calendrier source
-    const startDate = event.start.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    const endDate = event.end.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    
-    let url = '';
-    let message = '';
-    
-    if (event.source === 'icloud') {
-      // Pour iCloud, ouvrir dans l'app Calendrier ou iCloud.com
-      url = `https://www.icloud.com/calendar/`;
-      message = 'Ouverture du calendrier iCloud. Recherchez l\'événement par titre ou date.';
-    } else if (event.source === 'outlook') {
-      // Pour Outlook, ouvrir Outlook Web avec la date
-      const eventDate = event.start.toISOString().split('T')[0];
-      url = `https://outlook.live.com/calendar/0/view/month/${eventDate}`;
-      message = 'Ouverture d\'Outlook Web Calendar à la date de l\'événement.';
-    } else {
-      // Fallback: créer un événement Google Calendar pour visualisation
-      const googleUrl = new URL('https://calendar.google.com/calendar/render');
-      googleUrl.searchParams.set('action', 'TEMPLATE');
-      googleUrl.searchParams.set('text', event.title);
-      googleUrl.searchParams.set('dates', `${startDate}/${endDate}`);
-      googleUrl.searchParams.set('details', event.description || '');
-      googleUrl.searchParams.set('location', event.location || '');
-      url = googleUrl.toString();
-      message = 'Ouverture dans Google Calendar pour visualisation complète.';
-    }
-    
-    // Afficher un message informatif
-    showToast('info', message, false);
-    
-    // Ouvrir le lien
-    window.open(url, '_blank');
-  };
+
 
   const exportToICS = (event: CalendarEvent) => {
     const formatDate = (date: Date) => {
@@ -807,7 +773,7 @@ export const Calendar: React.FC = () => {
               onExportToGoogle={exportToGoogleCalendar}
               onExportToOutlook={exportToOutlookCalendar}
               onExportToICS={exportToICS}
-              onViewOnline={viewEventOnline}
+
               eventsPerPage={5}
             />
           )}

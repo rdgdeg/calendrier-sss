@@ -10,6 +10,7 @@
 @import './styles/display-components.css';
 @import './styles/upcoming-events-section.css';
 @import './styles/event-images-preview.css';
+@import './styles/event-modal.css';
 
 /* UCLouvain Color Palette - Charte officielle */
 :root {

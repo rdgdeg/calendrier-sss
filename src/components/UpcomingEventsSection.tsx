@@ -11,7 +11,7 @@ interface UpcomingEventsSectionProps {
   onExportToGoogle: (event: CalendarEvent) => void;
   onExportToOutlook: (event: CalendarEvent) => void;
   onExportToICS: (event: CalendarEvent) => void;
-  onViewOnline: (event: CalendarEvent) => void;
+
   eventsPerPage?: number;
 }
 
@@ -21,7 +21,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
   onExportToGoogle,
   onExportToOutlook,
   onExportToICS,
-  onViewOnline,
+
   eventsPerPage = 5
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -142,13 +142,6 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                   title="Voir les détails"
                 >
                   👁️ Détails
-                </button>
-                <button
-                  onClick={() => onViewOnline(event)}
-                  className="btn-view-online"
-                  title="Voir dans le calendrier source (images, pièces jointes...)"
-                >
-                  🌐 Voir en ligne
                 </button>
               </div>
               <div className="export-buttons-compact">

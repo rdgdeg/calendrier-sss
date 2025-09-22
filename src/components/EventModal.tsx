@@ -4,6 +4,8 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getSourceDisplayName } from '../utils/sourceUtils';
 import { EventDescription } from './EventDescription';
+import { extractImagesFromDescription } from '../utils/imageExtractor';
+import { EventImagesPreview } from './EventImagesPreview';
 
 interface EventModalProps {
   event: CalendarEvent | null;
@@ -23,6 +25,9 @@ export const EventModal: React.FC<EventModalProps> = ({
   onExportToICS 
 }) => {
   if (!isOpen || !event) return null;
+
+  // Traitement des images dans la description
+  const processedContent = event.description ? extractImagesFromDescription(event.description) : null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -94,17 +99,30 @@ export const EventModal: React.FC<EventModalProps> = ({
               </div>
             </div>
 
-            {/* Description */}
-            {event.description && (
+            {/* Images extraites */}
+            {processedContent && processedContent.hasImages && (
+              <div className="event-detail-row">
+                <div className="detail-icon">🖼️</div>
+                <div className="detail-content">
+                  <strong>Images</strong>
+                  <EventImagesPreview 
+                    images={processedContent.images}
+                    maxImages={6}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Description nettoyée */}
+            {processedContent && processedContent.cleanDescription && (
               <div className="event-detail-row description-row">
                 <div className="detail-icon">📝</div>
                 <div className="detail-content">
                   <strong>Description</strong>
                   <div className="description-content">
-                    <EventDescription 
-                      description={event.description}
-                      className="event-description-modal"
-                    />
+                    <div className="event-description-modal">
+                      {processedContent.cleanDescription}
+                    </div>
                   </div>
                 </div>
               </div>

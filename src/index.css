@@ -8,6 +8,7 @@
 @import './styles/new-components.css';
 @import './styles/loading-screen.css';
 @import './styles/display-components.css';
+@import './styles/upcoming-events-section.css';
 
 /* UCLouvain Color Palette - Charte officielle */
 :root {
@@ -173,6 +174,18 @@ body {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* Layout pleine largeur sans sidebar */
+.calendar-layout-full {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--ucl-spacing-md);
+}
+
+.calendar-main-full {
+  width: 100%;
 }
 
 /* Header principal avec titre UCLouvain */

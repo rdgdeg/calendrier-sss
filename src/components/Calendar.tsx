@@ -14,6 +14,7 @@ import { EventLegend } from './EventLegend';
 import { SearchBar } from './SearchBar';
 import { UniversalSidebar } from './UniversalSidebar';
 import { SearchResults } from './SearchResults';
+import { UpcomingEventsSection } from './UpcomingEventsSection';
 
 import { useSearch } from '../hooks/useSearch';
 import { EVENT_TYPES } from '../utils/eventCategories';
@@ -720,8 +721,8 @@ export const Calendar: React.FC = () => {
         </div>
       )}
 
-      <div className={`calendar-layout ${currentView === 'display' ? 'display-mode' : ''} ${searchState.isSearching ? 'search-active' : ''}`}>
-        <div className="calendar-main">
+      <div className={`calendar-layout-full ${currentView === 'display' ? 'display-mode' : ''} ${searchState.isSearching ? 'search-active' : ''}`}>
+        <div className="calendar-main-full">
           <div className="calendar-content scale-in">
             {renderCurrentView()}
           </div>
@@ -743,15 +744,11 @@ export const Calendar: React.FC = () => {
               />
             </div>
           )}
-        </div>
-        
-        {currentView !== 'display' && !searchState.isSearching && (
-          <div className="calendar-sidebar">
-            <UniversalSidebar
-              searchResults={[]} // Plus de résultats dans le sidebar
-              upcomingEvents={getUpcomingEvents()}
-              isSearching={false} // Toujours afficher les événements à venir
-              searchQuery=""
+
+          {/* Section des événements à venir sous le calendrier */}
+          {currentView !== 'display' && !searchState.isSearching && (
+            <UpcomingEventsSection
+              events={filteredEvents}
               onEventClick={(event) => {
                 setSelectedEvent(event);
                 setIsModalOpen(true);
@@ -759,9 +756,10 @@ export const Calendar: React.FC = () => {
               onExportToGoogle={exportToGoogleCalendar}
               onExportToOutlook={exportToOutlookCalendar}
               onExportToICS={exportToICS}
+              eventsPerPage={5}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Légende des événements sous le calendrier */}

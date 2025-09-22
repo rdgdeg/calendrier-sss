@@ -650,10 +650,7 @@ export const Calendar: React.FC = () => {
             onViewChange={setCurrentView} 
           />
         </div>
-        
-
       </div>
-      )}
 
       {/* Section des filtres sous le header */}
       <div className="calendar-filters-section">

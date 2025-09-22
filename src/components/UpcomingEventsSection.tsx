@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { extractImagesFromDescription } from '../utils/imageExtractor';
+import { EventImagesPreview } from './EventImagesPreview';
 
 interface UpcomingEventsSectionProps {
   events: CalendarEvent[];
@@ -81,46 +83,56 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
       </div>
 
       <div className="upcoming-events-grid">
-        {currentEvents.map((event, index) => (
-          <div key={`${event.id}-${index}`} className="upcoming-event-card">
-            <div className="upcoming-event-header">
-              <div className="upcoming-event-date-time">
-                <div className="upcoming-event-date">
-                  {formatEventDate(event.start)}
+        {currentEvents.map((event, index) => {
+          const processedContent = event.description ? extractImagesFromDescription(event.description) : null;
+          
+          return (
+            <div key={`${event.id}-${index}`} className="upcoming-event-card">
+              <div className="upcoming-event-header">
+                <div className="upcoming-event-date-time">
+                  <div className="upcoming-event-date">
+                    {formatEventDate(event.start)}
+                  </div>
+                  <div className="upcoming-event-time">
+                    {formatEventTime(event.start, event.end, event.allDay)}
+                  </div>
                 </div>
-                <div className="upcoming-event-time">
-                  {formatEventTime(event.start, event.end, event.allDay)}
+                <div className={`upcoming-event-source upcoming-event-source-${event.source}`}>
+                  {getSourceLabel(event.source)}
                 </div>
               </div>
-              <div className={`upcoming-event-source upcoming-event-source-${event.source}`}>
-                {getSourceLabel(event.source)}
+
+              <div className="upcoming-event-content">
+                <h4 
+                  className="upcoming-event-title"
+                  onClick={() => onEventClick(event)}
+                  title="Cliquer pour voir les détails"
+                >
+                  {event.title}
+                </h4>
+                
+                {event.location && (
+                  <div className="upcoming-event-location">
+                    📍 {event.location}
+                  </div>
+                )}
+
+                {processedContent && processedContent.cleanDescription && (
+                  <div className="upcoming-event-description">
+                    {processedContent.cleanDescription.length > 100 
+                      ? `${processedContent.cleanDescription.substring(0, 100)}...`
+                      : processedContent.cleanDescription
+                    }
+                  </div>
+                )}
+
+                {processedContent && processedContent.hasImages && (
+                  <EventImagesPreview 
+                    images={processedContent.images}
+                    maxImages={2}
+                  />
+                )}
               </div>
-            </div>
-
-            <div className="upcoming-event-content">
-              <h4 
-                className="upcoming-event-title"
-                onClick={() => onEventClick(event)}
-                title="Cliquer pour voir les détails"
-              >
-                {event.title}
-              </h4>
-              
-              {event.location && (
-                <div className="upcoming-event-location">
-                  📍 {event.location}
-                </div>
-              )}
-
-              {event.description && (
-                <div className="upcoming-event-description">
-                  {event.description.length > 100 
-                    ? `${event.description.substring(0, 100)}...`
-                    : event.description
-                  }
-                </div>
-              )}
-            </div>
 
             <div className="upcoming-event-actions">
               <div className="primary-actions">
@@ -162,9 +174,10 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                   💾
                 </button>
               </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {totalPages > 1 && (

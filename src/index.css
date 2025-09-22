@@ -7642,16 +7642,18 @@ TEMPORARILY DISABLED */
 .display-title {
   font-size: 2.2rem;
   font-weight: 700;
-*/
   margin: 0 0 var(--ucl-spacing-sm) 0;
   position: relative;
   z-index: 1;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+*/
 
+/*
 .display-period {
   font-size: 1.1rem;
   font-weight: 500;
+*/
   margin: 0;
   opacity: 0.9;
   position: relative;

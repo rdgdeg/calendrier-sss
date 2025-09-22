@@ -59,6 +59,9 @@ export const Calendar: React.FC = () => {
     isVisible: boolean;
   }>({ type: 'info', message: '', isVisible: false });
   const [isRealTimeLoading, setIsRealTimeLoading] = useState(false);
+  
+  // Référence pour gérer le timer de auto-hide des toasts
+  const toastTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   
   // Hook de recherche
@@ -154,8 +157,22 @@ export const Calendar: React.FC = () => {
 
 
   // Fonction pour afficher les notifications
-  const showToast = (type: 'success' | 'error' | 'info', message: string) => {
+  const showToast = (type: 'success' | 'error' | 'info', message: string, autoHide: boolean = true) => {
+    // Nettoyer le timer précédent s'il existe
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = null;
+    }
+    
     setToast({ type, message, isVisible: true });
+    
+    // Auto-hide après 3 secondes pour les notifications de succès
+    if (autoHide && type === 'success') {
+      toastTimerRef.current = setTimeout(() => {
+        setToast(prev => ({ ...prev, isVisible: false }));
+        toastTimerRef.current = null;
+      }, 3000);
+    }
   };
 
   const hideToast = () => {
@@ -355,9 +372,12 @@ export const Calendar: React.FC = () => {
       loadEvents();
     }, 10 * 60 * 1000); // 10 minutes
     
-    // Nettoyer l'intervalle au démontage du composant
+    // Nettoyer l'intervalle et le timer toast au démontage du composant
     return () => {
       clearInterval(autoRefreshInterval);
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
     };
   }, []);
 

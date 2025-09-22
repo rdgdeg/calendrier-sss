@@ -7,7 +7,7 @@
 @import './styles/micro-interactions.css';
 @import './styles/new-components.css';
 @import './styles/loading-screen.css';
-@import './styles/display-components.css';
+/* @import './styles/display-components.css'; */
 @import './styles/upcoming-events-section.css';
 @import './styles/event-images-preview.css';
 @import './styles/event-modal.css';
@@ -7603,17 +7603,13 @@ méliorations supplémentaires pour la lisibilité des événements */
 }
 
 /* 
-===== DISPLAY VIEW - Vue d'affichage public ===== 
-TEMPORARILY DISABLED */
-/*
+===== DISPLAY VIEW - Vue d'affichage public ===== */
 .display-view {
   background: var(--ucl-white);
   min-height: 100vh;
   font-family: var(--ucl-font-family);
 }
-*/
 
-/*
 .display-header {
   background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
   color: var(--ucl-white);
@@ -7623,9 +7619,7 @@ TEMPORARILY DISABLED */
   position: relative;
   overflow: hidden;
 }
-*/
 
-/*
 .display-header::before {
   content: "";
   position: absolute;
@@ -7636,9 +7630,7 @@ TEMPORARILY DISABLED */
   background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
   opacity: 0.3;
 }
-*/
 
-/*
 .display-title {
   font-size: 2.2rem;
   font-weight: 700;
@@ -7647,13 +7639,10 @@ TEMPORARILY DISABLED */
   z-index: 1;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-*/
 
-/*
 .display-period {
   font-size: 1.1rem;
   font-weight: 500;
-*/
   margin: 0;
   opacity: 0.9;
   position: relative;
@@ -7956,12 +7945,10 @@ TEMPORARILY DISABLED */
   }
 }
 
-/* Animation d'entrée pour la vue d'affichage - DISABLED */
-/*
+/* Animation d'entrée pour la vue d'affichage */
 .display-view {
   animation: displayFadeIn 0.6s ease-out;
 }
-*/
 
 @keyframes displayFadeIn {
   from {
@@ -9067,11 +9054,9 @@ TEMPORARILY DISABLED */
 }
 
 /* ===== DISPLAY VIEW COMPACT STYLES ===== */
-/*
 .display-header-compact {
   text-align: center;
   padding: var(--ucl-spacing-lg) 0;
-*/
   background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
   color: var(--ucl-white);
   border-radius: var(--ucl-border-radius-lg) var(--ucl-border-radius-lg) 0 0;
@@ -9485,21 +9470,17 @@ TEMPORARILY DISABLED */
 
 /* ===== STYLES POUR LA VUE DISPLAY COMPACTE ===== */
 
-/*
 .display-view {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: var(--ucl-spacing-lg);
 }
-*/
 
-/*
 .display-header-compact {
   text-align: center;
   margin-bottom: var(--ucl-spacing-lg);
   padding: var(--ucl-spacing-md) var(--ucl-spacing-lg);
   background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
-*/
   color: var(--ucl-white);
   border-radius: var(--ucl-border-radius-lg);
   box-shadow: var(--ucl-shadow-lg);

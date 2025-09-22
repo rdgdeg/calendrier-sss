@@ -61,7 +61,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                 <div className="day-events">
                   {dayEvents.slice(0, 2).map((event, eventIndex) => {
                     // Raccourcir drastiquement le titre selon la taille de l'écran
-                    const maxLength = window.innerWidth > 1400 ? 20 : window.innerWidth > 1200 ? 15 : 12;
+                    const maxLength = window.innerWidth > 1400 ? 15 : window.innerWidth > 1200 ? 12 : 8;
                     const shortTitle = event.title.length > maxLength
                       ? `${event.title.substring(0, maxLength - 3)}...`
                       : event.title;

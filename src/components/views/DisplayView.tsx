@@ -20,7 +20,14 @@ const DisplayViewComponent: React.FC<DisplayViewProps> = ({
       className="display-view"
       role="main"
       aria-label="Affichage public des événements UCLouvain"
-      style={{ height: '100vh', overflow: 'hidden' }}
+      style={{ 
+        height: '100vh', 
+        width: '100vw',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        background: '#f8fafc'
+      }}
     >
       {/* Modern Header with UCLouvain Branding */}
       <Header title="Événements à Venir - Secteur SSS" />
@@ -29,6 +36,12 @@ const DisplayViewComponent: React.FC<DisplayViewProps> = ({
       <section 
         aria-label="Liste des prochains événements"
         role="region"
+        style={{ 
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}
       >
         <EventsGrid 
           events={events}

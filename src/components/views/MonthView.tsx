@@ -59,10 +59,11 @@ export const MonthView: React.FC<MonthViewProps> = ({
                   {day.getDate()}
                 </div>
                 <div className="day-events">
-                  {dayEvents.slice(0, 2).map((event, eventIndex) => {
-                    // Raccourcir le titre pour une meilleure lisibilité
-                    const shortTitle = event.title.length > 25
-                      ? `${event.title.substring(0, 22)}...`
+                  {dayEvents.slice(0, 3).map((event, eventIndex) => {
+                    // Raccourcir le titre pour une meilleure lisibilité selon la taille de l'écran
+                    const maxLength = window.innerWidth > 1400 ? 30 : window.innerWidth > 1200 ? 25 : 20;
+                    const shortTitle = event.title.length > maxLength
+                      ? `${event.title.substring(0, maxLength - 3)}...`
                       : event.title;
 
                     const isHighlighted = isEventHighlighted(event.id);
@@ -95,7 +96,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                       </div>
                     );
                   })}
-                  {dayEvents.length > 2 && (
+                  {dayEvents.length > 3 && (
                     <div
                       className="event-item more-events"
                       style={{
@@ -105,9 +106,9 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         fontWeight: '600',
                         textAlign: 'center'
                       }}
-                      title={`${dayEvents.length - 2} autres événements ce jour`}
+                      title={`${dayEvents.length - 3} autres événements ce jour`}
                     >
-                      +{dayEvents.length - 2} autres
+                      +{dayEvents.length - 3} autres
                     </div>
                   )}
                 </div>

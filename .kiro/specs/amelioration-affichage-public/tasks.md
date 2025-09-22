@@ -105,3 +105,16 @@
   - Optimiser les performances pour l'affichage continu
   - Créer la documentation pour la configuration et maintenance
   - _Exigences: 3.2, 3.4, 6.1, 6.4_
+
+- [x] 10. Corriger les problèmes d'affichage identifiés
+  - [x] 10.1 Résoudre la vue calendrier tronquée
+    - Corriger la hauteur des cellules du calendrier mensuel (140px → 160px minimum)
+    - Améliorer l'affichage des événements dans les cellules (overflow visible)
+    - Optimiser le texte des événements pour éviter la troncature (3 événements max, taille adaptative)
+    - _Exigences: 2.1, 2.2, 2.3_
+
+  - [x] 10.2 Corriger la vue écran d'affichage public
+    - Résoudre les problèmes de mise en page de la DisplayView (flexbox layout)
+    - Optimiser l'affichage pour les écrans 16:9 (grilles adaptatives)
+    - Corriger les problèmes de débordement et de positionnement (layouts spécifiques par nombre d'événements)
+    - _Exigences: 1.1, 1.2, 3.1, 6.1_

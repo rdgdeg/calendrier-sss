@@ -380,14 +380,14 @@ body {
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 140px);
+  grid-template-rows: repeat(6, minmax(160px, auto));
   gap: 0;
   width: 100%;
 }
 
 .calendar-day {
-  min-height: 140px;
-  height: 140px;
+  min-height: 160px;
+  height: auto;
   border-right: 1px solid var(--ucl-gray-200);
   border-bottom: 1px solid var(--ucl-gray-200);
   padding: 8px;
@@ -396,7 +396,7 @@ body {
   transition: all var(--ucl-transition);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
 }
 
@@ -465,15 +465,16 @@ body {
   flex-direction: column;
   gap: 3px;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
   margin-top: 4px;
+  min-height: 0;
 }
 
 .event-item {
   /* Les couleurs sont maintenant gérées par JavaScript avec getOptimalTextColor */
   padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
   border-radius: var(--ucl-border-radius);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: var(--ucl-font-weight-semibold);
   cursor: pointer;
   overflow: hidden;
@@ -484,9 +485,12 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  min-height: 22px;
+  min-height: 20px;
   display: flex;
   align-items: center;
+  line-height: 1.2;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .event-item::before {

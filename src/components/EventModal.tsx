@@ -47,37 +47,24 @@ export const EventModal: React.FC<EventModalProps> = ({
       // Extract images first (legacy support)
       const imageContent = extractImagesFromDescription(event.description);
       
-      // Process with advanced text formatter
-      const advancedContent = textFormatter.processAdvancedContent(event.description, {
-        preserveLineBreaks: true,
-        formatParagraphs: true,
-        formatLists: true,
-        addVisualBullets: true,
-        paragraphSpacing: 'normal',
-        listStyle: 'bullets',
-        maxParagraphs: 20
-      });
-
-      // Extract links separately for display
-      const extractedLinks = textFormatter.extractLinks(event.description);
+      // Simple HTML cleaning without link extraction or automatic formatting
+      const cleanedHtml = textFormatter.cleanHtmlContent(event.description);
       
-      // Get formatted HTML with highlights
-      const formattedHtml = textFormatter.formatAdvancedDescription(event.description, {
-        preserveLineBreaks: true,
-        formatParagraphs: true,
-        formatLists: true,
-        addVisualBullets: true,
-        paragraphSpacing: 'normal'
-      });
+      // Basic paragraph formatting without link generation
+      const paragraphs = cleanedHtml.split(/\n\s*\n/).filter(p => p.trim());
+      let formattedHtml = cleanedHtml;
+      
+      if (paragraphs.length > 1) {
+        formattedHtml = paragraphs
+          .map(p => `<p class="text-formatter-paragraph-normal">${p.trim()}</p>`)
+          .join('');
+      }
 
       setProcessedContent({
         ...imageContent,
-        ...advancedContent,
-        extractedLinks,
-        formattedHtml,
-        hasAdvancedFormatting: advancedContent.formatting.paragraphs.length > 1 || 
-                              advancedContent.formatting.lists.length > 0 ||
-                              extractedLinks.length > 0
+        cleanText: cleanedHtml,
+        formattedHtml: formattedHtml,
+        hasAdvancedFormatting: paragraphs.length > 1
       });
     } catch (error) {
       console.warn('Error processing event description:', error);
@@ -85,21 +72,12 @@ export const EventModal: React.FC<EventModalProps> = ({
       // Fallback to basic image extraction
       const imageContent = extractImagesFromDescription(event.description);
       
+      const cleanText = event.description.replace(/<[^>]*>/g, '');
       setProcessedContent({
         ...imageContent,
-        cleanText: event.description.replace(/<[^>]*>/g, ''),
-        links: [],
-        dates: [],
-        contacts: [],
+        cleanText: cleanText,
         images: imageContent?.images || [],
-        formatting: {
-          paragraphs: [],
-          lists: [],
-          emphasis: [],
-          lineBreaks: []
-        },
-        extractedLinks: [],
-        formattedHtml: event.description.replace(/<[^>]*>/g, ''),
+        formattedHtml: cleanText,
         hasAdvancedFormatting: false
       });
     }
@@ -230,32 +208,7 @@ export const EventModal: React.FC<EventModalProps> = ({
               </div>
             </div>
 
-            {/* Liens extraits */}
-            {processedContent && processedContent.extractedLinks && processedContent.extractedLinks.length > 0 && (
-              <div className="event-detail-row">
-                <div className="detail-icon">🔗</div>
-                <div className="detail-content">
-                  <strong>Liens et contacts</strong>
-                  <div className="extracted-links">
-                    {processedContent.extractedLinks.map((link: any, index: number) => (
-                      <div key={index} className={`extracted-link extracted-link--${link.type}`}>
-                        <a 
-                          href={link.url} 
-                          target={link.type === 'url' ? '_blank' : undefined}
-                          rel={link.type === 'url' ? 'noopener noreferrer' : undefined}
-                          className="extracted-link-anchor"
-                        >
-                          <span className="extracted-link-icon">
-                            {link.type === 'url' ? '🌐' : link.type === 'email' ? '📧' : '📞'}
-                          </span>
-                          <span className="extracted-link-text">{link.text}</span>
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+
 
             {/* Images extraites */}
             {processedContent && processedContent.hasImages && (

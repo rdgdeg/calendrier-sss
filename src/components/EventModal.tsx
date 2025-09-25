@@ -33,15 +33,12 @@ export const EventModal: React.FC<EventModalProps> = ({
     isScrollable: false
   });
 
-  // Early return with safety checks
-  if (!isOpen || !event || !event.id) return null;
-
   // Advanced content processing with text formatter - using useState to avoid useMemo issues
   const [processedContent, setProcessedContent] = useState<any>(null);
 
-  // Process content when event changes
+  // Process content when event changes - ALWAYS call this hook
   useEffect(() => {
-    if (!event?.description) {
+    if (!isOpen || !event?.description) {
       setProcessedContent(null);
       return;
     }
@@ -106,10 +103,12 @@ export const EventModal: React.FC<EventModalProps> = ({
         hasAdvancedFormatting: false
       });
     }
-  }, [event?.id, event?.description]);
+  }, [isOpen, event?.id, event?.description]);
 
-  // Scroll detection for description content
+  // Scroll detection for description content - ALWAYS call this hook
   useEffect(() => {
+    if (!isOpen) return;
+
     const descriptionElement = descriptionRef.current;
     if (!descriptionElement || !processedContent) return;
 
@@ -150,7 +149,10 @@ export const EventModal: React.FC<EventModalProps> = ({
         resizeObserver.disconnect();
       }
     };
-  }, [processedContent?.formattedHtml]); // Only depend on the actual content that affects layout
+  }, [isOpen, processedContent?.formattedHtml]); // Only depend on the actual content that affects layout
+
+  // Early return AFTER all hooks are called
+  if (!isOpen || !event || !event.id) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {

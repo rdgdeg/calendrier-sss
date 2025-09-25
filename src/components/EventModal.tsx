@@ -47,8 +47,11 @@ export const EventModal: React.FC<EventModalProps> = ({
       // Extract images first (legacy support)
       const imageContent = extractImagesFromDescription(event.description);
       
+      // Process custom line break markers first (*** becomes line breaks)
+      const textWithCustomBreaks = textFormatter.processCustomLineBreaks(event.description, '***');
+      
       // Simple HTML cleaning without link extraction or automatic formatting
-      const cleanedHtml = textFormatter.cleanHtmlContent(event.description);
+      const cleanedHtml = textFormatter.cleanHtmlContent(textWithCustomBreaks);
       
       // Basic paragraph formatting without link generation
       const paragraphs = cleanedHtml.split(/\n\s*\n/).filter(p => p.trim());

@@ -231,8 +231,9 @@ export class TextFormatter {
       };
     }
 
-    // Clean the text first (memoized)
-    const cleanedText = this.memoizedCleanHtml(text);
+    // Process custom line break markers first, then clean the text (memoized)
+    const textWithCustomBreaks = this.processCustomLineBreaks(text, '***');
+    const cleanedText = this.memoizedCleanHtml(textWithCustomBreaks);
     const specialContent = this.memoizedExtractSpecialContent(cleanedText);
     
     // Apply truncation if needed (memoized)
@@ -256,6 +257,19 @@ export class TextFormatter {
    */
   cleanHtmlContent(html: string): string {
     return this.memoizedCleanHtml(html);
+  }
+
+  /**
+   * Process custom line break markers in text
+   * Converts custom markers like *** to actual line breaks
+   */
+  processCustomLineBreaks(text: string, marker: string = '***'): string {
+    if (!text || typeof text !== 'string') {
+      return '';
+    }
+
+    // Replace custom markers with HTML line breaks
+    return text.replace(new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '<br><br>');
   }
 
   /**

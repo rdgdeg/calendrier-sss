@@ -2,7 +2,6 @@
  * Test to verify React error #310 fix
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ResponsiveText } from '../components/display/ResponsiveText';

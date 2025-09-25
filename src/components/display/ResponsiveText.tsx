@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { globalResizeHandler } from '../../utils/performanceOptimizer';
 
 // Types and interfaces
@@ -111,12 +111,19 @@ export const ResponsiveText = React.forwardRef<HTMLDivElement, ResponsiveTextPro
   className = '',
   screenSize: overrideScreenSize
 }, ref) => {
+  // Use override screenSize if provided, otherwise detect
   const detectedScreenSize = useScreenSize();
   const screenSize = overrideScreenSize || detectedScreenSize;
   
-  const typographyStyle = useMemo(() => {
+  // Safety check for text content first
+  if (!text || typeof text !== 'string') {
+    return null;
+  }
+
+  // Calculate typography style without useMemo to avoid dependency issues
+  const getTypographyStyle = (): React.CSSProperties => {
     // Safety checks to prevent errors
-    if (!variant || !screenSize || !text) {
+    if (!variant || !screenSize) {
       return {
         fontSize: '14px',
         lineHeight: '1.4',
@@ -157,13 +164,9 @@ export const ResponsiveText = React.forwardRef<HTMLDivElement, ResponsiveTextPro
     }
 
     return style;
-  }, [variant, screenSize, maxLines, text]);
+  };
 
-  // Safety check for text content
-  if (!text || typeof text !== 'string') {
-    return null;
-  }
-
+  const typographyStyle = getTypographyStyle();
   const combinedClassName = `responsive-text responsive-text--${variant} responsive-text--${screenSize} ${className}`.trim();
 
   return (

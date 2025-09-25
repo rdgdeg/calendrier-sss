@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -36,9 +36,15 @@ export const EventModal: React.FC<EventModalProps> = ({
   // Early return with safety checks
   if (!isOpen || !event || !event.id) return null;
 
-  // Advanced content processing with text formatter
-  const processedContent = useMemo(() => {
-    if (!event?.description) return null;
+  // Advanced content processing with text formatter - using useState to avoid useMemo issues
+  const [processedContent, setProcessedContent] = useState<any>(null);
+
+  // Process content when event changes
+  useEffect(() => {
+    if (!event?.description) {
+      setProcessedContent(null);
+      return;
+    }
 
     try {
       // Extract images first (legacy support)
@@ -67,7 +73,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         paragraphSpacing: 'normal'
       });
 
-      return {
+      setProcessedContent({
         ...imageContent,
         ...advancedContent,
         extractedLinks,
@@ -75,14 +81,14 @@ export const EventModal: React.FC<EventModalProps> = ({
         hasAdvancedFormatting: advancedContent.formatting.paragraphs.length > 1 || 
                               advancedContent.formatting.lists.length > 0 ||
                               extractedLinks.length > 0
-      };
+      });
     } catch (error) {
       console.warn('Error processing event description:', error);
       
       // Fallback to basic image extraction
       const imageContent = extractImagesFromDescription(event.description);
       
-      return {
+      setProcessedContent({
         ...imageContent,
         cleanText: event.description.replace(/<[^>]*>/g, ''),
         links: [],
@@ -98,14 +104,14 @@ export const EventModal: React.FC<EventModalProps> = ({
         extractedLinks: [],
         formattedHtml: event.description.replace(/<[^>]*>/g, ''),
         hasAdvancedFormatting: false
-      };
+      });
     }
   }, [event?.id, event?.description]);
 
   // Scroll detection for description content
   useEffect(() => {
     const descriptionElement = descriptionRef.current;
-    if (!descriptionElement) return;
+    if (!descriptionElement || !processedContent) return;
 
     const updateScrollState = () => {
       const { scrollTop, scrollHeight, clientHeight } = descriptionElement;
@@ -120,21 +126,31 @@ export const EventModal: React.FC<EventModalProps> = ({
       });
     };
 
-    // Initial check
-    updateScrollState();
+    // Use a timeout to ensure DOM is updated
+    const timeoutId = setTimeout(() => {
+      updateScrollState();
+    }, 0);
 
     // Add scroll listener
     descriptionElement.addEventListener('scroll', updateScrollState);
     
     // Add resize observer to handle content changes
-    const resizeObserver = new ResizeObserver(updateScrollState);
-    resizeObserver.observe(descriptionElement);
+    let resizeObserver: ResizeObserver | null = null;
+    try {
+      resizeObserver = new ResizeObserver(updateScrollState);
+      resizeObserver.observe(descriptionElement);
+    } catch (error) {
+      console.warn('ResizeObserver not available:', error);
+    }
 
     return () => {
+      clearTimeout(timeoutId);
       descriptionElement.removeEventListener('scroll', updateScrollState);
-      resizeObserver.disconnect();
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
     };
-  }, [processedContent]);
+  }, [processedContent?.formattedHtml]); // Only depend on the actual content that affects layout
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -219,7 +235,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <div className="detail-content">
                   <strong>Liens et contacts</strong>
                   <div className="extracted-links">
-                    {processedContent.extractedLinks.map((link, index) => (
+                    {processedContent.extractedLinks.map((link: any, index: number) => (
                       <div key={index} className={`extracted-link extracted-link--${link.type}`}>
                         <a 
                           href={link.url} 
@@ -246,7 +262,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <div className="detail-content">
                   <strong>Images</strong>
                   <EventImagesPreview 
-                    images={processedContent.images.map(img => ({
+                    images={processedContent.images.map((img: any) => ({
                       src: img.src,
                       alt: img.alt || '',
                       title: img.alt || '',

@@ -294,8 +294,10 @@ export class TextFormatter {
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
       .replace(/&apos;/g, "'")
-      // Remove all remaining HTML tags
-      .replace(/<[^>]*>/g, '')
+      // Preserve <br> tags but remove all other HTML tags
+      .replace(/<br\s*\/?>/gi, '\n') // Convert <br> to newlines temporarily
+      .replace(/<[^>]*>/g, '') // Remove all other HTML tags
+      .replace(/\n/g, '<br>') // Convert newlines back to <br>
       // Clean up whitespace
       .replace(/\s+/g, ' ')
       .trim();

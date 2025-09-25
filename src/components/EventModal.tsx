@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getSourceDisplayName } from '../utils/sourceUtils';
 import { extractImagesFromDescription } from '../utils/imageExtractor';
 import { EventImagesPreview } from './EventImagesPreview';
+import { textFormatter } from '../utils/textFormatter';
+import { ResponsiveText } from './display/ResponsiveText';
 
 interface EventModalProps {
   event: CalendarEvent | null;
@@ -23,10 +25,114 @@ export const EventModal: React.FC<EventModalProps> = ({
   onExportToOutlook, 
   onExportToICS 
 }) => {
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const [scrollState, setScrollState] = useState({
+    canScrollUp: false,
+    canScrollDown: false,
+    isScrollable: false
+  });
+
   if (!isOpen || !event) return null;
 
-  // Traitement des images dans la description
-  const processedContent = event.description ? extractImagesFromDescription(event.description) : null;
+  // Advanced content processing with text formatter
+  const processedContent = useMemo(() => {
+    if (!event.description) return null;
+
+    try {
+      // Extract images first (legacy support)
+      const imageContent = extractImagesFromDescription(event.description);
+      
+      // Process with advanced text formatter
+      const advancedContent = textFormatter.processAdvancedContent(event.description, {
+        preserveLineBreaks: true,
+        formatParagraphs: true,
+        formatLists: true,
+        addVisualBullets: true,
+        paragraphSpacing: 'normal',
+        listStyle: 'bullets',
+        maxParagraphs: 20
+      });
+
+      // Extract links separately for display
+      const extractedLinks = textFormatter.extractLinks(event.description);
+      
+      // Get formatted HTML with highlights
+      const formattedHtml = textFormatter.formatAdvancedDescription(event.description, {
+        preserveLineBreaks: true,
+        formatParagraphs: true,
+        formatLists: true,
+        addVisualBullets: true,
+        paragraphSpacing: 'normal'
+      });
+
+      return {
+        ...imageContent,
+        ...advancedContent,
+        extractedLinks,
+        formattedHtml,
+        hasAdvancedFormatting: advancedContent.formatting.paragraphs.length > 1 || 
+                              advancedContent.formatting.lists.length > 0 ||
+                              extractedLinks.length > 0
+      };
+    } catch (error) {
+      console.warn('Error processing event description:', error);
+      
+      // Fallback to basic image extraction
+      const imageContent = extractImagesFromDescription(event.description);
+      
+      return {
+        ...imageContent,
+        cleanText: event.description.replace(/<[^>]*>/g, ''),
+        links: [],
+        dates: [],
+        contacts: [],
+        images: imageContent?.images || [],
+        formatting: {
+          paragraphs: [],
+          lists: [],
+          emphasis: [],
+          lineBreaks: []
+        },
+        extractedLinks: [],
+        formattedHtml: event.description.replace(/<[^>]*>/g, ''),
+        hasAdvancedFormatting: false
+      };
+    }
+  }, [event.description]);
+
+  // Scroll detection for description content
+  useEffect(() => {
+    const descriptionElement = descriptionRef.current;
+    if (!descriptionElement) return;
+
+    const updateScrollState = () => {
+      const { scrollTop, scrollHeight, clientHeight } = descriptionElement;
+      const isScrollable = scrollHeight > clientHeight;
+      const canScrollUp = scrollTop > 5;
+      const canScrollDown = scrollTop < scrollHeight - clientHeight - 5;
+
+      setScrollState({
+        canScrollUp,
+        canScrollDown,
+        isScrollable
+      });
+    };
+
+    // Initial check
+    updateScrollState();
+
+    // Add scroll listener
+    descriptionElement.addEventListener('scroll', updateScrollState);
+    
+    // Add resize observer to handle content changes
+    const resizeObserver = new ResizeObserver(updateScrollState);
+    resizeObserver.observe(descriptionElement);
+
+    return () => {
+      descriptionElement.removeEventListener('scroll', updateScrollState);
+      resizeObserver.disconnect();
+    };
+  }, [processedContent]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -49,7 +155,11 @@ export const EventModal: React.FC<EventModalProps> = ({
     >
       <div className="event-modal" role="dialog" aria-labelledby="event-title" aria-modal="true">
         <div className="event-modal-header">
-          <h2 id="event-title" className="event-modal-title">{event.title}</h2>
+          <ResponsiveText
+            text={event.title}
+            variant="title"
+            className="event-modal-title"
+          />
           <button 
             className="event-modal-close" 
             onClick={onClose}
@@ -98,6 +208,33 @@ export const EventModal: React.FC<EventModalProps> = ({
               </div>
             </div>
 
+            {/* Liens extraits */}
+            {processedContent && processedContent.extractedLinks && processedContent.extractedLinks.length > 0 && (
+              <div className="event-detail-row">
+                <div className="detail-icon">🔗</div>
+                <div className="detail-content">
+                  <strong>Liens et contacts</strong>
+                  <div className="extracted-links">
+                    {processedContent.extractedLinks.map((link, index) => (
+                      <div key={index} className={`extracted-link extracted-link--${link.type}`}>
+                        <a 
+                          href={link.url} 
+                          target={link.type === 'url' ? '_blank' : undefined}
+                          rel={link.type === 'url' ? 'noopener noreferrer' : undefined}
+                          className="extracted-link-anchor"
+                        >
+                          <span className="extracted-link-icon">
+                            {link.type === 'url' ? '🌐' : link.type === 'email' ? '📧' : '📞'}
+                          </span>
+                          <span className="extracted-link-text">{link.text}</span>
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Images extraites */}
             {processedContent && processedContent.hasImages && (
               <div className="event-detail-row">
@@ -105,23 +242,54 @@ export const EventModal: React.FC<EventModalProps> = ({
                 <div className="detail-content">
                   <strong>Images</strong>
                   <EventImagesPreview 
-                    images={processedContent.images}
+                    images={processedContent.images.map(img => ({
+                      src: img.src,
+                      alt: img.alt || '',
+                      title: img.alt || '',
+                      isBase64: img.src.startsWith('data:'),
+                      isUrl: !img.src.startsWith('data:')
+                    }))}
                     maxImages={6}
                   />
                 </div>
               </div>
             )}
 
-            {/* Description nettoyée */}
-            {processedContent && processedContent.cleanDescription && (
+            {/* Description formatée avec indicateurs de scroll */}
+            {processedContent && (processedContent.formattedHtml || processedContent.cleanDescription) && (
               <div className="event-detail-row description-row">
                 <div className="detail-icon">📝</div>
                 <div className="detail-content">
                   <strong>Description</strong>
-                  <div className="description-content">
-                    <div className="event-description-modal">
-                      {processedContent.cleanDescription}
+                  <div className="description-content-wrapper">
+                    <div 
+                      ref={descriptionRef}
+                      className="description-content" 
+                      data-has-scroll={scrollState.isScrollable ? "true" : "false"}
+                    >
+                      <div 
+                        className="event-description-modal"
+                        dangerouslySetInnerHTML={{ 
+                          __html: processedContent.formattedHtml || processedContent.cleanDescription || ''
+                        }}
+                      />
                     </div>
+                    {scrollState.isScrollable && (
+                      <>
+                        <div 
+                          className={`scroll-indicator scroll-indicator--top ${scrollState.canScrollUp ? 'scroll-indicator--visible' : ''}`}
+                          aria-hidden="true"
+                        >
+                          <div className="scroll-fade"></div>
+                        </div>
+                        <div 
+                          className={`scroll-indicator scroll-indicator--bottom ${scrollState.canScrollDown ? 'scroll-indicator--visible' : ''}`}
+                          aria-hidden="true"
+                        >
+                          <div className="scroll-fade"></div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,0 +1,410 @@
+/* TextFormatter Special Content Styles - Enhanced with Adaptive Typography */
+
+/* URL Links - Using adaptive typography variables */
+.text-formatter-url {
+  color: var(--typography-url-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(37, 99, 235, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.text-formatter-url:hover {
+  color: var(--typography-url-hover-color);
+  text-decoration-color: var(--typography-url-hover-color);
+  text-decoration-thickness: 2px;
+  transform: translateY(-1px);
+}
+
+.text-formatter-url:focus {
+  outline: 2px solid var(--typography-url-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Email Links - Using adaptive typography variables */
+.text-formatter-email {
+  color: var(--typography-email-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(5, 150, 105, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.text-formatter-email:hover {
+  color: var(--typography-email-hover-color);
+  text-decoration-color: var(--typography-email-hover-color);
+  text-decoration-thickness: 2px;
+  transform: translateY(-1px);
+}
+
+.text-formatter-email:focus {
+  outline: 2px solid var(--typography-email-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Phone Links - Using adaptive typography variables */
+.text-formatter-phone {
+  color: var(--typography-phone-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(124, 58, 237, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.text-formatter-phone:hover {
+  color: var(--typography-phone-hover-color);
+  text-decoration-color: var(--typography-phone-hover-color);
+  text-decoration-thickness: 2px;
+  transform: translateY(-1px);
+}
+
+.text-formatter-phone:focus {
+  outline: 2px solid var(--typography-phone-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Date Highlighting - Enhanced with adaptive typography */
+.text-formatter-date {
+  background-color: var(--typography-date-bg);
+  color: var(--typography-date-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9em;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* Time Highlighting - Enhanced with adaptive typography */
+.text-formatter-time {
+  background-color: var(--typography-time-bg);
+  color: var(--typography-time-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9em;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* Important Words - Enhanced with adaptive typography */
+.text-formatter-important {
+  background-color: var(--typography-important-bg);
+  color: var(--typography-important-color);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: inline-block;
+  line-height: 1.2;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Dark mode support - Using adaptive typography variables */
+@media (prefers-color-scheme: dark) {
+  .text-formatter-url {
+    color: var(--typography-dark-url-color);
+  }
+  
+  .text-formatter-url:hover {
+    color: var(--typography-dark-url-hover-color);
+  }
+  
+  .text-formatter-email {
+    color: var(--typography-dark-email-color);
+  }
+  
+  .text-formatter-email:hover {
+    color: var(--typography-dark-email-hover-color);
+  }
+  
+  .text-formatter-phone {
+    color: var(--typography-dark-phone-color);
+  }
+  
+  .text-formatter-phone:hover {
+    color: var(--typography-dark-phone-hover-color);
+  }
+  
+  .text-formatter-date {
+    background-color: var(--typography-dark-date-bg);
+    color: var(--typography-dark-date-color);
+    border-color: rgba(251, 191, 36, 0.4);
+  }
+  
+  .text-formatter-time {
+    background-color: var(--typography-dark-time-bg);
+    color: var(--typography-dark-time-color);
+    border-color: rgba(139, 92, 246, 0.4);
+  }
+  
+  .text-formatter-important {
+    background-color: var(--typography-dark-important-bg);
+    color: var(--typography-dark-important-color);
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+}
+
+/* High contrast mode support - Enhanced for accessibility */
+@media (prefers-contrast: high) {
+  .text-formatter-url,
+  .text-formatter-email,
+  .text-formatter-phone {
+    text-decoration-thickness: 2px;
+    font-weight: 600;
+  }
+  
+  .text-formatter-date,
+  .text-formatter-time,
+  .text-formatter-important {
+    border-width: 2px;
+    font-weight: 700;
+  }
+}
+
+/* Reduced motion support - Enhanced for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .text-formatter-url,
+  .text-formatter-email,
+  .text-formatter-phone {
+    transition: none;
+  }
+  
+  .text-formatter-url:hover,
+  .text-formatter-email:hover,
+  .text-formatter-phone:hover {
+    transform: none;
+  }
+  
+  .text-formatter-important {
+    animation: none;
+  }
+}
+
+/* High resolution display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi), (min-resolution: 2dppx) {
+  .text-formatter-url,
+  .text-formatter-email,
+  .text-formatter-phone {
+    text-decoration-thickness: 0.5px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .text-formatter-url:hover,
+  .text-formatter-email:hover,
+  .text-formatter-phone:hover {
+    text-decoration-thickness: 1px;
+  }
+  
+  .text-formatter-date,
+  .text-formatter-time,
+  .text-formatter-important {
+    border-width: 0.5px;
+  }
+}
+
+/* Ultra high DPI displays (3x and above) */
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi), (min-resolution: 3dppx) {
+  .text-formatter-url,
+  .text-formatter-email,
+  .text-formatter-phone {
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-variant-ligatures: common-ligatures;
+  }
+}
+
+/* Advanced Formatting Styles */
+
+/* Paragraph Spacing */
+.text-formatter-paragraph-compact {
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.text-formatter-paragraph-normal {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.text-formatter-paragraph-spacious {
+  margin: 0.75rem 0;
+  line-height: 1.6;
+}
+
+.text-formatter-paragraph-compact:first-child,
+.text-formatter-paragraph-normal:first-child,
+.text-formatter-paragraph-spacious:first-child {
+  margin-top: 0;
+}
+
+.text-formatter-paragraph-compact:last-child,
+.text-formatter-paragraph-normal:last-child,
+.text-formatter-paragraph-spacious:last-child {
+  margin-bottom: 0;
+}
+
+/* List Formatting */
+.text-formatter-list {
+  display: flex;
+  align-items: flex-start;
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.text-formatter-list:first-child {
+  margin-top: 0;
+}
+
+.text-formatter-list:last-child {
+  margin-bottom: 0;
+}
+
+/* List Bullets */
+.text-formatter-bullet {
+  color: #6b7280;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.text-formatter-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* List Indentation Levels */
+.text-formatter-list-level-0 {
+  padding-left: 0;
+}
+
+.text-formatter-list-level-1 {
+  padding-left: 1rem;
+}
+
+.text-formatter-list-level-2 {
+  padding-left: 2rem;
+}
+
+.text-formatter-list-level-3 {
+  padding-left: 3rem;
+}
+
+.text-formatter-list-level-4 {
+  padding-left: 4rem;
+}
+
+/* List Style Variations */
+.text-formatter-list-bullets .text-formatter-bullet {
+  color: #3b82f6;
+}
+
+.text-formatter-list-numbers .text-formatter-bullet {
+  color: #059669;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-formatter-list-dashes .text-formatter-bullet {
+  color: #6b7280;
+}
+
+/* Dark mode support for advanced formatting */
+@media (prefers-color-scheme: dark) {
+  .text-formatter-bullet {
+    color: #9ca3af;
+  }
+  
+  .text-formatter-list-bullets .text-formatter-bullet {
+    color: #60a5fa;
+  }
+  
+  .text-formatter-list-numbers .text-formatter-bullet {
+    color: #34d399;
+  }
+  
+  .text-formatter-list-dashes .text-formatter-bullet {
+    color: #9ca3af;
+  }
+}
+
+/* High contrast mode for lists */
+@media (prefers-contrast: high) {
+  .text-formatter-bullet {
+    font-weight: 900;
+  }
+  
+  .text-formatter-list {
+    border-left: 2px solid transparent;
+  }
+  
+  .text-formatter-list-level-1,
+  .text-formatter-list-level-2,
+  .text-formatter-list-level-3,
+  .text-formatter-list-level-4 {
+    border-left-color: currentColor;
+    border-left-width: 1px;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .text-formatter-list-level-1 {
+    padding-left: 0.75rem;
+  }
+  
+  .text-formatter-list-level-2 {
+    padding-left: 1.5rem;
+  }
+  
+  .text-formatter-list-level-3 {
+    padding-left: 2.25rem;
+  }
+  
+  .text-formatter-list-level-4 {
+    padding-left: 3rem;
+  }
+  
+  .text-formatter-bullet {
+    margin-right: 0.375rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .text-formatter-paragraph-compact,
+  .text-formatter-paragraph-normal,
+  .text-formatter-paragraph-spacious {
+    margin: 0.25rem 0;
+  }
+  
+  .text-formatter-list {
+    break-inside: avoid;
+  }
+  
+  .text-formatter-bullet {
+    color: #000 !important;
+  }
+}

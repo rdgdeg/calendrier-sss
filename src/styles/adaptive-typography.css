@@ -1,0 +1,656 @@
+/* Adaptive Typography System for UCLouvain Calendar */
+
+/* ===== CSS VARIABLES FOR TYPOGRAPHY SCALES ===== */
+:root {
+  /* Base Typography Variables */
+  --typography-font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --typography-font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  
+  /* Mobile Typography Scale (320px - 767px) */
+  --typography-mobile-title-size: 16px;
+  --typography-mobile-title-height: 1.3;
+  --typography-mobile-title-weight: 600;
+  --typography-mobile-title-spacing: -0.01em;
+  
+  --typography-mobile-description-size: 13px;
+  --typography-mobile-description-height: 1.4;
+  --typography-mobile-description-weight: 400;
+  --typography-mobile-description-spacing: 0;
+  
+  --typography-mobile-metadata-size: 11px;
+  --typography-mobile-metadata-height: 1.3;
+  --typography-mobile-metadata-weight: 500;
+  --typography-mobile-metadata-spacing: 0.025em;
+  
+  /* Tablet Typography Scale (768px - 1023px) */
+  --typography-tablet-title-size: 18px;
+  --typography-tablet-title-height: 1.3;
+  --typography-tablet-title-weight: 600;
+  --typography-tablet-title-spacing: -0.01em;
+  
+  --typography-tablet-description-size: 14px;
+  --typography-tablet-description-height: 1.5;
+  --typography-tablet-description-weight: 400;
+  --typography-tablet-description-spacing: 0;
+  
+  --typography-tablet-metadata-size: 12px;
+  --typography-tablet-metadata-height: 1.3;
+  --typography-tablet-metadata-weight: 500;
+  --typography-tablet-metadata-spacing: 0.025em;
+  
+  /* Desktop Typography Scale (1024px - 1439px) */
+  --typography-desktop-title-size: 20px;
+  --typography-desktop-title-height: 1.3;
+  --typography-desktop-title-weight: 600;
+  --typography-desktop-title-spacing: -0.015em;
+  
+  --typography-desktop-description-size: 15px;
+  --typography-desktop-description-height: 1.5;
+  --typography-desktop-description-weight: 400;
+  --typography-desktop-description-spacing: 0;
+  
+  --typography-desktop-metadata-size: 13px;
+  --typography-desktop-metadata-height: 1.3;
+  --typography-desktop-metadata-weight: 500;
+  --typography-desktop-metadata-spacing: 0.025em;
+  
+  /* TV/Large Screen Typography Scale (1440px+) */
+  --typography-tv-title-size: 28px;
+  --typography-tv-title-height: 1.2;
+  --typography-tv-title-weight: 700;
+  --typography-tv-title-spacing: -0.02em;
+  
+  --typography-tv-description-size: 18px;
+  --typography-tv-description-height: 1.4;
+  --typography-tv-description-weight: 400;
+  --typography-tv-description-spacing: 0;
+  
+  --typography-tv-metadata-size: 16px;
+  --typography-tv-metadata-height: 1.3;
+  --typography-tv-metadata-weight: 500;
+  --typography-tv-metadata-spacing: 0.025em;
+  
+  /* Special Content Colors */
+  --typography-url-color: #2563eb;
+  --typography-url-hover-color: #1d4ed8;
+  --typography-email-color: #059669;
+  --typography-email-hover-color: #047857;
+  --typography-phone-color: #7c3aed;
+  --typography-phone-hover-color: #6d28d9;
+  --typography-date-bg: rgba(251, 191, 36, 0.2);
+  --typography-date-color: #92400e;
+  --typography-time-bg: rgba(139, 92, 246, 0.2);
+  --typography-time-color: #6b21a8;
+  --typography-important-bg: rgba(239, 68, 68, 0.15);
+  --typography-important-color: #dc2626;
+  
+  /* Dark Mode Special Content Colors */
+  --typography-dark-url-color: #60a5fa;
+  --typography-dark-url-hover-color: #93c5fd;
+  --typography-dark-email-color: #34d399;
+  --typography-dark-email-hover-color: #6ee7b7;
+  --typography-dark-phone-color: #a78bfa;
+  --typography-dark-phone-hover-color: #c4b5fd;
+  --typography-dark-date-bg: rgba(251, 191, 36, 0.3);
+  --typography-dark-date-color: #fbbf24;
+  --typography-dark-time-bg: rgba(139, 92, 246, 0.3);
+  --typography-dark-time-color: #a78bfa;
+  --typography-dark-important-bg: rgba(239, 68, 68, 0.25);
+  --typography-dark-important-color: #f87171;
+}
+
+/* ===== BASE TYPOGRAPHY CLASSES ===== */
+.adaptive-typography {
+  font-family: var(--typography-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* ===== MOBILE FIRST RESPONSIVE TYPOGRAPHY ===== */
+
+/* Mobile Typography (Default - 320px+) */
+.adaptive-typography--title {
+  font-size: var(--typography-mobile-title-size);
+  line-height: var(--typography-mobile-title-height);
+  font-weight: var(--typography-mobile-title-weight);
+  letter-spacing: var(--typography-mobile-title-spacing);
+  color: var(--ucl-text-primary);
+}
+
+.adaptive-typography--description {
+  font-size: var(--typography-mobile-description-size);
+  line-height: var(--typography-mobile-description-height);
+  font-weight: var(--typography-mobile-description-weight);
+  letter-spacing: var(--typography-mobile-description-spacing);
+  color: var(--ucl-text-secondary);
+}
+
+.adaptive-typography--metadata {
+  font-size: var(--typography-mobile-metadata-size);
+  line-height: var(--typography-mobile-metadata-height);
+  font-weight: var(--typography-mobile-metadata-weight);
+  letter-spacing: var(--typography-mobile-metadata-spacing);
+  color: var(--ucl-text-muted);
+  text-transform: uppercase;
+}
+
+/* ===== MEDIA QUERIES FOR AUTOMATIC ADAPTATION ===== */
+
+/* Tablet Typography (768px+) */
+@media (min-width: 768px) {
+  .adaptive-typography--title {
+    font-size: var(--typography-tablet-title-size);
+    line-height: var(--typography-tablet-title-height);
+    font-weight: var(--typography-tablet-title-weight);
+    letter-spacing: var(--typography-tablet-title-spacing);
+  }
+  
+  .adaptive-typography--description {
+    font-size: var(--typography-tablet-description-size);
+    line-height: var(--typography-tablet-description-height);
+    font-weight: var(--typography-tablet-description-weight);
+    letter-spacing: var(--typography-tablet-description-spacing);
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: var(--typography-tablet-metadata-size);
+    line-height: var(--typography-tablet-metadata-height);
+    font-weight: var(--typography-tablet-metadata-weight);
+    letter-spacing: var(--typography-tablet-metadata-spacing);
+  }
+}
+
+/* Desktop Typography (1024px+) */
+@media (min-width: 1024px) {
+  .adaptive-typography--title {
+    font-size: var(--typography-desktop-title-size);
+    line-height: var(--typography-desktop-title-height);
+    font-weight: var(--typography-desktop-title-weight);
+    letter-spacing: var(--typography-desktop-title-spacing);
+  }
+  
+  .adaptive-typography--description {
+    font-size: var(--typography-desktop-description-size);
+    line-height: var(--typography-desktop-description-height);
+    font-weight: var(--typography-desktop-description-weight);
+    letter-spacing: var(--typography-desktop-description-spacing);
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: var(--typography-desktop-metadata-size);
+    line-height: var(--typography-desktop-metadata-height);
+    font-weight: var(--typography-desktop-metadata-weight);
+    letter-spacing: var(--typography-desktop-metadata-spacing);
+  }
+}
+
+/* TV/Large Screen Typography (1440px+) */
+@media (min-width: 1440px) {
+  .adaptive-typography--title {
+    font-size: var(--typography-tv-title-size);
+    line-height: var(--typography-tv-title-height);
+    font-weight: var(--typography-tv-title-weight);
+    letter-spacing: var(--typography-tv-title-spacing);
+  }
+  
+  .adaptive-typography--description {
+    font-size: var(--typography-tv-description-size);
+    line-height: var(--typography-tv-description-height);
+    font-weight: var(--typography-tv-description-weight);
+    letter-spacing: var(--typography-tv-description-spacing);
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: var(--typography-tv-metadata-size);
+    line-height: var(--typography-tv-metadata-height);
+    font-weight: var(--typography-tv-metadata-weight);
+    letter-spacing: var(--typography-tv-metadata-spacing);
+  }
+}
+
+/* ===== SPECIAL CONTENT STYLES ===== */
+
+/* URL Links */
+.adaptive-typography-url {
+  color: var(--typography-url-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(37, 99, 235, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.adaptive-typography-url:hover {
+  color: var(--typography-url-hover-color);
+  text-decoration-color: var(--typography-url-hover-color);
+  text-decoration-thickness: 2px;
+  transform: translateY(-1px);
+}
+
+.adaptive-typography-url:focus {
+  outline: 2px solid var(--typography-url-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Email Links */
+.adaptive-typography-email {
+  color: var(--typography-email-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(5, 150, 105, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.adaptive-typography-email:hover {
+  color: var(--typography-email-hover-color);
+  text-decoration-color: var(--typography-email-hover-color);
+  text-decoration-thickness: 2px;
+  transform: translateY(-1px);
+}
+
+.adaptive-typography-email:focus {
+  outline: 2px solid var(--typography-email-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Phone Links */
+.adaptive-typography-phone {
+  color: var(--typography-phone-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(124, 58, 237, 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.adaptive-typography-phone:hover {
+  color: var(--typography-phone-hover-color);
+  text-decoration-color: var(--typography-phone-hover-color);
+  text-decoration-thickness: 2px;
+  transform: translateY(-1px);
+}
+
+.adaptive-typography-phone:focus {
+  outline: 2px solid var(--typography-phone-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Date Highlighting */
+.adaptive-typography-date {
+  background-color: var(--typography-date-bg);
+  color: var(--typography-date-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9em;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* Time Highlighting */
+.adaptive-typography-time {
+  background-color: var(--typography-time-bg);
+  color: var(--typography-time-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9em;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* Important Words */
+.adaptive-typography-important {
+  background-color: var(--typography-important-bg);
+  color: var(--typography-important-color);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: inline-block;
+  line-height: 1.2;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* ===== HIGH RESOLUTION DISPLAY OPTIMIZATIONS ===== */
+
+/* Retina and High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi), (min-resolution: 2dppx) {
+  .adaptive-typography {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  .adaptive-typography--title {
+    font-weight: 500; /* Slightly lighter on high DPI */
+  }
+  
+  .adaptive-typography-url,
+  .adaptive-typography-email,
+  .adaptive-typography-phone {
+    text-decoration-thickness: 0.5px; /* Thinner underlines on high DPI */
+  }
+  
+  .adaptive-typography-url:hover,
+  .adaptive-typography-email:hover,
+  .adaptive-typography-phone:hover {
+    text-decoration-thickness: 1px;
+  }
+}
+
+/* Ultra High DPI (3x and above) */
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 288dpi), (min-resolution: 3dppx) {
+  .adaptive-typography {
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-variant-ligatures: common-ligatures;
+  }
+  
+  .adaptive-typography--title {
+    font-weight: 400; /* Even lighter on ultra high DPI */
+  }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+  .adaptive-typography-url {
+    color: var(--typography-dark-url-color);
+  }
+  
+  .adaptive-typography-url:hover {
+    color: var(--typography-dark-url-hover-color);
+  }
+  
+  .adaptive-typography-email {
+    color: var(--typography-dark-email-color);
+  }
+  
+  .adaptive-typography-email:hover {
+    color: var(--typography-dark-email-hover-color);
+  }
+  
+  .adaptive-typography-phone {
+    color: var(--typography-dark-phone-color);
+  }
+  
+  .adaptive-typography-phone:hover {
+    color: var(--typography-dark-phone-hover-color);
+  }
+  
+  .adaptive-typography-date {
+    background-color: var(--typography-dark-date-bg);
+    color: var(--typography-dark-date-color);
+    border-color: rgba(251, 191, 36, 0.4);
+  }
+  
+  .adaptive-typography-time {
+    background-color: var(--typography-dark-time-bg);
+    color: var(--typography-dark-time-color);
+    border-color: rgba(139, 92, 246, 0.4);
+  }
+  
+  .adaptive-typography-important {
+    background-color: var(--typography-dark-important-bg);
+    color: var(--typography-dark-important-color);
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+}
+
+/* ===== ACCESSIBILITY ENHANCEMENTS ===== */
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .adaptive-typography-url,
+  .adaptive-typography-email,
+  .adaptive-typography-phone {
+    text-decoration-thickness: 2px;
+    font-weight: 600;
+  }
+  
+  .adaptive-typography-date,
+  .adaptive-typography-time,
+  .adaptive-typography-important {
+    border-width: 2px;
+    font-weight: 700;
+  }
+  
+  .adaptive-typography--title {
+    font-weight: 700;
+  }
+  
+  .adaptive-typography--description {
+    font-weight: 500;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .adaptive-typography-url,
+  .adaptive-typography-email,
+  .adaptive-typography-phone {
+    transition: none;
+  }
+  
+  .adaptive-typography-url:hover,
+  .adaptive-typography-email:hover,
+  .adaptive-typography-phone:hover {
+    transform: none;
+  }
+  
+  .adaptive-typography-important {
+    animation: none;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .adaptive-typography {
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  
+  .adaptive-typography--title {
+    font-size: 14pt !important;
+    line-height: 1.2 !important;
+    font-weight: 600 !important;
+  }
+  
+  .adaptive-typography--description {
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    font-weight: 400 !important;
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: 9pt !important;
+    line-height: 1.3 !important;
+    font-weight: 500 !important;
+  }
+  
+  .adaptive-typography-url,
+  .adaptive-typography-email,
+  .adaptive-typography-phone {
+    color: black !important;
+    text-decoration: underline !important;
+  }
+  
+  .adaptive-typography-date,
+  .adaptive-typography-time,
+  .adaptive-typography-important {
+    background: transparent !important;
+    color: black !important;
+    border: 1px solid black !important;
+  }
+}
+
+/* ===== RESPONSIVE BREAKPOINT ADJUSTMENTS ===== */
+
+/* Small Mobile (320px - 479px) */
+@media (max-width: 479px) {
+  .adaptive-typography--title {
+    font-size: 14px;
+    line-height: 1.25;
+  }
+  
+  .adaptive-typography--description {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+}
+
+/* Large Mobile (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .adaptive-typography--title {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  
+  .adaptive-typography--description {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+}
+
+/* Large Desktop (1200px - 1439px) */
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .adaptive-typography--title {
+    font-size: 22px;
+    line-height: 1.25;
+  }
+  
+  .adaptive-typography--description {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+}
+
+/* Ultra Wide Screens (1920px+) */
+@media (min-width: 1920px) {
+  .adaptive-typography--title {
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+  
+  .adaptive-typography--description {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+  
+  .adaptive-typography--metadata {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Truncation Utilities */
+.adaptive-typography--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adaptive-typography--truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.adaptive-typography--truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Weight Variations */
+.adaptive-typography--light {
+  font-weight: 300;
+}
+
+.adaptive-typography--normal {
+  font-weight: 400;
+}
+
+.adaptive-typography--medium {
+  font-weight: 500;
+}
+
+.adaptive-typography--semibold {
+  font-weight: 600;
+}
+
+.adaptive-typography--bold {
+  font-weight: 700;
+}
+
+/* Size Variations */
+.adaptive-typography--xs {
+  font-size: 0.75em;
+}
+
+.adaptive-typography--sm {
+  font-size: 0.875em;
+}
+
+.adaptive-typography--base {
+  font-size: 1em;
+}
+
+.adaptive-typography--lg {
+  font-size: 1.125em;
+}
+
+.adaptive-typography--xl {
+  font-size: 1.25em;
+}
+
+.adaptive-typography--2xl {
+  font-size: 1.5em;
+}

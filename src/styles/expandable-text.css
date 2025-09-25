@@ -1,0 +1,354 @@
+/* ExpandableText Component Styles */
+
+.expandable-text {
+  position: relative;
+  width: 100%;
+}
+
+/* Content container */
+.expandable-text__content {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Text element */
+.expandable-text__text {
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Collapsed state - apply line clamping */
+.expandable-text--collapsed .expandable-text__text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Expanded state - remove line clamping */
+.expandable-text--expanded .expandable-text__text {
+  display: block;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+/* Overflow indicator container */
+.expandable-text__overflow-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Fade gradient overlay */
+.expandable-text__fade-gradient {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 1.5em;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--background-color, #ffffff) 70%,
+    var(--background-color, #ffffff) 100%
+  );
+  pointer-events: none;
+}
+
+/* Overflow dots */
+.expandable-text__overflow-dots {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0 4px;
+  background: var(--background-color, #ffffff);
+  color: var(--text-secondary, #6b7280);
+  font-weight: 600;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+/* Toggle button */
+.expandable-text__toggle-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 0.375rem;
+  color: var(--text-primary, #374151);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.expandable-text__toggle-button:hover {
+  background: var(--hover-background, #f9fafb);
+  border-color: var(--hover-border, #9ca3af);
+  color: var(--hover-text, #111827);
+}
+
+.expandable-text__toggle-button:focus {
+  outline: 2px solid var(--focus-color, #3b82f6);
+  outline-offset: 2px;
+}
+
+.expandable-text__toggle-button:active {
+  background: var(--active-background, #f3f4f6);
+  transform: translateY(1px);
+}
+
+/* Toggle button text */
+.expandable-text__toggle-text {
+  font-size: inherit;
+  line-height: 1;
+}
+
+/* Toggle button icon */
+.expandable-text__toggle-icon {
+  font-size: 0.75rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.expandable-text__toggle-button:hover .expandable-text__toggle-icon {
+  transform: scale(1.1);
+}
+
+/* Variant-specific styles */
+.expandable-text--title .expandable-text__toggle-button {
+  font-size: 0.8rem;
+  margin-top: 0.375rem;
+}
+
+.expandable-text--description .expandable-text__toggle-button {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.expandable-text--metadata .expandable-text__toggle-button {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  padding: 0.125rem 0.375rem;
+}
+
+/* Screen size adaptations */
+@media (max-width: 768px) {
+  .expandable-text__toggle-button {
+    font-size: 0.8rem;
+    padding: 0.375rem 0.75rem;
+    margin-top: 0.75rem;
+  }
+  
+  .expandable-text__fade-gradient {
+    width: 50px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .expandable-text__toggle-button {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin-top: 0.75rem;
+  }
+  
+  .expandable-text__fade-gradient {
+    width: 80px;
+    height: 2em;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .expandable-text__fade-gradient {
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      var(--background-color, #1f2937) 70%,
+      var(--background-color, #1f2937) 100%
+    );
+  }
+  
+  .expandable-text__overflow-dots {
+    background: var(--background-color, #1f2937);
+    color: var(--text-secondary, #9ca3af);
+  }
+  
+  .expandable-text__toggle-button {
+    border-color: var(--border-color, #4b5563);
+    color: var(--text-primary, #f9fafb);
+  }
+  
+  .expandable-text__toggle-button:hover {
+    background: var(--hover-background, #374151);
+    border-color: var(--hover-border, #6b7280);
+    color: var(--hover-text, #ffffff);
+  }
+  
+  .expandable-text__toggle-button:active {
+    background: var(--active-background, #4b5563);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .expandable-text__toggle-button {
+    border-width: 2px;
+    font-weight: 600;
+  }
+  
+  .expandable-text__overflow-dots {
+    font-weight: 900;
+    text-shadow: 0 0 1px currentColor;
+  }
+  
+  .expandable-text__fade-gradient {
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      var(--background-color, #ffffff) 50%,
+      var(--background-color, #ffffff) 100%
+    );
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .expandable-text__text,
+  .expandable-text__toggle-icon,
+  .expandable-text__toggle-button {
+    transition: none;
+  }
+  
+  .expandable-text__toggle-button:active {
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .expandable-text__toggle-button {
+    display: none;
+  }
+  
+  .expandable-text__overflow-indicator {
+    display: none;
+  }
+  
+  .expandable-text--collapsed .expandable-text__text {
+    display: block;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+    overflow: visible;
+    text-overflow: unset;
+  }
+}
+
+/* Animation for smooth expand/collapse */
+@keyframes expandText {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
+}
+
+@keyframes collapseText {
+  from {
+    max-height: 1000px;
+    opacity: 1;
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+.expandable-text--expanded .expandable-text__text {
+  animation: expandText 0.3s ease-out;
+}
+
+.expandable-text--collapsed .expandable-text__text {
+  animation: collapseText 0.3s ease-in;
+}
+
+/* Focus management for accessibility */
+.expandable-text__toggle-button:focus-visible {
+  outline: 2px solid var(--focus-color, #3b82f6);
+  outline-offset: 2px;
+  border-color: var(--focus-color, #3b82f6);
+}
+
+/* Loading state */
+.expandable-text--loading .expandable-text__text {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.expandable-text--loading .expandable-text__toggle-button {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error state */
+.expandable-text--error .expandable-text__text {
+  color: var(--error-color, #dc2626);
+  border-left: 3px solid var(--error-color, #dc2626);
+  padding-left: 0.5rem;
+}
+
+/* Word breaking for very long words */
+.expandable-text__text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* Ensure long URLs and words break appropriately */
+.expandable-text__text .text-formatter-url,
+.expandable-text__text .text-formatter-email {
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+/* Special handling for very long words */
+.expandable-text__text {
+  /* Use CSS word-break for emergency breaking */
+  word-break: break-word;
+}
+
+/* Responsive font size adjustments for toggle button */
+.expandable-text--mobile .expandable-text__toggle-button {
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.expandable-text--tablet .expandable-text__toggle-button {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.625rem;
+}
+
+.expandable-text--desktop .expandable-text__toggle-button {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.expandable-text--tv .expandable-text__toggle-button {
+  font-size: 1.125rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+}

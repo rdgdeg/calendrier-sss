@@ -7,6 +7,10 @@
 @import './styles/micro-interactions.css';
 @import './styles/new-components.css';
 @import './styles/loading-screen.css';
+@import './styles/text-formatter.css';
+@import './styles/responsive-text.css';
+@import './styles/expandable-text.css';
+@import './styles/adaptive-typography.css';
 /* @import './styles/display-components.css'; */
 @import './styles/upcoming-events-section.css';
 @import './styles/event-images-preview.css';

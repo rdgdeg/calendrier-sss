@@ -5,3 +5,5 @@ export { EventCard } from './EventCard';
 export { EventBadge } from './EventBadge';
 export { EventIcon } from './EventIcon';
 export { EmptyState } from './EmptyState';
+export { ResponsiveText } from './ResponsiveText';
+export { ExpandableText } from './ExpandableText';

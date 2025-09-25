@@ -232,7 +232,59 @@
   flex-shrink: 0;
 }
 
-/* Event description dans le modal */
+/* Enhanced description content wrapper */
+.description-content-wrapper {
+  position: relative;
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.description-content[data-has-scroll="true"] {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: var(--ucl-spacing-xs);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  scroll-behavior: smooth;
+}
+
+/* Scroll indicators */
+.scroll-indicator {
+  position: absolute;
+  left: 0;
+  right: var(--ucl-spacing-xs);
+  height: 20px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-indicator--visible {
+  opacity: 0.8;
+}
+
+.scroll-indicator--top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--ucl-white) 0%, transparent 100%);
+}
+
+.scroll-indicator--bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--ucl-white) 0%, transparent 100%);
+}
+
+.description-content-wrapper:hover .scroll-indicator--visible {
+  opacity: 1;
+}
+
+.scroll-fade {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--ucl-border-radius-sm);
+}
+
+/* Event description dans le modal avec formatage avancé */
 .event-description-modal {
   line-height: 1.6;
   color: var(--ucl-text-primary);
@@ -250,6 +302,175 @@
   margin-bottom: 0;
 }
 
+/* Advanced text formatting styles */
+.event-description-modal .text-formatter-paragraph-normal {
+  margin-bottom: var(--ucl-spacing-md);
+  line-height: 1.6;
+}
+
+.event-description-modal .text-formatter-paragraph-compact {
+  margin-bottom: var(--ucl-spacing-sm);
+  line-height: 1.5;
+}
+
+.event-description-modal .text-formatter-paragraph-spacious {
+  margin-bottom: var(--ucl-spacing-lg);
+  line-height: 1.7;
+}
+
+/* List formatting */
+.event-description-modal .text-formatter-list {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: var(--ucl-spacing-xs);
+  line-height: 1.5;
+}
+
+.event-description-modal .text-formatter-bullet {
+  color: var(--ucl-primary);
+  font-weight: bold;
+  margin-right: var(--ucl-spacing-sm);
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+}
+
+.event-description-modal .text-formatter-list-content {
+  flex: 1;
+}
+
+.event-description-modal .text-formatter-list-level-0 {
+  margin-left: 0;
+}
+
+.event-description-modal .text-formatter-list-level-1 {
+  margin-left: var(--ucl-spacing-md);
+}
+
+.event-description-modal .text-formatter-list-level-2 {
+  margin-left: calc(var(--ucl-spacing-md) * 2);
+}
+
+/* Special content highlighting */
+.event-description-modal .text-formatter-url {
+  color: var(--ucl-primary);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.event-description-modal .text-formatter-url:hover {
+  color: var(--ucl-secondary);
+  text-decoration: none;
+}
+
+.event-description-modal .text-formatter-email {
+  color: var(--ucl-accent);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.event-description-modal .text-formatter-email:hover {
+  color: var(--ucl-primary);
+  text-decoration: none;
+}
+
+.event-description-modal .text-formatter-phone {
+  color: var(--ucl-success);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.event-description-modal .text-formatter-phone:hover {
+  color: var(--ucl-primary);
+  text-decoration: none;
+}
+
+.event-description-modal .text-formatter-date {
+  background: rgba(var(--ucl-primary-rgb), 0.1);
+  color: var(--ucl-primary);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.event-description-modal .text-formatter-time {
+  background: rgba(var(--ucl-secondary-rgb), 0.1);
+  color: var(--ucl-secondary);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.event-description-modal .text-formatter-important {
+  background: rgba(var(--ucl-warning-rgb), 0.2);
+  color: var(--ucl-warning-dark);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9em;
+}
+
+/* Extracted links section */
+.extracted-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ucl-spacing-sm);
+  margin-top: var(--ucl-spacing-sm);
+}
+
+.extracted-link {
+  background: var(--ucl-gray-50);
+  border: 1px solid var(--ucl-gray-200);
+  border-radius: var(--ucl-border-radius);
+  overflow: hidden;
+  transition: all var(--ucl-transition);
+}
+
+.extracted-link:hover {
+  background: var(--ucl-gray-100);
+  border-color: var(--ucl-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--ucl-shadow-sm);
+}
+
+.extracted-link-anchor {
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-sm);
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-md);
+  text-decoration: none;
+  color: var(--ucl-dark);
+  width: 100%;
+}
+
+.extracted-link-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.extracted-link-text {
+  flex: 1;
+  font-size: var(--ucl-font-size-sm);
+  font-weight: var(--ucl-font-weight-medium);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.extracted-link--url .extracted-link-anchor:hover {
+  color: var(--ucl-primary);
+}
+
+.extracted-link--email .extracted-link-anchor:hover {
+  color: var(--ucl-accent);
+}
+
+.extracted-link--phone .extracted-link-anchor:hover {
+  color: var(--ucl-success);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .event-modal-backdrop {
@@ -262,10 +483,6 @@
 
   .event-modal-header {
     padding: var(--ucl-spacing-md);
-  }
-
-  .event-modal-title {
-    font-size: var(--ucl-font-size-lg);
   }
 
   .event-modal-details {
@@ -290,6 +507,36 @@
   .btn-export-modal {
     padding: var(--ucl-spacing-sm);
     font-size: var(--ucl-font-size-xs);
+  }
+
+  /* Mobile adjustments for enhanced features */
+  .description-content-wrapper {
+    max-height: 300px;
+  }
+
+  .description-content[data-has-scroll="true"] {
+    max-height: 300px;
+  }
+
+  .extracted-links {
+    gap: var(--ucl-spacing-xs);
+  }
+
+  .extracted-link-anchor {
+    padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
+  }
+
+  .extracted-link-text {
+    font-size: var(--ucl-font-size-xs);
+  }
+
+  .event-description-modal .text-formatter-list {
+    margin-bottom: var(--ucl-spacing-xs);
+  }
+
+  .event-description-modal .text-formatter-bullet {
+    margin-right: var(--ucl-spacing-xs);
+    width: 10px;
   }
 }
 

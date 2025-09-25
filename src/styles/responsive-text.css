@@ -1,0 +1,211 @@
+/* ResponsiveText Component Styles - Enhanced with Adaptive Typography */
+
+.responsive-text {
+  /* Base adaptive typography styles */
+  font-family: var(--typography-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* Variant-specific styles with adaptive typography integration */
+.responsive-text--title {
+  /* Mobile first approach */
+  font-size: var(--typography-mobile-title-size);
+  line-height: var(--typography-mobile-title-height);
+  font-weight: var(--typography-mobile-title-weight);
+  letter-spacing: var(--typography-mobile-title-spacing);
+  color: var(--ucl-text-primary, #1a1a1a);
+  font-family: var(--typography-font-family);
+}
+
+.responsive-text--description {
+  /* Mobile first approach */
+  font-size: var(--typography-mobile-description-size);
+  line-height: var(--typography-mobile-description-height);
+  font-weight: var(--typography-mobile-description-weight);
+  letter-spacing: var(--typography-mobile-description-spacing);
+  color: var(--ucl-text-secondary, #4a4a4a);
+  font-family: var(--typography-font-family);
+}
+
+.responsive-text--metadata {
+  /* Mobile first approach */
+  font-size: var(--typography-mobile-metadata-size);
+  line-height: var(--typography-mobile-metadata-height);
+  font-weight: var(--typography-mobile-metadata-weight);
+  letter-spacing: var(--typography-mobile-metadata-spacing);
+  color: var(--ucl-text-muted, #6a6a6a);
+  font-family: var(--typography-font-family);
+  text-transform: uppercase;
+}
+
+/* Responsive breakpoints for title */
+@media (min-width: 768px) {
+  .responsive-text--title {
+    font-size: var(--typography-tablet-title-size);
+    line-height: var(--typography-tablet-title-height);
+    font-weight: var(--typography-tablet-title-weight);
+    letter-spacing: var(--typography-tablet-title-spacing);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text--title {
+    font-size: var(--typography-desktop-title-size);
+    line-height: var(--typography-desktop-title-height);
+    font-weight: var(--typography-desktop-title-weight);
+    letter-spacing: var(--typography-desktop-title-spacing);
+  }
+}
+
+@media (min-width: 1440px) {
+  .responsive-text--title {
+    font-size: var(--typography-tv-title-size);
+    line-height: var(--typography-tv-title-height);
+    font-weight: var(--typography-tv-title-weight);
+    letter-spacing: var(--typography-tv-title-spacing);
+  }
+}
+
+/* Responsive breakpoints for description */
+@media (min-width: 768px) {
+  .responsive-text--description {
+    font-size: var(--typography-tablet-description-size);
+    line-height: var(--typography-tablet-description-height);
+    font-weight: var(--typography-tablet-description-weight);
+    letter-spacing: var(--typography-tablet-description-spacing);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text--description {
+    font-size: var(--typography-desktop-description-size);
+    line-height: var(--typography-desktop-description-height);
+    font-weight: var(--typography-desktop-description-weight);
+    letter-spacing: var(--typography-desktop-description-spacing);
+  }
+}
+
+@media (min-width: 1440px) {
+  .responsive-text--description {
+    font-size: var(--typography-tv-description-size);
+    line-height: var(--typography-tv-description-height);
+    font-weight: var(--typography-tv-description-weight);
+    letter-spacing: var(--typography-tv-description-spacing);
+  }
+}
+
+/* Responsive breakpoints for metadata */
+@media (min-width: 768px) {
+  .responsive-text--metadata {
+    font-size: var(--typography-tablet-metadata-size);
+    line-height: var(--typography-tablet-metadata-height);
+    font-weight: var(--typography-tablet-metadata-weight);
+    letter-spacing: var(--typography-tablet-metadata-spacing);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text--metadata {
+    font-size: var(--typography-desktop-metadata-size);
+    line-height: var(--typography-desktop-metadata-height);
+    font-weight: var(--typography-desktop-metadata-weight);
+    letter-spacing: var(--typography-desktop-metadata-spacing);
+  }
+}
+
+@media (min-width: 1440px) {
+  .responsive-text--metadata {
+    font-size: var(--typography-tv-metadata-size);
+    line-height: var(--typography-tv-metadata-height);
+    font-weight: var(--typography-tv-metadata-weight);
+    letter-spacing: var(--typography-tv-metadata-spacing);
+  }
+}
+
+/* Screen size specific adjustments */
+.responsive-text--mobile {
+  /* Mobile-specific optimizations */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.responsive-text--tablet {
+  /* Tablet-specific optimizations */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.responsive-text--desktop {
+  /* Desktop-specific optimizations */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.responsive-text--tv {
+  /* TV/Large screen optimizations */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .responsive-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .responsive-text {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .responsive-text--title {
+    color: var(--text-primary-high-contrast, #000000);
+  }
+  
+  .responsive-text--description {
+    color: var(--text-secondary-high-contrast, #000000);
+  }
+  
+  .responsive-text--metadata {
+    color: var(--text-tertiary-high-contrast, #000000);
+  }
+}
+
+/* Print styles */
+@media print {
+  .responsive-text {
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+  
+  .responsive-text--title {
+    font-size: 14pt !important;
+    line-height: 1.2 !important;
+  }
+  
+  .responsive-text--description {
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+  
+  .responsive-text--metadata {
+    font-size: 9pt !important;
+    line-height: 1.3 !important;
+  }
+}

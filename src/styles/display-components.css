@@ -1041,13 +1041,7 @@
   color: var(--ucl-gray-700);
   line-height: var(--ucl-leading-relaxed);
   flex: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   margin-bottom: 8px;
-  text-overflow: ellipsis;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }

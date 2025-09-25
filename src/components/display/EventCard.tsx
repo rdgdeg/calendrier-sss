@@ -1,8 +1,10 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { CalendarEvent } from '../../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { EventIcon } from './EventIcon';
+import { extractImagesFromDescription } from '../../utils/imageExtractor';
+import { EventDescription } from '../EventDescription';
 
 interface EventCardProps {
   event: CalendarEvent;
@@ -74,8 +76,19 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
     return truncated.trim() + '...';
   };
 
+  const processedContent = useMemo(() => {
+    if (!event.description) {
+      return null;
+    }
+
+    return extractImagesFromDescription(event.description);
+  }, [event.description]);
+
+  const descriptionToRender = processedContent?.cleanDescription ?? event.description ?? '';
+  const hasDescription = descriptionToRender.trim().length > 0;
+
   return (
-    <article 
+    <article
       className={`event-card slide-in-up ${isHovered ? 'hover-effect' : ''} ${className}`}
       role="article"
       aria-labelledby={`event-title-${event.id}`}
@@ -115,13 +128,16 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
         </div>
         
         {/* Description */}
-        {event.description && (
-          <div 
+        {hasDescription && (
+          <div
             id={`event-details-${event.id}`}
             className="event-description"
           >
             <span className="sr-only">Description: </span>
-            {event.description}
+            <EventDescription
+              description={descriptionToRender}
+              className="event-description-compact"
+            />
           </div>
         )}
 

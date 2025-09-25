@@ -2,6 +2,8 @@ import React from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { extractImagesFromDescription } from '../utils/imageExtractor';
+import { EventDescription } from './EventDescription';
 
 interface SearchResultsProps {
   searchResults: CalendarEvent[];
@@ -26,85 +28,91 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
     return null;
   }
 
-  const renderEventCard = (event: CalendarEvent, index: number) => (
-    <div
-      key={`${event.id}-${event.start.getTime()}-${index}`}
-      className="search-result-card"
-    >
-      <div className="search-result-content">
-        <div className="search-result-header">
-          <h4 className="search-result-title">
-            {event.title}
-          </h4>
-          <div className="search-result-source">
-            <span className={`source-badge ${event.source}`}>
-              {event.source === 'icloud' ? 'de Duve' : '📧 SSS'}
+  const renderEventCard = (event: CalendarEvent, index: number) => {
+    const processedContent = event.description ? extractImagesFromDescription(event.description) : null;
+    const descriptionToRender = processedContent?.cleanDescription ?? event.description ?? '';
+    const hasDescription = descriptionToRender.trim().length > 0;
+
+    return (
+      <div
+        key={`${event.id}-${event.start.getTime()}-${index}`}
+        className="search-result-card"
+      >
+        <div className="search-result-content">
+          <div className="search-result-header">
+            <h4 className="search-result-title">
+              {event.title}
+            </h4>
+            <div className="search-result-source">
+              <span className={`source-badge ${event.source}`}>
+                {event.source === 'icloud' ? 'de Duve' : '📧 SSS'}
+              </span>
+            </div>
+          </div>
+
+          <div className="search-result-datetime">
+            <span className="search-result-date">
+              📅 {format(event.start, 'd MMM yyyy', { locale: fr })}
+            </span>
+            <span className="search-result-time">
+              🕐 {event.allDay
+                ? 'Journée entière'
+                : `${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`
+              }
             </span>
           </div>
-        </div>
 
-        <div className="search-result-datetime">
-          <span className="search-result-date">
-            📅 {format(event.start, 'd MMM yyyy', { locale: fr })}
-          </span>
-          <span className="search-result-time">
-            🕐 {event.allDay
-              ? 'Journée entière'
-              : `${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`
-            }
-          </span>
-        </div>
+          {event.location && (
+            <div className="search-result-location">
+              📍 {event.location}
+            </div>
+          )}
 
-        {event.location && (
-          <div className="search-result-location">
-            📍 {event.location}
-          </div>
-        )}
+          {hasDescription && (
+            <div className="search-result-description">
+              <EventDescription
+                description={descriptionToRender}
+                className="event-description-preview event-description-compact"
+              />
+            </div>
+          )}
 
-        {event.description && (
-          <div className="search-result-description">
-            {event.description.length > 120
-              ? `${event.description.substring(0, 120)}...`
-              : event.description
-            }
-          </div>
-        )}
-
-        <div className="search-result-actions">
-          <button
-            className="btn-search-info"
-            onClick={() => onEventClick(event)}
-            title="Plus d'informations"
-          >
-            ℹ️ Détails
-          </button>
-          <div className="search-export-buttons">
+          <div className="search-result-actions">
             <button
-              className="btn-search-export google"
-              onClick={() => onExportToGoogle(event)}
-              title="Ajouter à Google Calendar"
+              className="btn-search-info"
+              onClick={() => onEventClick(event)}
+              title="Plus d'informations"
             >
-              📅
+              ℹ️ Détails
             </button>
-            <button
-              className="btn-search-export outlook"
-              onClick={() => onExportToOutlook(event)}
-              title="Ajouter à Outlook"
-            >
-              📆
-            </button>
-            <button
-              className="btn-search-export ics"
-              onClick={() => onExportToICS(event)}
-              title="Télécharger fichier ICS"
-            >
-              💾
-            </button>
+            <div className="search-export-buttons">
+              <button
+                className="btn-search-export google"
+                onClick={() => onExportToGoogle(event)}
+                title="Ajouter à Google Calendar"
+              >
+                📅
+              </button>
+              <button
+                className="btn-search-export outlook"
+                onClick={() => onExportToOutlook(event)}
+                title="Ajouter à Outlook"
+              >
+                📆
+              </button>
+              <button
+                className="btn-search-export ics"
+                onClick={() => onExportToICS(event)}
+                title="Télécharger fichier ICS"
+              >
+                💾
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="search-results-section">

@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { getSourceDisplayName } from '../../utils/sourceUtils';
 import { EventDescription } from '../EventDescription';
 import { getHighContrastTitleColor } from '../../utils/colorUtils';
+import { extractImagesFromDescription } from '../../utils/imageExtractor';
 
 interface AgendaViewProps {
   currentDate: Date;
@@ -225,7 +226,10 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                 <div className="agenda-events">
                   {dayEvents.map((event, index) => {
                     const isExpanded = expandedEvents.has(event.id);
-                    const hasDetails = event.description || event.location;
+                    const processedContent = event.description ? extractImagesFromDescription(event.description) : null;
+                    const descriptionToRender = processedContent?.cleanDescription ?? event.description ?? '';
+                    const hasDescription = descriptionToRender.trim().length > 0;
+                    const hasDetails = hasDescription || !!event.location;
                     const isHighlighted = isEventHighlighted(event.id);
                     const isSelected = selectedEventId === event.id;
                     
@@ -305,12 +309,12 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                               </div>
                             )}
                             
-                            {event.description && (
+                            {hasDescription && (
                               <div className="event-detail-item">
                                 <span className="detail-icon">📝</span>
                                 <div className="detail-text">
-                                  <EventDescription 
-                                    description={event.description}
+                                  <EventDescription
+                                    description={descriptionToRender}
                                     className="event-description-full"
                                   />
                                 </div>

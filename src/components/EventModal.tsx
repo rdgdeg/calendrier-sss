@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { getSourceDisplayName } from '../utils/sourceUtils';
 import { extractImagesFromDescription } from '../utils/imageExtractor';
 import { EventImagesPreview } from './EventImagesPreview';
+import { EventDescription } from './EventDescription';
 
 interface EventModalProps {
   event: CalendarEvent | null;
@@ -27,6 +28,8 @@ export const EventModal: React.FC<EventModalProps> = ({
 
   // Traitement des images dans la description
   const processedContent = event.description ? extractImagesFromDescription(event.description) : null;
+  const descriptionToRender = processedContent?.cleanDescription ?? event.description ?? '';
+  const hasDescription = descriptionToRender.trim().length > 0;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -113,15 +116,16 @@ export const EventModal: React.FC<EventModalProps> = ({
             )}
 
             {/* Description nettoyée */}
-            {processedContent && processedContent.cleanDescription && (
+            {hasDescription && (
               <div className="event-detail-row description-row">
                 <div className="detail-icon">📝</div>
                 <div className="detail-content">
                   <strong>Description</strong>
                   <div className="description-content">
-                    <div className="event-description-modal">
-                      {processedContent.cleanDescription}
-                    </div>
+                    <EventDescription
+                      description={descriptionToRender}
+                      className="event-description-modal"
+                    />
                   </div>
                 </div>
               </div>

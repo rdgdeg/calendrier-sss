@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { EventIcon } from './EventIcon';
 import { ResponsiveText, useScreenSize } from './ResponsiveText';
 import { textFormatter } from '../../utils/textFormatter';
+import { ErrorBoundary } from '../ErrorBoundary';
 
 interface EventCardProps {
   event: CalendarEvent;
@@ -13,25 +14,22 @@ interface EventCardProps {
 
 const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [iconSize, setIconSize] = useState(24);
   const screenSize = useScreenSize();
 
-  // Adjust icon size based on screen size
-  React.useEffect(() => {
-    const updateIconSize = () => {
-      if (window.innerWidth >= 1920) {
-        setIconSize(36);
-      } else if (window.innerWidth >= 1400) {
-        setIconSize(30);
-      } else {
-        setIconSize(24);
-      }
-    };
-
-    updateIconSize();
-    window.addEventListener('resize', updateIconSize);
-    return () => window.removeEventListener('resize', updateIconSize);
-  }, []);
+  // Calculate icon size based on screen size (no separate state needed)
+  const iconSize = React.useMemo(() => {
+    switch (screenSize) {
+      case 'tv':
+        return 36;
+      case 'desktop':
+        return window.innerWidth >= 1400 ? 30 : 24;
+      case 'tablet':
+        return 24;
+      case 'mobile':
+      default:
+        return 20;
+    }
+  }, [screenSize]);
 
   const formatEventDate = (start: Date) => {
     return format(start, 'EEEE d MMMM', { locale: fr });
@@ -113,31 +111,37 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
           <div className="event-datetime-block">
             <div className="event-date">
               <span className="sr-only">Date: </span>
-              <ResponsiveText
-                text={formatEventDate(event.start)}
-                variant="metadata"
-                screenSize={screenSize}
-                className="event-date-text"
-              />
+              <ErrorBoundary fallback={<span>{formatEventDate(event.start)}</span>}>
+                <ResponsiveText
+                  text={formatEventDate(event.start)}
+                  variant="metadata"
+                  screenSize={screenSize}
+                  className="event-date-text"
+                />
+              </ErrorBoundary>
             </div>
             <div className="event-time">
               <span className="sr-only">Heure: </span>
-              <ResponsiveText
-                text={formatEventTime(event.start, event.end, event.allDay)}
-                variant="metadata"
-                screenSize={screenSize}
-                className="event-time-text"
-              />
+              <ErrorBoundary fallback={<span>{formatEventTime(event.start, event.end, event.allDay)}</span>}>
+                <ResponsiveText
+                  text={formatEventTime(event.start, event.end, event.allDay)}
+                  variant="metadata"
+                  screenSize={screenSize}
+                  className="event-time-text"
+                />
+              </ErrorBoundary>
             </div>
           </div>
           <div className={`event-source event-source-${event.source}`}>
             <span className="sr-only">Source: </span>
-            <ResponsiveText
-              text={getSourceLabel(event.source)}
-              variant="metadata"
-              screenSize={screenSize}
-              className="event-source-text"
-            />
+            <ErrorBoundary fallback={<span>{getSourceLabel(event.source)}</span>}>
+              <ResponsiveText
+                text={getSourceLabel(event.source)}
+                variant="metadata"
+                screenSize={screenSize}
+                className="event-source-text"
+              />
+            </ErrorBoundary>
           </div>
         </div>
         
@@ -148,12 +152,14 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
             id={`event-title-${event.id}`}
             className="event-title"
           >
-            <ResponsiveText
-              text={formatTitle(event.title)}
-              variant="title"
-              screenSize={screenSize}
-              className="event-title-text"
-            />
+            <ErrorBoundary fallback={<span>{formatTitle(event.title)}</span>}>
+              <ResponsiveText
+                text={formatTitle(event.title)}
+                variant="title"
+                screenSize={screenSize}
+                className="event-title-text"
+              />
+            </ErrorBoundary>
           </h3>
         </div>
         
@@ -164,13 +170,15 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
             className="event-description"
           >
             <span className="sr-only">Description: </span>
-            <ResponsiveText
-              text={formatDescription(event.description)}
-              variant="description"
-              screenSize={screenSize}
-              maxLines={screenSize === 'mobile' ? 2 : screenSize === 'tablet' ? 3 : 3}
-              className="event-description-text"
-            />
+            <ErrorBoundary fallback={<span>{formatDescription(event.description)}</span>}>
+              <ResponsiveText
+                text={formatDescription(event.description)}
+                variant="description"
+                screenSize={screenSize}
+                maxLines={screenSize === 'mobile' ? 2 : screenSize === 'tablet' ? 3 : 3}
+                className="event-description-text"
+              />
+            </ErrorBoundary>
           </div>
         )}
 
@@ -179,12 +187,14 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
           <div className="event-location">
             <span className="sr-only">Lieu: </span>
             <span className="location-icon">📍</span>
-            <ResponsiveText
-              text={event.location}
-              variant="metadata"
-              screenSize={screenSize}
-              className="event-location-text"
-            />
+            <ErrorBoundary fallback={<span>{event.location}</span>}>
+              <ResponsiveText
+                text={event.location}
+                variant="metadata"
+                screenSize={screenSize}
+                className="event-location-text"
+              />
+            </ErrorBoundary>
           </div>
         )}
       </div>

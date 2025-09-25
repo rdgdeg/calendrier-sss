@@ -63,6 +63,8 @@ export const useScreenSize = (): ScreenSize => {
   });
 
   const detectScreenSize = useCallback((): ScreenSize => {
+    if (typeof window === 'undefined') return 'desktop';
+    
     const width = window.innerWidth;
     
     if (width < BREAKPOINTS.mobile) return 'mobile';
@@ -75,13 +77,25 @@ export const useScreenSize = (): ScreenSize => {
     const newScreenSize = detectScreenSize();
     setScreenSize(prevSize => {
       // Only update if screen size actually changed
-      return prevSize !== newScreenSize ? newScreenSize : prevSize;
+      if (prevSize !== newScreenSize) {
+        return newScreenSize;
+      }
+      return prevSize;
     });
   }, [detectScreenSize]);
 
   useEffect(() => {
     // Use global resize handler for better performance
-    const cleanup = globalResizeHandler.addCallback(handleResize);
+    let cleanup: (() => void) | undefined;
+    
+    try {
+      cleanup = globalResizeHandler.addCallback(handleResize);
+    } catch (error) {
+      console.warn('Failed to add resize handler:', error);
+      // Fallback to direct window listener
+      window.addEventListener('resize', handleResize);
+      cleanup = () => window.removeEventListener('resize', handleResize);
+    }
     
     return cleanup;
   }, [handleResize]);
@@ -101,6 +115,29 @@ export const ResponsiveText = React.forwardRef<HTMLDivElement, ResponsiveTextPro
   const screenSize = overrideScreenSize || detectedScreenSize;
   
   const typographyStyle = useMemo(() => {
+    // Safety checks to prevent errors
+    if (!variant || !screenSize || !text) {
+      return {
+        fontSize: '14px',
+        lineHeight: '1.4',
+        fontWeight: '400',
+        margin: 0,
+        padding: 0
+      };
+    }
+
+    if (!TYPOGRAPHY_SCALES[variant] || !TYPOGRAPHY_SCALES[variant][screenSize]) {
+      // Fallback to desktop scale if invalid variant/screenSize
+      const fallbackScale = TYPOGRAPHY_SCALES.description.desktop;
+      return {
+        fontSize: fallbackScale.fontSize,
+        lineHeight: fallbackScale.lineHeight,
+        fontWeight: fallbackScale.fontWeight,
+        margin: 0,
+        padding: 0
+      };
+    }
+
     const scale = TYPOGRAPHY_SCALES[variant][screenSize];
     const style: React.CSSProperties = {
       fontSize: scale.fontSize,
@@ -120,7 +157,12 @@ export const ResponsiveText = React.forwardRef<HTMLDivElement, ResponsiveTextPro
     }
 
     return style;
-  }, [variant, screenSize, maxLines]);
+  }, [variant, screenSize, maxLines, text]);
+
+  // Safety check for text content
+  if (!text || typeof text !== 'string') {
+    return null;
+  }
 
   const combinedClassName = `responsive-text responsive-text--${variant} responsive-text--${screenSize} ${className}`.trim();
 

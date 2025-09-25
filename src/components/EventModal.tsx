@@ -7,6 +7,7 @@ import { extractImagesFromDescription } from '../utils/imageExtractor';
 import { EventImagesPreview } from './EventImagesPreview';
 import { textFormatter } from '../utils/textFormatter';
 import { ResponsiveText } from './display/ResponsiveText';
+import { ErrorBoundary } from './ErrorBoundary';
 
 interface EventModalProps {
   event: CalendarEvent | null;
@@ -32,11 +33,12 @@ export const EventModal: React.FC<EventModalProps> = ({
     isScrollable: false
   });
 
-  if (!isOpen || !event) return null;
+  // Early return with safety checks
+  if (!isOpen || !event || !event.id) return null;
 
   // Advanced content processing with text formatter
   const processedContent = useMemo(() => {
-    if (!event.description) return null;
+    if (!event?.description) return null;
 
     try {
       // Extract images first (legacy support)
@@ -98,7 +100,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         hasAdvancedFormatting: false
       };
     }
-  }, [event.description]);
+  }, [event?.id, event?.description]);
 
   // Scroll detection for description content
   useEffect(() => {
@@ -155,11 +157,13 @@ export const EventModal: React.FC<EventModalProps> = ({
     >
       <div className="event-modal" role="dialog" aria-labelledby="event-title" aria-modal="true">
         <div className="event-modal-header">
-          <ResponsiveText
-            text={event.title}
-            variant="title"
-            className="event-modal-title"
-          />
+          <ErrorBoundary fallback={<h2 className="event-modal-title">{event.title}</h2>}>
+            <ResponsiveText
+              text={event.title}
+              variant="title"
+              className="event-modal-title"
+            />
+          </ErrorBoundary>
           <button 
             className="event-modal-close" 
             onClick={onClose}

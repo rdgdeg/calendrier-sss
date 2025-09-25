@@ -4,10 +4,9 @@
  * Validates Requirements: 1.1, 2.1, 3.1, 4.1, 5.1, 6.1
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { Calendar } from '../components/Calendar';
+// Calendar import removed as not used in tests
 import { EventModal } from '../components/EventModal';
 import { EventCard } from '../components/display/EventCard';
 import { ResponsiveText } from '../components/display/ResponsiveText';
@@ -138,15 +137,15 @@ describe('System Integration Tests', () => {
         showEllipsis: true
       });
 
-      const descriptionResult = textFormatter.formatDescription(complexEvent.description, {
+      const descriptionResult = textFormatter.formatDescription(complexEvent.description || '', {
         maxLength: 500,
         preserveWords: true,
         showEllipsis: true
       });
 
-      const cleanedContent = textFormatter.cleanHtmlContent(complexEvent.description);
+      const cleanedContent = textFormatter.cleanHtmlContent(complexEvent.description || '');
       const specialContent = textFormatter.extractSpecialContent(cleanedContent);
-      const advancedContent = textFormatter.processAdvancedContent(complexEvent.description);
+      const advancedContent = textFormatter.processAdvancedContent(complexEvent.description || '');
 
       // Validate title processing
       expect(titleResult.isTruncated).toBe(true);
@@ -441,7 +440,7 @@ describe('System Integration Tests', () => {
       expect(eventCards).toHaveLength(20);
 
       // Each card should have properly formatted content
-      events.forEach((event, index) => {
+      events.forEach((_, index) => {
         const titleElement = screen.getByText(new RegExp(`Event ${index}`));
         expect(titleElement).toBeInTheDocument();
       });
@@ -460,8 +459,8 @@ describe('System Integration Tests', () => {
       // Process same content multiple times
       events.forEach(event => {
         textFormatter.formatTitle(event.title, { maxLength: 100 });
-        textFormatter.formatDescription(event.description, { maxLength: 200 });
-        textFormatter.cleanHtmlContent(event.description);
+        textFormatter.formatDescription(event.description || '', { maxLength: 200 });
+        textFormatter.cleanHtmlContent(event.description || '');
       });
 
       const processingTime = performance.now() - startTime;

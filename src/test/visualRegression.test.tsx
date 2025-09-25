@@ -4,7 +4,7 @@
  * Validates consistent appearance across different scenarios
  */
 
-import React from 'react';
+// React import removed as JSX transform handles it
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EventCard } from '../components/display/EventCard';
@@ -170,7 +170,7 @@ describe('Visual Regression Tests', () => {
 
       // Long description should be truncated
       const descriptionElement = container.querySelector('.event-description');
-      expect(descriptionElement?.textContent!.length).toBeLessThan(event.description.length);
+      expect(descriptionElement?.textContent!.length).toBeLessThan(event.description?.length || 0);
     });
 
     it('should handle special characters consistently', () => {

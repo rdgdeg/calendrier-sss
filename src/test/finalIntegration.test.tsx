@@ -3,7 +3,7 @@
  * Validates the complete integration and core functionality
  */
 
-import React from 'react';
+// React import removed as JSX transform handles it
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EventCard } from '../components/display/EventCard';
@@ -104,7 +104,7 @@ describe('Final Integration Tests', () => {
       expect(titleResult.content).toContain('...');
 
       // Process description
-      const cleanedDesc = textFormatter.cleanHtmlContent(event.description);
+      const cleanedDesc = textFormatter.cleanHtmlContent(event.description || '');
       expect(cleanedDesc).not.toContain('<');
       expect(cleanedDesc).toContain('irec@uclouvain.be');
 
@@ -288,7 +288,7 @@ describe('Final Integration Tests', () => {
 
     it('validates Requirement 5.1: Intelligent truncation', () => {
       const event = createTestEvent();
-      const { container } = render(<EventCard event={event} />);
+      render(<EventCard event={event} />);
 
       const titleElement = screen.getByRole('heading', { level: 3 });
       const titleText = titleElement.textContent || '';

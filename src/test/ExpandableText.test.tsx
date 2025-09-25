@@ -1,4 +1,4 @@
-import React from 'react';
+// React import removed as JSX transform handles it
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ExpandableText from '../components/display/ExpandableText';

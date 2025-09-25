@@ -569,7 +569,7 @@ export class TextFormatter {
   /**
    * Analyze text for overflow characteristics
    */
-  analyzeTextOverflow(text: string, maxLength?: number, estimatedLineHeight?: number, containerWidth?: number): TextOverflowAnalysis {
+  analyzeTextOverflow(text: string, maxLength?: number, _estimatedLineHeight?: number, containerWidth?: number): TextOverflowAnalysis {
     if (!text || typeof text !== 'string') {
       return {
         hasOverflow: false,

@@ -4,8 +4,7 @@
  * Validates Requirement 4.1, 4.2, 4.3, 4.4
  */
 
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EventCard } from '../components/display/EventCard';
 import { EventModal } from '../components/EventModal';
@@ -127,13 +126,13 @@ describe('Screen Size Validation Tests', () => {
   });
 
   describe('EventCard Screen Size Adaptation', () => {
-    Object.entries(SCREEN_SIZES).forEach(([sizeName, config]) => {
+    Object.entries(SCREEN_SIZES).forEach(([, config]) => {
       describe(`${config.name} (${config.width}x${config.height})`, () => {
         beforeEach(() => {
           mockScreenSize(config.width, config.height);
         });
 
-        Object.entries(EVENT_TYPES).forEach(([eventType, _]) => {
+        Object.entries(EVENT_TYPES).forEach(([eventType]) => {
           it(`should render ${eventType} event correctly`, () => {
             const event = createTestEvent(eventType as keyof typeof EVENT_TYPES);
             const { container } = render(<EventCard event={event} />);
@@ -231,7 +230,7 @@ describe('Screen Size Validation Tests', () => {
   });
 
   describe('EventModal Screen Size Adaptation', () => {
-    Object.entries(SCREEN_SIZES).forEach(([sizeName, config]) => {
+    Object.entries(SCREEN_SIZES).forEach(([, config]) => {
       describe(`${config.name} (${config.width}x${config.height})`, () => {
         beforeEach(() => {
           mockScreenSize(config.width, config.height);
@@ -311,7 +310,7 @@ describe('Screen Size Validation Tests', () => {
   describe('ResponsiveText Direct Testing', () => {
     const testText = 'Test text for responsive typography validation';
 
-    Object.entries(SCREEN_SIZES).forEach(([sizeName, config]) => {
+    Object.entries(SCREEN_SIZES).forEach(([, config]) => {
       describe(`${config.name} (${config.width}x${config.height})`, () => {
         beforeEach(() => {
           mockScreenSize(config.width, config.height);
@@ -429,14 +428,12 @@ describe('Screen Size Validation Tests', () => {
   });
 
   describe('Truncation Behavior Across Screen Sizes', () => {
-    const longTitle = 'Very Long Event Title That Should Be Truncated Differently Based on Available Screen Space and Typography Settings';
-
-    Object.entries(SCREEN_SIZES).forEach(([sizeName, config]) => {
+    Object.entries(SCREEN_SIZES).forEach(([, config]) => {
       it(`should truncate appropriately on ${config.name}`, () => {
         mockScreenSize(config.width, config.height);
         
         const event = createTestEvent('long');
-        const { container } = render(<EventCard event={event} />);
+        render(<EventCard event={event} />);
 
         const titleElement = screen.getByRole('heading', { level: 3 });
         const titleText = titleElement.textContent || '';
@@ -473,7 +470,7 @@ describe('Screen Size Validation Tests', () => {
         createTestEvent('medium', i % 2 === 0 ? 'icloud' : 'outlook')
       );
 
-      Object.entries(SCREEN_SIZES).forEach(([sizeName, config]) => {
+      Object.entries(SCREEN_SIZES).forEach(([, config]) => {
         mockScreenSize(config.width, config.height);
         
         const startTime = performance.now();
@@ -501,7 +498,7 @@ describe('Screen Size Validation Tests', () => {
   });
 
   describe('Accessibility Across Screen Sizes', () => {
-    Object.entries(SCREEN_SIZES).forEach(([sizeName, config]) => {
+    Object.entries(SCREEN_SIZES).forEach(([, config]) => {
       it(`should maintain accessibility on ${config.name}`, () => {
         mockScreenSize(config.width, config.height);
         

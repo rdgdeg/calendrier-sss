@@ -287,7 +287,7 @@ export class LazyTextProcessor {
    * Create processing promise with priority handling
    */
   private async createProcessingPromise<T>(
-    key: string,
+    _key: string,
     processor: () => Promise<T> | T,
     priority: 'high' | 'normal' | 'low'
   ): Promise<T> {

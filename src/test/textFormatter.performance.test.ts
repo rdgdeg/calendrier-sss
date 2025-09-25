@@ -3,7 +3,7 @@
  * Tests for memoization and performance optimizations in TextFormatter
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { TextFormatter } from '../utils/textFormatter';
 import { globalTextFormattingCache } from '../utils/performanceOptimizer';
 

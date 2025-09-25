@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { extractImagesFromDescription } from '../utils/imageExtractor';
 import { EventImagesPreview } from './EventImagesPreview';
+import { EventDescription } from './EventDescription';
 
 interface UpcomingEventsSectionProps {
   events: CalendarEvent[];
@@ -85,7 +86,9 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
       <div className="upcoming-events-grid">
         {currentEvents.map((event, index) => {
           const processedContent = event.description ? extractImagesFromDescription(event.description) : null;
-          
+          const descriptionToRender = processedContent?.cleanDescription ?? event.description ?? '';
+          const hasDescription = descriptionToRender.trim().length > 0;
+
           return (
             <div key={`${event.id}-${index}`} className="upcoming-event-card">
               <div className="upcoming-event-header">
@@ -117,12 +120,12 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                   </div>
                 )}
 
-                {processedContent && processedContent.cleanDescription && (
+                {hasDescription && (
                   <div className="upcoming-event-description">
-                    {processedContent.cleanDescription.length > 100 
-                      ? `${processedContent.cleanDescription.substring(0, 100)}...`
-                      : processedContent.cleanDescription
-                    }
+                    <EventDescription
+                      description={descriptionToRender}
+                      className="event-description-preview event-description-compact"
+                    />
                   </div>
                 )}
 

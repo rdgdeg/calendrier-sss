@@ -92,10 +92,52 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
     cleanDescription = cleanDescription.replace(src, '[Image intégrée]');
   }
 
+  // Normaliser les retours à la ligne avant de supprimer les balises restantes
+  cleanDescription = cleanDescription
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+
+  // Convertir les balises de structure en retours à la ligne ou puces
+  const structuralReplacements: Array<[RegExp, string]> = [
+    [/\s*<br\s*\/?\s*>\s*/gi, '\n'],
+    [/\s*<p[^>]*>\s*/gi, ''],
+    [/\s*<\/p>\s*/gi, '\n\n'],
+    [/\s*<div[^>]*>\s*/gi, ''],
+    [/\s*<\/div>\s*/gi, '\n'],
+    [/\s*<h[1-6][^>]*>\s*/gi, ''],
+    [/\s*<\/h[1-6]>\s*/gi, '\n\n'],
+    [/\s*<li[^>]*>\s*/gi, '• '],
+    [/\s*<\/li>\s*/gi, '\n'],
+    [/\s*<\/?ul[^>]*>\s*/gi, '\n'],
+    [/\s*<\/?ol[^>]*>\s*/gi, '\n'],
+    [/\s*<\/?table[^>]*>\s*/gi, '\n'],
+    [/\s*<\/?tbody[^>]*>\s*/gi, '\n'],
+    [/\s*<\/tr>\s*/gi, '\n'],
+    [/\s*<tr[^>]*>\s*/gi, ''],
+    [/\s*<\/td>\s*/gi, '\t'],
+    [/\s*<td[^>]*>\s*/gi, '']
+  ];
+
+  structuralReplacements.forEach(([pattern, replacement]) => {
+    cleanDescription = cleanDescription.replace(pattern, replacement);
+  });
+
   // Nettoyer les balises HTML restantes
   cleanDescription = cleanDescription
     .replace(/<[^>]*>/g, '') // Supprimer toutes les balises HTML
-    .replace(/\s+/g, ' ') // Normaliser les espaces
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>');
+
+  // Normaliser les espaces sans perdre les retours à la ligne
+  cleanDescription = cleanDescription
+    .replace(/\t+/g, ' ')
+    .replace(/[ \u00A0]+/g, ' ')
+    .replace(/[ \t]*\n[ \t]*/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 
   return {

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { EventDescription } from './EventDescription';
+import { extractImagesFromDescription } from '../utils/imageExtractor';
 
 interface EventPreviewProps {
   event: CalendarEvent;
@@ -18,30 +19,34 @@ export const EventPreview: React.FC<EventPreviewProps> = ({
   showLocation = true,
   className = ''
 }) => {
+  const processedContent = useMemo(() => {
+    if (!event.description) {
+      return null;
+    }
+
+    return extractImagesFromDescription(event.description);
+  }, [event.description]);
+
+  const descriptionToRender = processedContent?.cleanDescription ?? event.description ?? '';
+  const hasDescription = descriptionToRender.trim().length > 0;
+
   const truncateDescription = (description: string, maxLength: number): string => {
     if (!description) return '';
-    
-    // Nettoyer le HTML d'abord
-    const cleanText = description
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/\s+/g, ' ')
-      .trim();
-    
-    if (cleanText.length <= maxLength) return cleanText;
-    
-    // Trouver le dernier espace avant la limite pour éviter de couper un mot
-    const truncated = cleanText.substring(0, maxLength);
-    const lastSpace = truncated.lastIndexOf(' ');
-    
-    return lastSpace > maxLength * 0.8 
-      ? truncated.substring(0, lastSpace) + '...'
-      : truncated + '...';
+
+    const normalized = description.trim();
+
+    if (normalized.length <= maxLength) {
+      return normalized;
+    }
+
+    const truncated = normalized.substring(0, maxLength);
+    const lastBreak = Math.max(truncated.lastIndexOf('\n'), truncated.lastIndexOf(' '));
+
+    if (lastBreak > maxLength * 0.6) {
+      return `${truncated.substring(0, lastBreak).trim()}...`;
+    }
+
+    return `${truncated.trim()}...`;
   };
 
   return (
@@ -65,10 +70,10 @@ export const EventPreview: React.FC<EventPreviewProps> = ({
         </div>
       )}
       
-      {event.description && (
+      {hasDescription && (
         <div className="event-preview-description">
-          <EventDescription 
-            description={truncateDescription(event.description, maxDescriptionLength)}
+          <EventDescription
+            description={truncateDescription(descriptionToRender, maxDescriptionLength)}
             className="event-description-preview"
           />
         </div>

@@ -37,6 +37,9 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
   
   // Regex pour détecter les images base64
   const base64ImageRegex = /data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/gi;
+  
+  // Regex pour détecter les codes d'image Outlook/Exchange (cid:)
+  const cidImageRegex = /\[cid:([^@\]]+)@([^\]]+)\]/gi;
 
   // Extraire les images HTML
   let match;
@@ -90,6 +93,16 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
 
     // Remplacer l'image base64 par un placeholder
     cleanDescription = cleanDescription.replace(src, '[Image intégrée]');
+  }
+
+  // Extraire et nettoyer les codes d'image Outlook/Exchange (cid:)
+  base64ImageRegex.lastIndex = 0; // Reset regex
+  while ((match = cidImageRegex.exec(description)) !== null) {
+    const fullMatch = match[0]; // Le code complet [cid:...]
+    const imageName = match[1]; // Le nom de l'image
+    
+    // Remplacer le code par un placeholder plus propre ou le supprimer complètement
+    cleanDescription = cleanDescription.replace(fullMatch, '');
   }
 
   // Nettoyer les balises HTML restantes

@@ -62,6 +62,7 @@
   padding-right: var(--ucl-spacing-md);
   word-wrap: break-word;
   overflow-wrap: break-word;
+  color: var(--ucl-white) !important; /* Force le texte en blanc pour la visibilité */
 }
 
 .event-modal-close {

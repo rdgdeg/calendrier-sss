@@ -69,3 +69,15 @@
   - Valider l'affichage sur tous les types d'écrans supportés
   - Créer les tests de régression visuelle pour éviter les régressions futures
   - _Requirements: 1.1, 2.1, 3.1, 4.1, 5.1, 6.1_
+
+- [x] 11. Corrections des problèmes d'affichage identifiés
+  - **Problème 1**: Titre invisible dans l'en-tête de la modal (texte bleu sur fond bleu)
+    - ✅ Ajout de `color: var(--ucl-white) !important;` dans `.event-modal-title`
+    - ✅ Force l'affichage du texte en blanc pour assurer la visibilité
+  - **Problème 2**: Codes d'image Outlook/Exchange non traités dans les descriptions
+    - ✅ Ajout de la regex `cidImageRegex` pour détecter les codes `[cid:image@id]`
+    - ✅ Suppression automatique des codes d'image dans `extractImagesFromDescription`
+    - ✅ Préservation du contenu textuel principal
+  - Tests créés pour valider les corrections
+    - ✅ `src/test/imageCodeFix.test.ts` - Tests de suppression des codes d'image
+    - ✅ `src/test/modalTitleFix.test.tsx` - Tests de visibilité du titre modal

@@ -99,7 +99,6 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
   base64ImageRegex.lastIndex = 0; // Reset regex
   while ((match = cidImageRegex.exec(description)) !== null) {
     const fullMatch = match[0]; // Le code complet [cid:...]
-    const imageName = match[1]; // Le nom de l'image
     
     // Remplacer le code par un placeholder plus propre ou le supprimer complètement
     cleanDescription = cleanDescription.replace(fullMatch, '');

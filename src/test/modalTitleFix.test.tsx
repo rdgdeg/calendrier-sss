@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { EventModal } from '../components/EventModal';
 import { CalendarEvent } from '../types';
@@ -25,8 +25,14 @@ describe('Modal Title Fix', () => {
     allDay: false,
     description: 'Test description',
     location: 'Auditoire central B',
-    source: 'test',
-    category: 'academic'
+    source: 'outlook',
+    category: {
+      id: 'defense',
+      name: 'Défense de thèse',
+      color: '#0056b3',
+      source: 'outlook'
+    },
+    color: '#0056b3'
   };
 
   it('should render modal title with white text color', () => {

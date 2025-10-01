@@ -21,7 +21,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
   onExportToOutlook,
   onExportToICS,
 
-  eventsPerPage = 5
+  eventsPerPage = 6
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 

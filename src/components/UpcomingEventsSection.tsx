@@ -3,7 +3,6 @@ import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { extractImagesFromDescription } from '../utils/imageExtractor';
-import { EventImagesPreview } from './EventImagesPreview';
 
 interface UpcomingEventsSectionProps {
   events: CalendarEvent[];
@@ -126,12 +125,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                   </div>
                 )}
 
-                {processedContent && processedContent.hasImages && (
-                  <EventImagesPreview 
-                    images={processedContent.images}
-                    maxImages={2}
-                  />
-                )}
+
               </div>
 
             <div className="upcoming-event-actions">

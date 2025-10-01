@@ -34,9 +34,25 @@
 /* Grille des événements à venir */
 .upcoming-events-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--ucl-spacing-md);
   padding: var(--ucl-spacing-lg);
+  max-width: 100%;
+}
+
+/* Optimisation pour éviter les lignes avec trop peu d'éléments */
+@media (min-width: 1200px) {
+  .upcoming-events-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
+  .upcoming-events-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* Carte d'événement à venir */

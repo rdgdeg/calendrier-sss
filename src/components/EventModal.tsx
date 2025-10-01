@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getSourceDisplayName } from '../utils/sourceUtils';
 import { extractImagesFromDescription } from '../utils/imageExtractor';
-import { EventImagesPreview } from './EventImagesPreview';
 import { textFormatter } from '../utils/textFormatter';
 import { ResponsiveText } from './display/ResponsiveText';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -213,25 +212,7 @@ export const EventModal: React.FC<EventModalProps> = ({
 
 
 
-            {/* Images extraites */}
-            {processedContent && processedContent.hasImages && (
-              <div className="event-detail-row">
-                <div className="detail-icon">🖼️</div>
-                <div className="detail-content">
-                  <strong>Images</strong>
-                  <EventImagesPreview 
-                    images={processedContent.images.map((img: any) => ({
-                      src: img.src,
-                      alt: img.alt || '',
-                      title: img.alt || '',
-                      isBase64: img.src.startsWith('data:'),
-                      isUrl: !img.src.startsWith('data:')
-                    }))}
-                    maxImages={6}
-                  />
-                </div>
-              </div>
-            )}
+
 
             {/* Description formatée avec indicateurs de scroll */}
             {processedContent && (processedContent.formattedHtml || processedContent.cleanDescription) && (

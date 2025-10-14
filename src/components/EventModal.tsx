@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -32,25 +32,18 @@ export const EventModal: React.FC<EventModalProps> = ({
     isScrollable: false
   });
 
-  // Advanced content processing with text formatter - using useState to avoid useMemo issues
-  const [processedContent, setProcessedContent] = useState<any>(null);
-
-  // Process content when event changes - ALWAYS call this hook
-  useEffect(() => {
+  // Memoized content processing to prevent unnecessary recalculations
+  const processedContent = useMemo(() => {
     if (!isOpen || !event?.description) {
-      setProcessedContent(null);
-      return;
+      return null;
     }
 
-    // Avoid processing the same content multiple times
-    const currentDescription = event.description;
-    
     try {
       // Extract images first (legacy support)
-      const imageContent = extractImagesFromDescription(currentDescription);
+      const imageContent = extractImagesFromDescription(event.description);
       
       // First clean HTML content
-      const cleanedHtml = textFormatter.cleanHtmlContent(currentDescription);
+      const cleanedHtml = textFormatter.cleanHtmlContent(event.description);
       
       // Then process custom line break markers (*** becomes line breaks)
       const textWithCustomBreaks = textFormatter.processCustomLineBreaks(cleanedHtml, '***');
@@ -65,79 +58,75 @@ export const EventModal: React.FC<EventModalProps> = ({
           .join('');
       }
 
-      const newProcessedContent = {
+      return {
         ...imageContent,
         cleanText: cleanedHtml,
         formattedHtml: formattedHtml,
         hasAdvancedFormatting: paragraphs.length > 1
       };
-
-      // Only update if content actually changed
-      setProcessedContent((prevContent: any) => {
-        if (prevContent?.formattedHtml === newProcessedContent.formattedHtml) {
-          return prevContent;
-        }
-        return newProcessedContent;
-      });
       
     } catch (error) {
       console.warn('Error processing event description:', error);
       
       // Fallback to basic image extraction
-      const imageContent = extractImagesFromDescription(currentDescription);
+      const imageContent = extractImagesFromDescription(event.description);
       
-      const cleanText = currentDescription.replace(/<[^>]*>/g, '');
-      setProcessedContent({
+      const cleanText = event.description.replace(/<[^>]*>/g, '');
+      return {
         ...imageContent,
         cleanText: cleanText,
         images: imageContent?.images || [],
         formattedHtml: cleanText,
         hasAdvancedFormatting: false
-      });
+      };
     }
   }, [isOpen, event?.id, event?.description]);
 
+  // Memoized scroll state update function to prevent recreating on every render
+  const updateScrollState = useCallback(() => {
+    const descriptionElement = descriptionRef.current;
+    if (!descriptionElement) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = descriptionElement;
+    const isScrollable = scrollHeight > clientHeight;
+    const canScrollUp = scrollTop > 5;
+    const canScrollDown = scrollTop < scrollHeight - clientHeight - 5;
+
+    // Only update state if values actually changed to prevent unnecessary re-renders
+    setScrollState(prevState => {
+      if (
+        prevState.canScrollUp === canScrollUp &&
+        prevState.canScrollDown === canScrollDown &&
+        prevState.isScrollable === isScrollable
+      ) {
+        return prevState; // No change, return previous state
+      }
+      
+      return {
+        canScrollUp,
+        canScrollDown,
+        isScrollable
+      };
+    });
+  }, []);
+
   // Scroll detection for description content - ALWAYS call this hook
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !processedContent) return;
 
     const descriptionElement = descriptionRef.current;
-    if (!descriptionElement || !processedContent) return;
-
-    const updateScrollState = () => {
-      const { scrollTop, scrollHeight, clientHeight } = descriptionElement;
-      const isScrollable = scrollHeight > clientHeight;
-      const canScrollUp = scrollTop > 5;
-      const canScrollDown = scrollTop < scrollHeight - clientHeight - 5;
-
-      // Only update state if values actually changed to prevent unnecessary re-renders
-      setScrollState(prevState => {
-        if (
-          prevState.canScrollUp === canScrollUp &&
-          prevState.canScrollDown === canScrollDown &&
-          prevState.isScrollable === isScrollable
-        ) {
-          return prevState; // No change, return previous state
-        }
-        
-        return {
-          canScrollUp,
-          canScrollDown,
-          isScrollable
-        };
-      });
-    };
+    if (!descriptionElement) return;
 
     // Use a timeout to ensure DOM is updated
     const timeoutId = setTimeout(() => {
       updateScrollState();
-    }, 100); // Increased timeout to prevent rapid updates
+    }, 150); // Increased timeout to prevent rapid updates
 
     // Add scroll listener with throttling
     let scrollTimeout: NodeJS.Timeout | null = null;
     const throttledScrollHandler = () => {
       if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(updateScrollState, 50);
+      scrollTimeout = setTimeout(updateScrollState, 100); // Increased throttling
     };
 
     descriptionElement.addEventListener('scroll', throttledScrollHandler, { passive: true });
@@ -149,7 +138,7 @@ export const EventModal: React.FC<EventModalProps> = ({
     try {
       resizeObserver = new ResizeObserver(() => {
         if (resizeTimeout) clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(updateScrollState, 100);
+        resizeTimeout = setTimeout(updateScrollState, 200); // Increased debouncing
       });
       resizeObserver.observe(descriptionElement);
     } catch (error) {
@@ -165,7 +154,7 @@ export const EventModal: React.FC<EventModalProps> = ({
         resizeObserver.disconnect();
       }
     };
-  }, [isOpen, processedContent]); // Depend on the whole processedContent object, not just formattedHtml
+  }, [isOpen, processedContent?.formattedHtml, updateScrollState]); // Only depend on the HTML content that affects layout
 
   // Early return AFTER all hooks are called
   if (!isOpen || !event || !event.id) return null;

@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { getSourceDisplayName } from '../utils/sourceUtils';
 import { extractImagesFromDescription } from '../utils/imageExtractor';
 import { textFormatter } from '../utils/textFormatter';
+import { processCustomLineBreaksFixed } from '../utils/textFormatterFixed';
 import { ResponsiveText } from './display/ResponsiveText';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -46,7 +47,7 @@ export const EventModal: React.FC<EventModalProps> = ({
       const cleanedHtml = textFormatter.cleanHtmlContent(event.description);
       
       // Then process custom line break markers (*** becomes line breaks)
-      const textWithCustomBreaks = textFormatter.processCustomLineBreaks(cleanedHtml, '***');
+      const textWithCustomBreaks = processCustomLineBreaksFixed(cleanedHtml, '***');
       
       // Basic paragraph formatting without link generation
       const paragraphs = textWithCustomBreaks.split(/\n\s*\n/).filter(p => p.trim());

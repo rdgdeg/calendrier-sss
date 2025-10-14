@@ -42,12 +42,15 @@ export const EventModal: React.FC<EventModalProps> = ({
       return;
     }
 
+    // Avoid processing the same content multiple times
+    const currentDescription = event.description;
+    
     try {
       // Extract images first (legacy support)
-      const imageContent = extractImagesFromDescription(event.description);
+      const imageContent = extractImagesFromDescription(currentDescription);
       
       // First clean HTML content
-      const cleanedHtml = textFormatter.cleanHtmlContent(event.description);
+      const cleanedHtml = textFormatter.cleanHtmlContent(currentDescription);
       
       // Then process custom line break markers (*** becomes line breaks)
       const textWithCustomBreaks = textFormatter.processCustomLineBreaks(cleanedHtml, '***');
@@ -62,19 +65,28 @@ export const EventModal: React.FC<EventModalProps> = ({
           .join('');
       }
 
-      setProcessedContent({
+      const newProcessedContent = {
         ...imageContent,
         cleanText: cleanedHtml,
         formattedHtml: formattedHtml,
         hasAdvancedFormatting: paragraphs.length > 1
+      };
+
+      // Only update if content actually changed
+      setProcessedContent((prevContent: any) => {
+        if (prevContent?.formattedHtml === newProcessedContent.formattedHtml) {
+          return prevContent;
+        }
+        return newProcessedContent;
       });
+      
     } catch (error) {
       console.warn('Error processing event description:', error);
       
       // Fallback to basic image extraction
-      const imageContent = extractImagesFromDescription(event.description);
+      const imageContent = extractImagesFromDescription(currentDescription);
       
-      const cleanText = event.description.replace(/<[^>]*>/g, '');
+      const cleanText = currentDescription.replace(/<[^>]*>/g, '');
       setProcessedContent({
         ...imageContent,
         cleanText: cleanText,
@@ -98,25 +110,47 @@ export const EventModal: React.FC<EventModalProps> = ({
       const canScrollUp = scrollTop > 5;
       const canScrollDown = scrollTop < scrollHeight - clientHeight - 5;
 
-      setScrollState({
-        canScrollUp,
-        canScrollDown,
-        isScrollable
+      // Only update state if values actually changed to prevent unnecessary re-renders
+      setScrollState(prevState => {
+        if (
+          prevState.canScrollUp === canScrollUp &&
+          prevState.canScrollDown === canScrollDown &&
+          prevState.isScrollable === isScrollable
+        ) {
+          return prevState; // No change, return previous state
+        }
+        
+        return {
+          canScrollUp,
+          canScrollDown,
+          isScrollable
+        };
       });
     };
 
     // Use a timeout to ensure DOM is updated
     const timeoutId = setTimeout(() => {
       updateScrollState();
-    }, 0);
+    }, 100); // Increased timeout to prevent rapid updates
 
-    // Add scroll listener
-    descriptionElement.addEventListener('scroll', updateScrollState);
+    // Add scroll listener with throttling
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    const throttledScrollHandler = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(updateScrollState, 50);
+    };
+
+    descriptionElement.addEventListener('scroll', throttledScrollHandler, { passive: true });
     
-    // Add resize observer to handle content changes
+    // Add resize observer with debouncing
     let resizeObserver: ResizeObserver | null = null;
+    let resizeTimeout: NodeJS.Timeout | null = null;
+    
     try {
-      resizeObserver = new ResizeObserver(updateScrollState);
+      resizeObserver = new ResizeObserver(() => {
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateScrollState, 100);
+      });
       resizeObserver.observe(descriptionElement);
     } catch (error) {
       console.warn('ResizeObserver not available:', error);
@@ -124,12 +158,14 @@ export const EventModal: React.FC<EventModalProps> = ({
 
     return () => {
       clearTimeout(timeoutId);
-      descriptionElement.removeEventListener('scroll', updateScrollState);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      descriptionElement.removeEventListener('scroll', throttledScrollHandler);
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
     };
-  }, [isOpen, processedContent?.formattedHtml]); // Only depend on the actual content that affects layout
+  }, [isOpen, processedContent]); // Depend on the whole processedContent object, not just formattedHtml
 
   // Early return AFTER all hooks are called
   if (!isOpen || !event || !event.id) return null;

@@ -6,6 +6,7 @@ import './styles/custom-formatting.css'
 import './styles/dark-mode-support.css'
 import './styles/agenda-view-improvements.css'
 import './styles/export-buttons.css'
+import './styles/screen-view.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

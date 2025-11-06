@@ -7,6 +7,7 @@ import { syncCalendarStatus, cacheEvents, getCachedEvents, clearCache } from '..
 import { ViewSelector } from './ViewSelector';
 import { MonthView } from './views/MonthView';
 import { AgendaView } from './views/AgendaView';
+import { ScreenView } from './views/ScreenView';
 
 import { EventModal } from './EventModal';
 import { Footer } from './Footer';
@@ -409,6 +410,8 @@ export const Calendar: React.FC = () => {
         return format(currentDate, 'MMMM yyyy', { locale: fr });
       case 'agenda':
         return 'Vue Agenda';
+      case 'screen':
+        return 'Vue Écran';
       default:
         return format(currentDate, 'MMMM yyyy', { locale: fr });
     }
@@ -529,6 +532,8 @@ export const Calendar: React.FC = () => {
         return <MonthView {...commonProps} />;
       case 'agenda':
         return <AgendaView {...commonProps} selectedEventId={selectedEvent?.id} />;
+      case 'screen':
+        return <ScreenView events={filteredEvents} />;
       default:
         return <MonthView {...commonProps} />;
     }
@@ -602,122 +607,146 @@ export const Calendar: React.FC = () => {
 
 
 
-      {/* Header réorganisé avec navigation et titre */}
-      <div className="calendar-header-redesigned">
-        {/* Première ligne : Navigation et Titre/Vue */}
-        <div className="header-top-row">
-          <div className="calendar-nav">
-            <button 
-              onClick={() => navigateDate('prev')} 
-              className="nav-button"
-              aria-label="Période précédente"
-            >
-              ← Précédent
-            </button>
-            <button 
-              onClick={goToToday} 
-              className="nav-button"
-              aria-label="Aller à aujourd'hui"
-            >
-              Aujourd'hui
-            </button>
-            <button 
-              onClick={() => navigateDate('next')} 
-              className="nav-button"
-              aria-label="Période suivante"
-            >
-              Suivant →
-            </button>
+      {/* Header réorganisé avec navigation et titre - Masqué en vue écran */}
+      {currentView !== 'screen' && (
+        <div className="calendar-header-redesigned">
+          {/* Première ligne : Navigation et Titre/Vue */}
+          <div className="header-top-row">
+            <div className="calendar-nav">
+              <button 
+                onClick={() => navigateDate('prev')} 
+                className="nav-button"
+                aria-label="Période précédente"
+              >
+                ← Précédent
+              </button>
+              <button 
+                onClick={goToToday} 
+                className="nav-button"
+                aria-label="Aller à aujourd'hui"
+              >
+                Aujourd'hui
+              </button>
+              <button 
+                onClick={() => navigateDate('next')} 
+                className="nav-button"
+                aria-label="Période suivante"
+              >
+                Suivant →
+              </button>
+            </div>
+
+            <div className="month-year-container-redesigned">
+              <h2 className="month-year">
+                {getNavigationLabel()}
+              </h2>
+              {currentView === 'month' && (
+                <span className="month-badge">Vue mensuelle</span>
+              )}
+            </div>
+
+            <div className="header-controls">
+              <ViewSelector 
+                currentView={currentView} 
+                onViewChange={setCurrentView} 
+              />
+            </div>
           </div>
 
-          <div className="month-year-container-redesigned">
-            <h2 className="month-year">
-              {getNavigationLabel()}
-            </h2>
-            {currentView === 'month' && (
-              <span className="month-badge">Vue mensuelle</span>
-            )}
-          </div>
+          {/* Deuxième ligne : Recherche et Statistiques */}
+          <div className="header-bottom-row">
+            <div className="calendar-search-section-redesigned">
+              <SearchBar
+                events={events}
+                onSearchResults={(_, query) => {
+                  setQuery(query);
+                }}
+                onClearSearch={() => {
+                  clearSearch();
+                }}
+                placeholder="Rechercher dans les événements..."
+              />
+              
+              {/* Bouton pour aller aux résultats ou message si aucun résultat */}
+              {searchState.isSearching && (
+                <>
+                  {searchState.results.length > 0 ? (
+                    <button
+                      className="scroll-to-results-btn"
+                      onClick={() => {
+                        searchResultsRef.current?.scrollIntoView({ 
+                          behavior: 'smooth', 
+                          block: 'start' 
+                        });
+                      }}
+                      title="Voir les résultats de recherche"
+                    >
+                      📍 {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} trouvé{searchState.results.length !== 1 ? 's' : ''} • Voir ↓
+                    </button>
+                  ) : (
+                    <div className="no-results-message-inline">
+                      🔍 Aucun résultat pour "{searchState.query}"
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
-          <div className="header-controls">
+            <div className="events-stats-redesigned">
+              <span className="stats-total">{filteredEvents.length} événements</span>
+              {searchState.isSearching && (
+                <span className="stats-found">• {searchState.results.length} trouvés</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header compact pour la vue écran avec sélecteur de vue */}
+      {currentView === 'screen' && (
+        <div className="screen-view-header">
+          <div className="screen-view-controls">
             <ViewSelector 
               currentView={currentView} 
               onViewChange={setCurrentView} 
             />
+            <button 
+              onClick={() => loadEvents()} 
+              className="nav-button refresh-button"
+              aria-label="Actualiser les événements"
+              title="Actualiser les événements"
+            >
+              🔄 Actualiser
+            </button>
           </div>
         </div>
-
-        {/* Deuxième ligne : Recherche et Statistiques */}
-        <div className="header-bottom-row">
-          <div className="calendar-search-section-redesigned">
-            <SearchBar
-              events={events}
-              onSearchResults={(_, query) => {
-                setQuery(query);
-              }}
-              onClearSearch={() => {
-                clearSearch();
-              }}
-              placeholder="Rechercher dans les événements..."
-            />
-            
-            {/* Bouton pour aller aux résultats ou message si aucun résultat */}
-            {searchState.isSearching && (
-              <>
-                {searchState.results.length > 0 ? (
-                  <button
-                    className="scroll-to-results-btn"
-                    onClick={() => {
-                      searchResultsRef.current?.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                      });
-                    }}
-                    title="Voir les résultats de recherche"
-                  >
-                    📍 {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} trouvé{searchState.results.length !== 1 ? 's' : ''} • Voir ↓
-                  </button>
-                ) : (
-                  <div className="no-results-message-inline">
-                    🔍 Aucun résultat pour "{searchState.query}"
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          <div className="events-stats-redesigned">
-            <span className="stats-total">{filteredEvents.length} événements</span>
-            {searchState.isSearching && (
-              <span className="stats-found">• {searchState.results.length} trouvés</span>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
 
 
 
-      <div className={`calendar-layout-full ${searchState.isSearching ? 'search-active' : ''}`}>
+      <div className={`calendar-layout-full ${searchState.isSearching ? 'search-active' : ''} ${currentView === 'screen' ? 'screen-mode' : ''}`}>
         <div className="calendar-main-full">
-          <div className="calendar-content scale-in">
+          <div className={`calendar-content ${currentView !== 'screen' ? 'scale-in' : ''}`}>
             {renderCurrentView()}
           </div>
           
-          {/* Résultats de recherche sous le calendrier */}
-          <div ref={searchResultsRef}>
-            <SearchResults
-              searchResults={searchState.results}
-              searchQuery={searchState.query}
-              isVisible={searchState.isSearching}
-              onEventClick={(event) => {
-                setSelectedEvent(event);
-                setIsModalOpen(true);
-              }}
-            />
-          </div>
+          {/* Résultats de recherche sous le calendrier - Masqués en vue écran */}
+          {currentView !== 'screen' && (
+            <div ref={searchResultsRef}>
+              <SearchResults
+                searchResults={searchState.results}
+                searchQuery={searchState.query}
+                isVisible={searchState.isSearching}
+                onEventClick={(event) => {
+                  setSelectedEvent(event);
+                  setIsModalOpen(true);
+                }}
+              />
+            </div>
+          )}
 
-          {/* Section des événements à venir sous le calendrier */}
-          {!searchState.isSearching && (
+          {/* Section des événements à venir sous le calendrier - Masquée en vue écran */}
+          {currentView !== 'screen' && !searchState.isSearching && (
             <UpcomingEventsSection
               events={filteredEvents}
               onEventClick={(event) => {
@@ -759,16 +788,21 @@ export const Calendar: React.FC = () => {
         </div>
       )}
 
-      <Footer />
-      
-      {/* Système d'aide */}
-      <HelpSystem />
-      
-      {/* Modales d'aide */}
-      <FAQSection
-        isVisible={showFAQ}
-        onClose={() => setShowFAQ(false)}
-      />
+      {/* Footer et système d'aide - Masqués en vue écran */}
+      {currentView !== 'screen' && (
+        <>
+          <Footer />
+          
+          {/* Système d'aide */}
+          <HelpSystem />
+          
+          {/* Modales d'aide */}
+          <FAQSection
+            isVisible={showFAQ}
+            onClose={() => setShowFAQ(false)}
+          />
+        </>
+      )}
     </div>
   );
 };

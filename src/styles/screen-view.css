@@ -1,0 +1,558 @@
+/* Vue Écran - Optimisée pour affichage TV/écran large */
+
+.screen-view {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  font-family: var(--ucl-font-family);
+  position: relative;
+  overflow: hidden;
+}
+
+.screen-view::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,61,122,0.03)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  pointer-events: none;
+}
+
+/* Header avec titre et horloge */
+.screen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  padding: 2rem 3rem;
+  background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
+  border-radius: 2rem;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 61, 122, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.screen-title h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  line-height: 1.1;
+}
+
+.ucl-branding {
+  font-size: 1.8rem;
+  font-weight: 500;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.screen-clock {
+  text-align: right;
+}
+
+.current-time {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  font-variant-numeric: tabular-nums;
+}
+
+.current-date {
+  font-size: 1.5rem;
+  font-weight: 400;
+  opacity: 0.9;
+  text-transform: capitalize;
+}
+
+/* Liste des événements */
+.screen-events {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Événement individuel */
+.screen-event {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 3rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-left: 8px solid var(--event-color);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  animation: slideInUp 0.6s ease-out;
+  animation-delay: calc(var(--event-index) * 0.1s);
+  animation-fill-mode: both;
+}
+
+.screen-event::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 2s ease;
+}
+
+.screen-event:hover::before {
+  transform: translateX(100%);
+}
+
+.screen-event.current {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-left-color: #ef4444;
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.2);
+  animation: currentEventPulse 2s ease-in-out infinite;
+}
+
+.screen-event.today {
+  background: linear-gradient(135deg, rgba(0, 61, 122, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border-left-color: var(--ucl-primary);
+  box-shadow: 0 8px 32px rgba(0, 61, 122, 0.2);
+}
+
+/* Indicateur d'événement */
+.event-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 80px;
+}
+
+.event-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.event-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ucl-primary);
+  background: rgba(0, 61, 122, 0.1);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenu de l'événement */
+.event-content {
+  flex: 1;
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+
+.event-datetime {
+  min-width: 300px;
+}
+
+.event-date {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--ucl-primary);
+  margin-bottom: 0.5rem;
+  text-transform: capitalize;
+}
+
+.event-time {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--ucl-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.event-details {
+  flex: 1;
+}
+
+.event-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--ucl-text-primary);
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.live-indicator {
+  background: #ef4444;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: livePulse 1.5s ease-in-out infinite;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.event-location {
+  font-size: 1.3rem;
+  color: var(--ucl-text-secondary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Badge de source */
+.event-source {
+  min-width: 150px;
+  text-align: right;
+}
+
+.source-badge {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.source-badge.icloud {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.source-badge.outlook {
+  background: linear-gradient(135deg, var(--ucl-primary) 0%, var(--ucl-secondary) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 61, 122, 0.3);
+}
+
+/* Message aucun événement */
+.no-events-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 2rem;
+}
+
+.no-events-icon {
+  font-size: 8rem;
+  opacity: 0.3;
+}
+
+.no-events-message {
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--ucl-text-secondary);
+}
+
+.no-events-submessage {
+  font-size: 1.5rem;
+  color: var(--ucl-text-muted);
+  font-style: italic;
+}
+
+/* Footer */
+.screen-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 1.5rem 3rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 1;
+}
+
+.footer-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  color: var(--ucl-text-secondary);
+}
+
+.footer-branding {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ucl-primary);
+}
+
+/* Animations */
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes currentEventPulse {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+  }
+}
+
+@keyframes livePulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Mode sombre pour écrans */
+@media (prefers-color-scheme: dark) {
+  .screen-view {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+  
+  .screen-header {
+    background: linear-gradient(135deg, var(--ucl-primary-adaptive) 0%, var(--ucl-secondary-adaptive) 100%);
+  }
+  
+  .screen-event {
+    background: rgba(30, 41, 59, 0.95);
+    color: var(--ucl-text-primary);
+  }
+  
+  .screen-event.current {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(30, 41, 59, 0.95) 100%);
+  }
+  
+  .screen-event.today {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.2) 0%, rgba(30, 41, 59, 0.95) 100%);
+  }
+  
+  .event-date {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .event-title {
+    color: var(--ucl-text-primary);
+  }
+  
+  .event-number {
+    color: var(--ucl-primary-adaptive);
+    background: rgba(74, 144, 226, 0.2);
+  }
+  
+  .screen-footer {
+    background: rgba(30, 41, 59, 0.8);
+  }
+  
+  .footer-branding {
+    color: var(--ucl-primary-adaptive);
+  }
+}
+
+/* Responsive pour différentes tailles d'écran */
+@media (max-width: 1920px) {
+  .screen-header {
+    padding: 1.5rem 2rem;
+  }
+  
+  .screen-title h1 {
+    font-size: 3rem;
+  }
+  
+  .current-time {
+    font-size: 3.5rem;
+  }
+  
+  .event-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 1366px) {
+  .screen-view {
+    padding: 1.5rem;
+  }
+  
+  .screen-title h1 {
+    font-size: 2.5rem;
+  }
+  
+  .current-time {
+    font-size: 3rem;
+  }
+  
+  .event-title {
+    font-size: 1.8rem;
+  }
+  
+  .event-date {
+    font-size: 1.5rem;
+  }
+  
+  .event-time {
+    font-size: 1.2rem;
+  }
+}
+
+/* Optimisation pour écrans 4K */
+@media (min-width: 2560px) {
+  .screen-title h1 {
+    font-size: 4.5rem;
+  }
+  
+  .current-time {
+    font-size: 5rem;
+  }
+  
+  .event-title {
+    font-size: 2.8rem;
+  }
+  
+  .event-date {
+    font-size: 2.2rem;
+  }
+  
+  .event-time {
+    font-size: 1.8rem;
+  }
+  
+  .screen-event {
+    padding: 3rem 4rem;
+  }
+}
+
+/* Réduction des animations pour les préférences utilisateur */
+@media (prefers-reduced-motion: reduce) {
+  .screen-event {
+    animation: none !important;
+  }
+  
+  .screen-event::before {
+    display: none !important;
+  }
+  
+  .live-indicator,
+  .screen-event.current {
+    animation: none !important;
+  }
+}
+
+/* Mode plein écran optimisé */
+.screen-view.fullscreen {
+  padding: 1rem;
+}
+
+.screen-view.fullscreen .screen-header {
+  margin-bottom: 2rem;
+}
+
+.screen-view.fullscreen .screen-footer {
+  margin-top: 2rem;
+}
+/* Contrô
+les pour la vue écran */
+.screen-view-header {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.screen-view-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.screen-view-controls .view-selector {
+  margin: 0;
+}
+
+.screen-view-controls .nav-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Layout pour la vue écran */
+.calendar-layout-full.screen-mode {
+  padding: 0;
+  margin: 0;
+}
+
+.calendar-layout-full.screen-mode .calendar-main-full {
+  width: 100%;
+  max-width: none;
+}
+
+.calendar-layout-full.screen-mode .calendar-content {
+  padding: 0;
+  margin: 0;
+}
+
+/* Mode sombre pour les contrôles */
+@media (prefers-color-scheme: dark) {
+  .screen-view-header {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Masquer les contrôles en mode plein écran */
+@media (max-width: 1024px) {
+  .screen-view-header {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  .screen-view-controls {
+    gap: 0.5rem;
+  }
+  
+  .screen-view-controls .nav-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}

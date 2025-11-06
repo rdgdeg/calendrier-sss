@@ -1,0 +1,658 @@
+/* Support du mode sombre pour macOS - UCLouvain Calendar */
+
+/* Variables de couleurs pour le mode sombre */
+:root {
+  /* Mode clair (par défaut) */
+  --ucl-bg-primary: #ffffff;
+  --ucl-bg-secondary: #f8fafc;
+  --ucl-bg-tertiary: #f1f5f9;
+  --ucl-bg-hover: #e2e8f0;
+  --ucl-text-primary: #1e293b;
+  --ucl-text-secondary: #475569;
+  --ucl-text-muted: #64748b;
+  --ucl-border: #e2e8f0;
+  --ucl-border-light: #f1f5f9;
+  
+  /* Couleurs UCLouvain adaptées */
+  --ucl-primary-adaptive: #003d7a;
+  --ucl-secondary-adaptive: #0066cc;
+  --ucl-accent-adaptive: #4a90e2;
+}
+
+/* Mode sombre automatique basé sur les préférences système */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Arrière-plans sombres */
+    --ucl-bg-primary: #0f172a;
+    --ucl-bg-secondary: #1e293b;
+    --ucl-bg-tertiary: #334155;
+    --ucl-bg-hover: #475569;
+    
+    /* Textes clairs */
+    --ucl-text-primary: #f8fafc;
+    --ucl-text-secondary: #cbd5e1;
+    --ucl-text-muted: #94a3b8;
+    
+    /* Bordures sombres */
+    --ucl-border: #334155;
+    --ucl-border-light: #475569;
+    
+    /* Couleurs UCLouvain adaptées pour le mode sombre */
+    --ucl-primary-adaptive: #4a90e2;
+    --ucl-secondary-adaptive: #60a5fa;
+    --ucl-accent-adaptive: #93c5fd;
+    
+    /* Couleurs de statut adaptées */
+    --ucl-success: #34d399;
+    --ucl-warning: #fbbf24;
+    --ucl-danger: #f87171;
+    --ucl-info: #38bdf8;
+    
+    /* Grilles de gris adaptées */
+    --ucl-gray-50: #1e293b;
+    --ucl-gray-100: #334155;
+    --ucl-gray-200: #475569;
+    --ucl-gray-300: #64748b;
+    --ucl-gray-400: #94a3b8;
+    --ucl-gray-500: #cbd5e1;
+    --ucl-gray-600: #e2e8f0;
+    --ucl-gray-700: #f1f5f9;
+    --ucl-gray-800: #f8fafc;
+    --ucl-gray-900: #ffffff;
+    
+    /* Ombres adaptées pour le mode sombre */
+    --ucl-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --ucl-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --ucl-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --ucl-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --ucl-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Corps de la page */
+  body {
+    background: var(--ucl-bg-primary);
+    color: var(--ucl-text-primary);
+  }
+  
+  /* Container principal */
+  .calendar-container {
+    background: var(--ucl-bg-secondary);
+  }
+  
+  /* Header principal */
+  .calendar-main-header {
+    background: linear-gradient(135deg, var(--ucl-primary-adaptive) 0%, var(--ucl-secondary-adaptive) 100%);
+  }
+  
+  /* Header de navigation */
+  .calendar-header {
+    background: var(--ucl-bg-primary);
+    border-bottom-color: var(--ucl-border);
+  }
+  
+  /* Grille du calendrier */
+  .calendar-grid {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  /* En-têtes des jours de la semaine */
+  .calendar-weekdays {
+    background: linear-gradient(135deg, var(--ucl-primary-adaptive) 0%, var(--ucl-secondary-adaptive) 100%);
+  }
+  
+  /* Jours du calendrier */
+  .calendar-day {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-primary);
+  }
+  
+  .calendar-day:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .calendar-day.other-month {
+    background: var(--ucl-bg-tertiary);
+    color: var(--ucl-text-muted);
+  }
+  
+  .calendar-day.today {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.2) 0%, rgba(96, 165, 250, 0.2) 100%);
+    border-color: var(--ucl-primary-adaptive);
+  }
+  
+  .calendar-day.today .day-number {
+    background: var(--ucl-primary-adaptive);
+    color: var(--ucl-bg-primary);
+  }
+  
+  /* Numéros des jours */
+  .day-number {
+    color: var(--ucl-text-primary);
+  }
+  
+  /* Boutons de navigation */
+  .nav-button {
+    background: var(--ucl-primary-adaptive);
+    border-color: var(--ucl-primary-adaptive);
+    color: var(--ucl-bg-primary);
+  }
+  
+  .nav-button:hover {
+    background: var(--ucl-secondary-adaptive);
+    border-color: var(--ucl-secondary-adaptive);
+  }
+  
+  /* Titre mois/année */
+  .month-year {
+    background: linear-gradient(135deg, var(--ucl-primary-adaptive) 0%, var(--ucl-secondary-adaptive) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Barre de recherche */
+  .search-input-wrapper {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .search-bar.active .search-input-wrapper {
+    border-color: var(--ucl-primary-adaptive);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+  }
+  
+  .search-input {
+    color: var(--ucl-text-primary);
+  }
+  
+  .search-input::placeholder {
+    color: var(--ucl-text-muted);
+  }
+  
+  .search-icon {
+    color: var(--ucl-text-muted);
+  }
+  
+  .search-bar.active .search-icon {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .search-suggestions {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .search-suggestion:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  /* Sidebar universelle */
+  .universal-sidebar {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .sidebar-section {
+    border-color: var(--ucl-border-light);
+  }
+  
+  .filters-section {
+    background: linear-gradient(135deg, var(--ucl-bg-secondary) 0%, var(--ucl-bg-primary) 100%);
+  }
+  
+  .sidebar-section-title {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .filter-select {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-primary);
+  }
+  
+  .filter-select:focus {
+    border-color: var(--ucl-primary-adaptive);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  .search-stats {
+    background: rgba(74, 144, 226, 0.1);
+    border-color: var(--ucl-primary-adaptive);
+  }
+  
+  /* Cartes d'événements dans la sidebar */
+  .sidebar-event-card {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .sidebar-event-card:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .sidebar-event-description {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-primary-adaptive);
+  }
+  
+  /* Vue agenda */
+  .agenda-controls {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .agenda-day-group {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .agenda-date-header {
+    background: linear-gradient(135deg, var(--ucl-primary-adaptive) 0%, var(--ucl-secondary-adaptive) 100%);
+  }
+  
+  .events-count {
+    background: var(--ucl-bg-primary);
+    color: var(--ucl-primary-adaptive);
+    border-color: var(--ucl-primary-adaptive);
+  }
+  
+  .agenda-event-card {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+    border-left-color: var(--ucl-primary-adaptive);
+  }
+  
+  .agenda-event-card:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .agenda-event-header:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .agenda-event-details {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border-light);
+  }
+  
+  /* Modal d'événement */
+  .event-modal {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .event-modal-header {
+    background: linear-gradient(135deg, var(--ucl-primary-adaptive), var(--ucl-accent-adaptive));
+  }
+  
+  .event-modal-content::-webkit-scrollbar-track {
+    background: var(--ucl-bg-secondary);
+  }
+  
+  .event-modal-content::-webkit-scrollbar-thumb {
+    background: var(--ucl-border);
+  }
+  
+  .event-modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--ucl-text-muted);
+  }
+  
+  /* Détails d'événement */
+  .event-details {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .event-details-header {
+    background: linear-gradient(135deg, var(--ucl-primary-adaptive), var(--ucl-accent-adaptive));
+  }
+  
+  .event-detail-row:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .detail-content strong {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .detail-content span {
+    color: var(--ucl-text-primary);
+  }
+  
+  /* Tooltip */
+  .event-tooltip {
+    background: var(--ucl-bg-tertiary);
+    color: var(--ucl-text-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .event-tooltip::after {
+    border-top-color: var(--ucl-bg-tertiary);
+  }
+  
+  /* Loader squelette */
+  .skeleton-calendar-grid {
+    background: var(--ucl-bg-primary);
+  }
+  
+  .skeleton-weekdays {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border);
+  }
+  
+  .skeleton-weekday {
+    background: linear-gradient(90deg, var(--ucl-bg-secondary) 25%, var(--ucl-bg-hover) 50%, var(--ucl-bg-secondary) 75%);
+    border-color: var(--ucl-border);
+  }
+  
+  .skeleton-day {
+    background: var(--ucl-bg-primary);
+  }
+  
+  .skeleton-day-number {
+    background: linear-gradient(90deg, var(--ucl-border) 25%, var(--ucl-bg-hover) 50%, var(--ucl-border) 75%);
+  }
+  
+  .skeleton-event {
+    background: linear-gradient(90deg, var(--ucl-primary-adaptive) 25%, var(--ucl-secondary-adaptive) 50%, var(--ucl-primary-adaptive) 75%);
+  }
+  
+  /* Barre de progression */
+  .progress-container {
+    background: var(--ucl-bg-primary);
+  }
+  
+  .progress-message {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .progress-bar-wrapper {
+    background: var(--ucl-bg-secondary);
+  }
+  
+  .progress-bar {
+    background: linear-gradient(90deg, var(--ucl-primary-adaptive), var(--ucl-secondary-adaptive));
+  }
+  
+  .progress-bar.indeterminate {
+    background: var(--ucl-bg-secondary);
+  }
+  
+  .progress-bar.indeterminate .progress-bar-fill {
+    background: linear-gradient(90deg, var(--ucl-primary-adaptive), var(--ucl-secondary-adaptive));
+  }
+  
+  /* Messages d'erreur */
+  .error {
+    background: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.3);
+    border-left-color: var(--ucl-danger);
+  }
+  
+  .error h3 {
+    color: var(--ucl-danger);
+  }
+  
+  /* Section de debug */
+  .debug-section {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border);
+  }
+  
+  .debug-section h4 {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .debug-section pre {
+    color: var(--ucl-text-primary);
+  }
+  
+  /* Messages sans événements */
+  .no-events {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-secondary);
+  }
+  
+  .no-events-message {
+    color: var(--ucl-text-secondary);
+  }
+  
+  /* Footer de la sidebar */
+  .sidebar-footer {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border-light);
+  }
+  
+  /* Boutons */
+  .btn-sidebar-info {
+    background: var(--ucl-primary-adaptive);
+  }
+  
+  .btn-sidebar-info:hover {
+    background: var(--ucl-secondary-adaptive);
+  }
+  
+  .btn-sidebar-export {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-secondary);
+  }
+  
+  .btn-sidebar-export:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .expand-button,
+  .btn-view-modal {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-secondary);
+  }
+  
+  .expand-button:hover,
+  .btn-view-modal:hover {
+    background: var(--ucl-primary-adaptive);
+    color: var(--ucl-bg-primary);
+    border-color: var(--ucl-primary-adaptive);
+  }
+  
+  .close-details-btn {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .close-details-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  .event-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .event-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Pagination */
+  .page-number {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-primary);
+  }
+  
+  .page-number:hover {
+    background: var(--ucl-bg-hover);
+    border-color: var(--ucl-primary-adaptive);
+  }
+  
+  .page-number.active {
+    background: var(--ucl-primary-adaptive);
+    color: var(--ucl-bg-primary);
+    border-color: var(--ucl-primary-adaptive);
+  }
+  
+  /* Sélecteurs */
+  .range-select {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-primary);
+  }
+  
+  .range-select:focus {
+    border-color: var(--ucl-primary-adaptive);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  /* Badges de source */
+  .source-badge.icloud {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: rgba(255, 107, 107, 0.4);
+  }
+  
+  .source-badge.outlook {
+    background: rgba(74, 144, 226, 0.2);
+    color: var(--ucl-primary-adaptive);
+    border-color: rgba(74, 144, 226, 0.4);
+  }
+  
+  .event-source-badge {
+    background: rgba(74, 144, 226, 0.2);
+    color: var(--ucl-primary-adaptive);
+    border-color: rgba(74, 144, 226, 0.4);
+  }
+  
+  .agenda-event-card.icloud .event-source-badge {
+    background: rgba(255, 107, 107, 0.2);
+    border-color: rgba(255, 107, 107, 0.4);
+  }
+  
+  .agenda-event-card.outlook .event-source-badge {
+    background: rgba(74, 144, 226, 0.2);
+    color: var(--ucl-primary-adaptive);
+    border-color: rgba(74, 144, 226, 0.4);
+  }
+  
+  /* Liens dans les descriptions */
+  .description-link {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .description-link:hover {
+    background: rgba(74, 144, 226, 0.2);
+    border-bottom-color: var(--ucl-primary-adaptive);
+  }
+  
+  .url-link:hover {
+    background: rgba(74, 144, 226, 0.2);
+    color: var(--ucl-accent-adaptive);
+  }
+  
+  .email-link:hover {
+    background: rgba(56, 189, 248, 0.2);
+    color: var(--ucl-info);
+    border-bottom-color: var(--ucl-info);
+  }
+  
+  .phone-link:hover {
+    background: rgba(52, 211, 153, 0.2);
+    color: var(--ucl-success);
+    border-bottom-color: var(--ucl-success);
+  }
+  
+  /* Dates mises en évidence */
+  .description-date {
+    color: var(--ucl-warning);
+    background: rgba(251, 191, 36, 0.2);
+  }
+  
+  /* Informations importantes */
+  .description-paragraph.important-info {
+    background: rgba(74, 144, 226, 0.1);
+    border-left-color: var(--ucl-primary-adaptive);
+  }
+  
+  /* Statistiques */
+  .stats-value {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .stats-item.highlight {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  /* Page info */
+  .page-info {
+    background: var(--ucl-bg-secondary);
+    color: var(--ucl-text-secondary);
+  }
+  
+  /* Total events */
+  .total-events {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  /* Upcoming events */
+  .upcoming-events {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .upcoming-events h2 {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  /* Event preview */
+  .event-preview {
+    background: var(--ucl-bg-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .event-preview:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .event-preview-title {
+    color: var(--ucl-primary-adaptive);
+  }
+  
+  .event-preview-time {
+    background: var(--ucl-bg-secondary);
+    color: var(--ucl-text-secondary);
+  }
+  
+  .event-preview-location {
+    color: var(--ucl-text-secondary);
+  }
+  
+  .event-description-preview {
+    color: var(--ucl-text-secondary);
+  }
+}
+
+/* Support pour le contraste élevé en mode sombre */
+@media (prefers-color-scheme: dark) and (prefers-contrast: high) {
+  :root {
+    --ucl-bg-primary: #000000;
+    --ucl-bg-secondary: #1a1a1a;
+    --ucl-bg-tertiary: #2d2d2d;
+    --ucl-text-primary: #ffffff;
+    --ucl-text-secondary: #e0e0e0;
+    --ucl-border: #404040;
+    --ucl-primary-adaptive: #66b3ff;
+    --ucl-secondary-adaptive: #80c7ff;
+  }
+}
+
+/* Transition fluide entre les modes */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Désactiver les transitions pour les utilisateurs préférant moins d'animations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

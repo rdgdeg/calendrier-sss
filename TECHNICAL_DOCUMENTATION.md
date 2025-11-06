@@ -248,10 +248,24 @@ export const syncCalendarStatus = async (status: CalendarStatus) => Promise<void
   --ucl-shadow-md: 0 4px 6px rgba(0,0,0,0.08);
   --ucl-shadow-lg: 0 10px 15px rgba(0,0,0,0.08);
 }
+
+/* Mode sombre automatique */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ucl-bg-primary: #0f172a;
+    --ucl-bg-secondary: #1e293b;
+    --ucl-text-primary: #f8fafc;
+    --ucl-text-secondary: #cbd5e1;
+    --ucl-primary-adaptive: #4a90e2;
+    --ucl-secondary-adaptive: #60a5fa;
+    /* Variables adaptatives pour tous les composants */
+  }
+}
 ```
 
 ### Architecture CSS modulaire
 - **index.css** : Variables globales et base
+- **dark-mode-support.css** : Support automatique du mode sombre macOS
 - **mobile-improvements.css** : Responsive mobile
 - **accessibility-improvements.css** : Accessibilité
 - **micro-interactions.css** : Animations et transitions
@@ -493,3 +507,49 @@ describe('Calendar Component', () => {
 ---
 
 Cette documentation technique fournit une vue complète de l'architecture et de l'implémentation de l'application Calendrier SSS, permettant une maintenance efficace et des évolutions futures maîtrisées.
+## 🌙 Suppor
+t du mode sombre
+
+### Détection automatique
+L'application détecte automatiquement le mode sombre du système macOS via `prefers-color-scheme: dark` et adapte tous les composants en conséquence.
+
+### Variables CSS adaptatives
+```css
+/* Mode clair (par défaut) */
+:root {
+  --ucl-bg-primary: #ffffff;
+  --ucl-text-primary: #1e293b;
+  --ucl-primary-adaptive: #003d7a;
+}
+
+/* Mode sombre automatique */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ucl-bg-primary: #0f172a;
+    --ucl-text-primary: #f8fafc;
+    --ucl-primary-adaptive: #4a90e2;
+  }
+}
+```
+
+### Composants adaptés
+- **Calendrier** : Arrière-plans sombres, textes clairs
+- **Sidebar** : Couleurs inversées avec contraste préservé
+- **Modals** : Thème sombre cohérent
+- **Boutons** : Couleurs UCLouvain adaptées
+- **Bordures et ombres** : Ajustées pour le mode sombre
+
+### Accessibilité
+- **Contraste élevé** : Support de `prefers-contrast: high`
+- **Transitions fluides** : Changement en douceur (0.3s)
+- **Respect des préférences** : `prefers-reduced-motion`
+- **Couleurs UCLouvain** : Maintien de l'identité visuelle
+
+### Implémentation
+```typescript
+// Import automatique dans main.tsx
+import './styles/dark-mode-support.css'
+
+// Détection en JavaScript (optionnel)
+const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+```

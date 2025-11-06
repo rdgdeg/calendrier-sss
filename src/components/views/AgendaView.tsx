@@ -146,13 +146,21 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
 
         <div className="agenda-summary">
           <div className="summary-stats">
-            <span className="total-events">
-              {totalEvents} événement{totalEvents > 1 ? 's' : ''} au total
-            </span>
-            {totalPages > 1 && (
-              <span className="page-info">
-                Page {currentPage + 1} sur {totalPages}
+            <div className="total-events-container">
+              <span className="total-events-number">{totalEvents}</span>
+              <span className="total-events-label">
+                événement{totalEvents > 1 ? 's' : ''} trouvé{totalEvents > 1 ? 's' : ''}
               </span>
+            </div>
+            {totalPages > 1 && (
+              <div className="pagination-info">
+                <span className="page-info">
+                  Page {currentPage + 1} sur {totalPages}
+                </span>
+                <span className="events-range">
+                  ({currentPage * eventsPerPage + 1}-{Math.min((currentPage + 1) * eventsPerPage, totalEvents)})
+                </span>
+              </div>
             )}
           </div>
           
@@ -214,12 +222,22 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
             return (
               <div key={dateKey} className="agenda-day-group">
                 <div className="agenda-date-header">
-                  <h3 className="date-title">
-                    {format(eventDate, 'EEEE d MMMM yyyy', { locale: fr })}
-                  </h3>
-                  <span className="events-count">
-                    {dayEvents.length} événement{dayEvents.length > 1 ? 's' : ''}
-                  </span>
+                  <div className="date-info">
+                    <h3 className="date-title">
+                      {format(eventDate, 'EEEE d MMMM yyyy', { locale: fr })}
+                    </h3>
+                    {isSameDay(eventDate, new Date()) && (
+                      <span className="today-badge">Aujourd'hui</span>
+                    )}
+                  </div>
+                  <div className="events-count-container">
+                    <span className="events-count">
+                      {dayEvents.length}
+                    </span>
+                    <span className="events-label">
+                      événement{dayEvents.length > 1 ? 's' : ''}
+                    </span>
+                  </div>
                 </div>
                 
                 <div className="agenda-events">

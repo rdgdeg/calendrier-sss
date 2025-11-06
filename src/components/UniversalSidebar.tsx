@@ -2,6 +2,7 @@ import React from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { getCleanPreview } from '../utils/textCleaner';
 
 interface UniversalSidebarProps {
     searchResults: CalendarEvent[];
@@ -36,11 +37,7 @@ export const UniversalSidebar: React.FC<UniversalSidebarProps> = ({
                     <h4 className="sidebar-event-title">
                         {event.title.length > 50 ? `${event.title.substring(0, 47)}...` : event.title}
                     </h4>
-                    <div className="sidebar-event-source">
-                        <span className={`source-badge ${event.source}`}>
-                            {event.source === 'icloud' ? '🏥' : '📧'}
-                        </span>
-                    </div>
+
                 </div>
 
                 <div className="sidebar-event-datetime">
@@ -63,10 +60,7 @@ export const UniversalSidebar: React.FC<UniversalSidebarProps> = ({
 
                 {event.description && (
                     <div className="sidebar-event-description">
-                        {event.description.length > 60
-                            ? `${event.description.substring(0, 57)}...`
-                            : event.description
-                        }
+                        {getCleanPreview(event.description, 60)}
                     </div>
                 )}
 

@@ -265,9 +265,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                               {isHighlighted && <span className="search-indicator">🔍 </span>}
                               {event.title}
                             </h4>
-                            <span className="event-source-badge">
-                              {getSourceDisplayName(event.source)}
-                            </span>
+
                           </div>
                           
                           <div className="event-actions-header">

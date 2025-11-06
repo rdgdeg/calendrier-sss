@@ -10,14 +10,13 @@ import { AgendaView } from './views/AgendaView';
 
 import { EventModal } from './EventModal';
 import { Footer } from './Footer';
-import { EventLegend } from './EventLegend';
+
 import { SearchBar } from './SearchBar';
 
 import { SearchResults } from './SearchResults';
 import { UpcomingEventsSection } from './UpcomingEventsSection';
 
 import { useSearch } from '../hooks/useSearch';
-import { EVENT_TYPES } from '../utils/eventCategories';
 
 import { HelpSystem, FAQSection } from './HelpSystem';
 
@@ -41,7 +40,7 @@ const CALENDAR_SOURCES: CalendarSource[] = [
 ];
 
 export const Calendar: React.FC = () => {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 8, 1)); // Septembre 2025
+  const [currentDate, setCurrentDate] = useState(new Date()); // Mois en cours
   const [currentView, setCurrentView] = useState<CalendarView>('month');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -68,9 +67,7 @@ export const Calendar: React.FC = () => {
   const {
     searchState,
     filteredEvents,
-    searchStats,
     setQuery,
-    updateFilters,
     clearSearch,
     isEventHighlighted
   } = useSearch(events);
@@ -240,14 +237,15 @@ export const Calendar: React.FC = () => {
       setLoadingMessage('Chargement des calendriers...');
       setLoadingProgress(30);
       
-      const sourcePromises = CALENDAR_SOURCES.map(async (source) => {
+      const sourcePromises = CALENDAR_SOURCES.map(async (source, index) => {
         try {
           setLoadingMessage(`Chargement ${source.name}...`);
           const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
           
-          // Mettre à jour la progression
-          const progressIncrement = 40 / CALENDAR_SOURCES.length;
-          setLoadingProgress(prev => prev + progressIncrement);
+          // Mettre à jour la progression de manière contrôlée
+          const progressPerSource = 40 / CALENDAR_SOURCES.length;
+          const targetProgress = 30 + (progressPerSource * (index + 1));
+          setLoadingProgress(Math.min(targetProgress, 70));
           
           console.log(`📅 ${source.name}: ${sourceEvents.length} événements chargés`);
           
@@ -652,64 +650,7 @@ export const Calendar: React.FC = () => {
         </div>
       </div>
 
-      {/* Section des filtres sous le header */}
-      <div className="calendar-filters-section">
-        <div className="filters-container-inline">
-          <div className="filters-row">
-            <div className="filter-group-compact">
-              <label className="filter-label-compact">Source :</label>
-              <select 
-                value={searchState.filters.source} 
-                onChange={(e) => updateFilters({ source: e.target.value as any })}
-                className="filter-select-compact"
-              >
-                <option value="all">Tous</option>
-                <option value="icloud">de Duve</option>
-                <option value="outlook">📧 SSS</option>
-              </select>
-            </div>
 
-            <div className="filter-group-compact">
-              <label className="filter-label-compact">Catégorie :</label>
-              <select 
-                value={searchState.filters.category} 
-                onChange={(e) => updateFilters({ category: e.target.value as any })}
-                className="filter-select-compact"
-              >
-                {EVENT_TYPES.map(eventType => (
-                  <option key={eventType.type} value={eventType.type}>
-                    {eventType.icon} {eventType.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="filter-group-compact">
-              <label className="filter-label-compact">Période :</label>
-              <select 
-                value={searchState.filters.dateRange} 
-                onChange={(e) => updateFilters({ dateRange: e.target.value as any })}
-                className="filter-select-compact"
-              >
-                <option value="all">Toutes</option>
-                <option value="upcoming">À venir</option>
-                <option value="thisWeek">Semaine</option>
-                <option value="thisMonth">Mois</option>
-              </select>
-            </div>
-
-            <div className="filter-stats-compact">
-              <span className="stats-total">{searchStats.totalEvents} événements</span>
-              {searchStats.hasActiveFilters && (
-                <span className="stats-filtered">• {searchStats.filteredCount} filtrés</span>
-              )}
-              {searchState.isSearching && (
-                <span className="stats-found">• {searchStats.resultsCount} trouvés</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div className={`calendar-layout-full ${searchState.isSearching ? 'search-active' : ''}`}>
         <div className="calendar-main-full">
@@ -751,10 +692,7 @@ export const Calendar: React.FC = () => {
         </div>
       </div>
 
-      {/* Légende des événements sous le calendrier */}
-      <div className="calendar-legend-section">
-        <EventLegend />
-      </div>
+
 
       <EventModal 
         event={selectedEvent}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { customMarkdownFormatter } from '../utils/customMarkdownFormatter';
 
 interface EventDescriptionProps {
   description: string;
@@ -9,6 +10,12 @@ export const EventDescription: React.FC<EventDescriptionProps> = ({
   description, 
   className = '' 
 }) => {
+  // Apply custom formatting first to process and remove markers
+  const processedDescription = React.useMemo(() => {
+    if (!description) return '';
+    return customMarkdownFormatter.processEventDescription(description);
+  }, [description]);
+
   const formatDescription = (text: string): JSX.Element[] => {
     const elements: JSX.Element[] = [];
     
@@ -198,8 +205,9 @@ export const EventDescription: React.FC<EventDescriptionProps> = ({
   }
 
   return (
-    <div className={`event-description-formatted ${className}`}>
-      {formatDescription(description)}
-    </div>
+    <div 
+      className={`event-description-formatted ${className}`}
+      dangerouslySetInnerHTML={{ __html: processedDescription }}
+    />
   );
 };

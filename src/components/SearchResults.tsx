@@ -2,6 +2,7 @@ import React from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { getCleanPreview } from '../utils/textCleaner';
 
 interface SearchResultsProps {
   searchResults: CalendarEvent[];
@@ -36,11 +37,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <h4 className="search-result-title">
             {event.title}
           </h4>
-          <div className="search-result-source">
-            <span className={`source-badge ${event.source}`}>
-              {event.source === 'icloud' ? 'de Duve' : '📧 SSS'}
-            </span>
-          </div>
+
         </div>
 
         <div className="search-result-datetime">
@@ -63,10 +60,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
 
         {event.description && (
           <div className="search-result-description">
-            {event.description.length > 120
-              ? `${event.description.substring(0, 120)}...`
-              : event.description
-            }
+            {getCleanPreview(event.description, 120)}
           </div>
         )}
 

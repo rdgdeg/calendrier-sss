@@ -1,11 +1,8 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { getSourceDisplayName } from '../utils/sourceUtils';
-import { extractImagesFromDescription } from '../utils/imageExtractor';
-import { textFormatter } from '../utils/textFormatter';
-import { processCustomLineBreaksFixed } from '../utils/textFormatterFixed';
+import { customMarkdownFormatter } from '../utils/customMarkdownFormatter';
 import { ResponsiveText } from './display/ResponsiveText';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -33,74 +30,51 @@ export const EventModal: React.FC<EventModalProps> = ({
     isScrollable: false
   });
 
-  // Memoized content processing to prevent unnecessary recalculations
-  const processedContent = useMemo(() => {
-    if (!isOpen || !event?.description) {
-      return null;
-    }
+  // Process description content with custom formatting and line breaks
+  const processedDescription = useMemo(() => {
+    if (!event?.description) return null;
 
-    try {
-      // Extract images first (legacy support)
-      const imageContent = extractImagesFromDescription(event.description);
-      
-      // First clean HTML content
-      const cleanedHtml = textFormatter.cleanHtmlContent(event.description);
-      
-      // Then process custom line break markers (*** becomes line breaks)
-      const textWithCustomBreaks = processCustomLineBreaksFixed(cleanedHtml, '***');
-      
-      // Basic paragraph formatting without link generation
-      const paragraphs = textWithCustomBreaks.split(/\n\s*\n/).filter(p => p.trim());
-      let formattedHtml = textWithCustomBreaks;
-      
-      if (paragraphs.length > 1) {
-        formattedHtml = paragraphs
-          .map(p => `<p class="text-formatter-paragraph-normal">${p.trim()}</p>`)
-          .join('');
-      }
+    // Apply custom markdown formatting FIRST (+++bold+++, ___italic___, ~~~underline~~~, |||, ===)
+    // Then clean HTML to preserve the custom formatting
+    let processedText = event.description;
+    
+    // Clean basic HTML but preserve structure
+    processedText = processedText
+      .replace(/<script[^>]*>.*?<\/script>/gis, '')
+      .replace(/<style[^>]*>.*?<\/style>/gis, '')
+      .replace(/<!--.*?-->/gs, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+    
+    // Apply custom formatting
+    const formattedText = customMarkdownFormatter.processEventDescription(processedText);
 
-      return {
-        ...imageContent,
-        cleanText: cleanedHtml,
-        formattedHtml: formattedHtml,
-        hasAdvancedFormatting: paragraphs.length > 1
-      };
-      
-    } catch (error) {
-      console.warn('Error processing event description:', error);
-      
-      // Fallback to basic image extraction
-      const imageContent = extractImagesFromDescription(event.description);
-      
-      const cleanText = event.description.replace(/<[^>]*>/g, '');
-      return {
-        ...imageContent,
-        cleanText: cleanText,
-        images: imageContent?.images || [],
-        formattedHtml: cleanText,
-        hasAdvancedFormatting: false
-      };
-    }
-  }, [isOpen, event?.id, event?.description]);
+    return formattedText;
+  }, [event?.description]);
 
-  // Memoized scroll state update function to prevent recreating on every render
+  // Stable scroll state update function - no dependencies to avoid re-creation
   const updateScrollState = useCallback(() => {
     const descriptionElement = descriptionRef.current;
     if (!descriptionElement) return;
 
+    // Direct update without requestAnimationFrame to avoid timing issues
     const { scrollTop, scrollHeight, clientHeight } = descriptionElement;
-    const isScrollable = scrollHeight > clientHeight;
-    const canScrollUp = scrollTop > 5;
-    const canScrollDown = scrollTop < scrollHeight - clientHeight - 5;
+    const isScrollable = scrollHeight > clientHeight + 5; // Larger buffer
+    const canScrollUp = scrollTop > 15; // Higher threshold
+    const canScrollDown = scrollTop < scrollHeight - clientHeight - 15; // Higher threshold
 
-    // Only update state if values actually changed to prevent unnecessary re-renders
+    // Only update state if values actually changed
     setScrollState(prevState => {
       if (
         prevState.canScrollUp === canScrollUp &&
         prevState.canScrollDown === canScrollDown &&
         prevState.isScrollable === isScrollable
       ) {
-        return prevState; // No change, return previous state
+        return prevState;
       }
       
       return {
@@ -109,53 +83,35 @@ export const EventModal: React.FC<EventModalProps> = ({
         isScrollable
       };
     });
-  }, []);
+  }, []); // Empty dependencies to ensure stability
 
-  // Scroll detection for description content - ALWAYS call this hook
+  // Simplified scroll detection - avoid dependencies that cause re-runs
   useEffect(() => {
-    if (!isOpen || !processedContent) return;
+    if (!isOpen || !processedDescription) return;
 
     const descriptionElement = descriptionRef.current;
     if (!descriptionElement) return;
 
-    // Use a timeout to ensure DOM is updated
+    // Initial scroll state check with delay to ensure DOM is ready
     const timeoutId = setTimeout(() => {
       updateScrollState();
-    }, 150); // Increased timeout to prevent rapid updates
+    }, 300);
 
-    // Add scroll listener with throttling
+    // Simple scroll listener without complex logic
     let scrollTimeout: NodeJS.Timeout | null = null;
     const throttledScrollHandler = () => {
       if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(updateScrollState, 100); // Increased throttling
+      scrollTimeout = setTimeout(updateScrollState, 200); // Increased delay
     };
 
     descriptionElement.addEventListener('scroll', throttledScrollHandler, { passive: true });
-    
-    // Add resize observer with debouncing
-    let resizeObserver: ResizeObserver | null = null;
-    let resizeTimeout: NodeJS.Timeout | null = null;
-    
-    try {
-      resizeObserver = new ResizeObserver(() => {
-        if (resizeTimeout) clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(updateScrollState, 200); // Increased debouncing
-      });
-      resizeObserver.observe(descriptionElement);
-    } catch (error) {
-      console.warn('ResizeObserver not available:', error);
-    }
 
     return () => {
       clearTimeout(timeoutId);
       if (scrollTimeout) clearTimeout(scrollTimeout);
-      if (resizeTimeout) clearTimeout(resizeTimeout);
       descriptionElement.removeEventListener('scroll', throttledScrollHandler);
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
     };
-  }, [isOpen, processedContent?.formattedHtml, updateScrollState]); // Only depend on the HTML content that affects layout
+  }, [isOpen]); // Remove processedDescription and updateScrollState from dependencies
 
   // Early return AFTER all hooks are called
   if (!isOpen || !event || !event.id) return null;
@@ -227,21 +183,14 @@ export const EventModal: React.FC<EventModalProps> = ({
 
 
 
-            {/* Source */}
-            <div className="event-detail-row">
-              <div className="detail-icon">📊</div>
-              <div className="detail-content">
-                <strong>Source</strong>
-                <span>{getSourceDisplayName(event.source)}</span>
-              </div>
-            </div>
+
 
 
 
 
 
             {/* Description formatée avec indicateurs de scroll */}
-            {processedContent && (processedContent.formattedHtml || processedContent.cleanDescription) && (
+            {processedDescription && (
               <div className="event-detail-row description-row">
                 <div className="detail-icon">📝</div>
                 <div className="detail-content">
@@ -254,9 +203,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                     >
                       <div 
                         className="event-description-modal"
-                        dangerouslySetInnerHTML={{ 
-                          __html: processedContent.formattedHtml || processedContent.cleanDescription || ''
-                        }}
+                        dangerouslySetInnerHTML={{ __html: processedDescription }}
                       />
                     </div>
                     {scrollState.isScrollable && (

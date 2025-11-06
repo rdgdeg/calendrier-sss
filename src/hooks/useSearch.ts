@@ -1,10 +1,7 @@
 import { useState, useMemo } from 'react';
-import { CalendarEvent, EventType } from '../types';
-import { detectEventType } from '../utils/eventCategories';
+import { CalendarEvent } from '../types';
 
 export interface SearchFilters {
-  source: 'all' | 'icloud' | 'outlook';
-  category: EventType;
   dateRange: 'all' | 'upcoming' | 'thisWeek' | 'thisMonth';
 }
 
@@ -21,8 +18,6 @@ export const useSearch = (events: CalendarEvent[]) => {
     query: '',
     results: [],
     filters: {
-      source: 'all',
-      category: 'all',
       dateRange: 'all'
     },
     isSearching: false,
@@ -33,18 +28,7 @@ export const useSearch = (events: CalendarEvent[]) => {
   const applyFilters = (events: CalendarEvent[], filters: SearchFilters): CalendarEvent[] => {
     let filtered = [...events];
 
-    // Filtre par source
-    if (filters.source !== 'all') {
-      filtered = filtered.filter(event => event.source === filters.source);
-    }
 
-    // Filtre par catégorie
-    if (filters.category !== 'all') {
-      filtered = filtered.filter(event => {
-        const eventType = detectEventType(event.title, event.description);
-        return eventType === filters.category;
-      });
-    }
 
     // Filtre par date
     const now = new Date();
@@ -169,9 +153,7 @@ export const useSearch = (events: CalendarEvent[]) => {
       totalEvents,
       filteredCount,
       resultsCount,
-      hasActiveFilters: searchState.filters.source !== 'all' || 
-                       searchState.filters.category !== 'all' || 
-                       searchState.filters.dateRange !== 'all'
+      hasActiveFilters: searchState.filters.dateRange !== 'all'
     };
   }, [events.length, filteredEvents.length, searchState.results.length, searchState.filters]);
 

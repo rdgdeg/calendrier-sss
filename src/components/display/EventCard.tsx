@@ -5,6 +5,8 @@ import { fr } from 'date-fns/locale';
 import { EventIcon } from './EventIcon';
 import { ResponsiveText, useScreenSize } from './ResponsiveText';
 import { textFormatter } from '../../utils/textFormatter';
+import { customMarkdownFormatter } from '../../utils/customMarkdownFormatter';
+import { getCleanPreview } from '../../utils/textCleaner';
 import { ErrorBoundary } from '../ErrorBoundary';
 
 interface EventCardProps {
@@ -45,16 +47,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
     return `${startTime} - ${endTime}`;
   };
 
-  const getSourceLabel = (source: string) => {
-    switch (source) {
-      case 'icloud':
-        return 'de Duve';
-      case 'outlook':
-        return 'SSS';
-      default:
-        return source;
-    }
-  };
+
 
   // Get max length for title based on screen size
   const getTitleMaxLength = (): number => {
@@ -83,16 +76,11 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
     return formattedTitle.content as string;
   };
 
-  // Format description for short preview
+  // Format description for short preview with custom formatting
   const formatDescription = (description: string): string => {
+    // Get clean preview without custom formatting markers
     const maxLength = screenSize === 'mobile' ? 100 : screenSize === 'tablet' ? 150 : 200;
-    const formattedDesc = textFormatter.formatDescription(description, {
-      maxLength,
-      preserveWords: true,
-      showEllipsis: true,
-      breakLongWords: true
-    });
-    return formattedDesc.content as string;
+    return getCleanPreview(description, maxLength);
   };
 
   return (
@@ -132,17 +120,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({ event, className = '' })
               </ErrorBoundary>
             </div>
           </div>
-          <div className={`event-source event-source-${event.source}`}>
-            <span className="sr-only">Source: </span>
-            <ErrorBoundary fallback={<span>{getSourceLabel(event.source)}</span>}>
-              <ResponsiveText
-                text={getSourceLabel(event.source)}
-                variant="metadata"
-                screenSize={screenSize}
-                className="event-source-text"
-              />
-            </ErrorBoundary>
-          </div>
+
         </div>
         
         {/* Titre avec icône */}

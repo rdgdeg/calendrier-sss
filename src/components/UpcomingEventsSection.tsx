@@ -51,13 +51,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
     return `${format(start, 'HH:mm')} - ${format(end, 'HH:mm')}`;
   };
 
-  const getSourceLabel = (source: string) => {
-    switch (source) {
-      case 'icloud': return 'de Duve';
-      case 'outlook': return 'SSS';
-      default: return source;
-    }
-  };
+
 
   if (upcomingEvents.length === 0) {
     return (
@@ -96,9 +90,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                     {formatEventTime(event.start, event.end, event.allDay)}
                   </div>
                 </div>
-                <div className={`upcoming-event-source upcoming-event-source-${event.source}`}>
-                  {getSourceLabel(event.source)}
-                </div>
+
               </div>
 
               <div className="upcoming-event-content">

@@ -23,10 +23,10 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress, message 
           <div className="loading-progress-bar">
             <div 
               className="loading-progress-fill"
-              style={{ width: `${Math.max(progress, 10)}%` }}
+              style={{ width: `${Math.min(Math.max(progress, 10), 100)}%` }}
             />
           </div>
-          <div className="loading-percentage">{Math.round(progress)}%</div>
+          <div className="loading-percentage">{Math.min(Math.round(progress), 100)}%</div>
         </div>
 
         {/* Message de chargement */}

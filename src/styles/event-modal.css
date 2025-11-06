@@ -155,11 +155,13 @@
 }
 
 .description-content {
-  max-height: 300px;
+  max-height: 350px;
   overflow-y: auto;
   padding-right: var(--ucl-spacing-xs);
   word-wrap: break-word;
   overflow-wrap: break-word;
+  /* Prevent layout shifts */
+  contain: layout style;
 }
 
 .description-content::-webkit-scrollbar {
@@ -236,17 +238,22 @@
 /* Enhanced description content wrapper */
 .description-content-wrapper {
   position: relative;
-  max-height: 400px;
+  max-height: 350px;
   overflow: hidden;
+  /* Prevent layout shifts */
+  contain: layout;
 }
 
 .description-content[data-has-scroll="true"] {
-  max-height: 400px;
+  max-height: 350px;
   overflow-y: auto;
   padding-right: var(--ucl-spacing-xs);
   word-wrap: break-word;
   overflow-wrap: break-word;
-  scroll-behavior: smooth;
+  /* Remove smooth scrolling to prevent auto-scroll to top */
+  scroll-behavior: auto;
+  /* Stabilize scrollbar */
+  scrollbar-gutter: stable;
 }
 
 /* Scroll indicators */
@@ -292,15 +299,28 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+  /* Prevent layout shifts and stabilize text rendering */
+  contain: layout style;
+  /* Use normal white-space to prevent constant line recalculation */
+  white-space: normal;
 }
 
 .event-description-modal p {
-  margin-bottom: var(--ucl-spacing-sm);
+  margin-bottom: var(--ucl-spacing-md);
   line-height: 1.7;
 }
 
 .event-description-modal p:last-child {
   margin-bottom: 0;
+}
+
+.event-description-modal br {
+  line-height: 1.8;
+}
+
+/* Amélioration des puces et listes */
+.event-description-modal p:has(br) {
+  margin-bottom: var(--ucl-spacing-sm);
 }
 
 /* Advanced text formatting styles */

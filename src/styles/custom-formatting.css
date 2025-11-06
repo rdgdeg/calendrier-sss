@@ -1,0 +1,120 @@
+/* Custom Formatting Styles for Event Descriptions */
+
+/* Bold text with custom marker */
+.custom-bold {
+  font-weight: var(--ucl-font-weight-bold);
+  color: var(--ucl-primary);
+}
+
+/* Italic text with custom marker */
+.custom-italic {
+  font-style: italic;
+  color: var(--ucl-secondary);
+}
+
+/* Underlined text with custom marker */
+.custom-underline {
+  text-decoration: underline;
+  text-decoration-color: var(--ucl-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+/* Custom line breaks */
+.custom-break {
+  display: block;
+  margin: var(--ucl-spacing-xs) 0;
+}
+
+/* Custom separators */
+.custom-separator {
+  border: none;
+  border-top: 2px solid var(--ucl-gray-300);
+  margin: var(--ucl-spacing-md) 0;
+  width: 100%;
+}
+
+/* Enhanced formatting in event descriptions */
+.event-description-modal .custom-bold {
+  font-weight: var(--ucl-font-weight-bold);
+  color: var(--ucl-primary);
+  background: rgba(var(--ucl-primary-rgb), 0.1);
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+
+.event-description-modal .custom-italic {
+  font-style: italic;
+  color: var(--ucl-secondary);
+  font-weight: var(--ucl-font-weight-medium);
+}
+
+.event-description-modal .custom-underline {
+  text-decoration: underline;
+  text-decoration-color: var(--ucl-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  color: var(--ucl-accent);
+  font-weight: var(--ucl-font-weight-medium);
+}
+
+.event-description-modal .custom-separator {
+  border-top: 2px solid var(--ucl-primary);
+  margin: var(--ucl-spacing-lg) 0;
+  opacity: 0.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .event-description-modal .custom-bold {
+    padding: 1px 2px;
+    font-size: 0.95em;
+  }
+  
+  .event-description-modal .custom-separator {
+    margin: var(--ucl-spacing-md) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .event-description-modal .custom-bold {
+    background: none;
+    padding: 0;
+  }
+  
+  .event-description-modal .custom-underline {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+}
+
+/* Accessibility improvements */
+.custom-bold:focus,
+.custom-italic:focus,
+.custom-underline:focus {
+  outline: 2px solid var(--ucl-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Print styles */
+@media print {
+  .custom-bold {
+    background: none !important;
+    color: black !important;
+    font-weight: bold !important;
+  }
+  
+  .custom-italic {
+    color: black !important;
+  }
+  
+  .custom-underline {
+    color: black !important;
+    text-decoration-color: black !important;
+  }
+  
+  .custom-separator {
+    border-color: black !important;
+  }
+}

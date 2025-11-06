@@ -9,6 +9,7 @@
       }
     }
   ],
+  "buildCommand": "vite build",
   "routes": [
     {
       "src": "/assets/(.*)",

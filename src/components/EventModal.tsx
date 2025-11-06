@@ -18,10 +18,7 @@ interface EventModalProps {
 export const EventModal: React.FC<EventModalProps> = ({ 
   event, 
   isOpen, 
-  onClose, 
-  onExportToGoogle, 
-  onExportToOutlook, 
-  onExportToICS 
+  onClose
 }) => {
   const descriptionRef = useRef<HTMLDivElement>(null);
   const [scrollState, setScrollState] = useState({
@@ -228,44 +225,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             )}
 
             {/* Boutons d'export */}
-            <div className="event-detail-row">
-              <div className="detail-icon">📅</div>
-              <div className="detail-content">
-                <strong>Ajouter à mon calendrier</strong>
-                <div className="export-buttons-modal">
-                  {onExportToGoogle && (
-                    <button
-                      className="btn-export-modal btn-export-google-modal"
-                      onClick={() => onExportToGoogle(event)}
-                      title="Ajouter à Google Calendar"
-                    >
-                      <span className="export-icon">📅</span>
-                      Google Calendar
-                    </button>
-                  )}
-                  {onExportToOutlook && (
-                    <button
-                      className="btn-export-modal btn-export-outlook-modal"
-                      onClick={() => onExportToOutlook(event)}
-                      title="Ajouter à Outlook"
-                    >
-                      <span className="export-icon">📆</span>
-                      Outlook
-                    </button>
-                  )}
-                  {onExportToICS && (
-                    <button
-                      className="btn-export-modal btn-export-ics-modal"
-                      onClick={() => onExportToICS(event)}
-                      title="Télécharger fichier ICS"
-                    >
-                      <span className="export-icon">💾</span>
-                      Fichier ICS
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>

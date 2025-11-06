@@ -1,11 +1,12 @@
-/* Header réorganisé - Styles */
+/* Header réorganisé - Styles optimisés */
 
 .calendar-header-redesigned {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 0 auto 32px auto;
+  max-width: 1200px;
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -3px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
 }
 
@@ -222,4 +223,108 @@
   color: #6b7280;
   margin: 0;
   text-align: center;
+}
+/
+* Optimisation de la disposition générale */
+.calendar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.calendar-main-header-compact {
+  max-width: 1200px;
+  margin: 0 auto 24px auto;
+  background: #003d7a;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 25px -5px rgba(0, 61, 122, 0.3);
+}
+
+.calendar-layout-full {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.calendar-main-full {
+  width: 100%;
+}
+
+.calendar-content {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+/* Amélioration du calendrier mensuel */
+.month-view {
+  width: 100%;
+}
+
+.calendar-grid {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+}
+
+/* Centrage et espacement des sections */
+.upcoming-events-section,
+.search-results-section {
+  max-width: 1200px;
+  margin: 0 auto 24px auto;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+/* Footer centré */
+.calendar-footer {
+  max-width: 1200px;
+  margin: 40px auto 0 auto;
+  border-radius: 16px 16px 0 0;
+}
+
+/* Responsive amélioré */
+@media (max-width: 1440px) {
+  .calendar-container {
+    max-width: 95%;
+    padding: 16px;
+  }
+  
+  .calendar-header-redesigned,
+  .calendar-main-header-compact,
+  .calendar-layout-full,
+  .upcoming-events-section,
+  .search-results-section,
+  .calendar-footer {
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 12px;
+  }
+  
+  .calendar-header-redesigned {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-main-header-compact {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  
+  .calendar-content,
+  .upcoming-events-section,
+  .search-results-section {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
 }

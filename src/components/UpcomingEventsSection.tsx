@@ -7,20 +7,15 @@ import { extractImagesFromDescription } from '../utils/imageExtractor';
 interface UpcomingEventsSectionProps {
   events: CalendarEvent[];
   onEventClick: (event: CalendarEvent) => void;
-  onExportToGoogle: (event: CalendarEvent) => void;
-  onExportToOutlook: (event: CalendarEvent) => void;
-  onExportToICS: (event: CalendarEvent) => void;
-
+  onExportToGoogle?: (event: CalendarEvent) => void;
+  onExportToOutlook?: (event: CalendarEvent) => void;
+  onExportToICS?: (event: CalendarEvent) => void;
   eventsPerPage?: number;
 }
 
 export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
   events,
   onEventClick,
-  onExportToGoogle,
-  onExportToOutlook,
-  onExportToICS,
-
   eventsPerPage = 6
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -130,29 +125,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                   👁️ Détails
                 </button>
               </div>
-              <div className="export-buttons-compact">
-                <button
-                  onClick={() => onExportToGoogle(event)}
-                  className="btn-export-compact google"
-                  title="Exporter vers Google Calendar"
-                >
-                  📅
-                </button>
-                <button
-                  onClick={() => onExportToOutlook(event)}
-                  className="btn-export-compact outlook"
-                  title="Exporter vers Outlook"
-                >
-                  📧
-                </button>
-                <button
-                  onClick={() => onExportToICS(event)}
-                  className="btn-export-compact ics"
-                  title="Télécharger fichier ICS"
-                >
-                  💾
-                </button>
-              </div>
+
               </div>
             </div>
           );

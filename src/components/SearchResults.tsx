@@ -9,19 +9,16 @@ interface SearchResultsProps {
   searchQuery: string;
   isVisible: boolean;
   onEventClick: (event: CalendarEvent) => void;
-  onExportToGoogle: (event: CalendarEvent) => void;
-  onExportToOutlook: (event: CalendarEvent) => void;
-  onExportToICS: (event: CalendarEvent) => void;
+  onExportToGoogle?: (event: CalendarEvent) => void;
+  onExportToOutlook?: (event: CalendarEvent) => void;
+  onExportToICS?: (event: CalendarEvent) => void;
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
   searchResults,
   searchQuery,
   isVisible,
-  onEventClick,
-  onExportToGoogle,
-  onExportToOutlook,
-  onExportToICS
+  onEventClick
 }) => {
   if (!isVisible || !searchQuery.trim()) {
     return null;
@@ -72,29 +69,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           >
             ℹ️ Détails
           </button>
-          <div className="search-export-buttons">
-            <button
-              className="btn-search-export google"
-              onClick={() => onExportToGoogle(event)}
-              title="Ajouter à Google Calendar"
-            >
-              📅
-            </button>
-            <button
-              className="btn-search-export outlook"
-              onClick={() => onExportToOutlook(event)}
-              title="Ajouter à Outlook"
-            >
-              📆
-            </button>
-            <button
-              className="btn-search-export ics"
-              onClick={() => onExportToICS(event)}
-              title="Télécharger fichier ICS"
-            >
-              💾
-            </button>
-          </div>
+
         </div>
       </div>
     </div>
@@ -108,7 +83,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <span className="search-results-count">({searchResults.length} résultat{searchResults.length !== 1 ? 's' : ''})</span>
         </h3>
         <p className="search-results-subtitle">
-          Cliquez sur un événement pour voir les détails ou l'ajouter à votre calendrier
+          Cliquez sur un événement pour voir les détails
         </p>
       </div>
 

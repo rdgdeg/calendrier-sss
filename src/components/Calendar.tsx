@@ -21,7 +21,7 @@ import { useSearch } from '../hooks/useSearch';
 import { HelpSystem, FAQSection } from './HelpSystem';
 
 import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
-import { ExportPrint } from './ExportPrint';
+
 import { LoadingScreen } from './LoadingScreen';
 import '../styles/header-redesign.css';
 
@@ -409,68 +409,7 @@ export const Calendar: React.FC = () => {
 
 
 
-  // Fonctions d'export vers les calendriers
-  const exportToGoogleCalendar = (event: CalendarEvent) => {
-    const startDate = event.start.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    const endDate = event.end.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    
-    const googleUrl = new URL('https://calendar.google.com/calendar/render');
-    googleUrl.searchParams.set('action', 'TEMPLATE');
-    googleUrl.searchParams.set('text', event.title);
-    googleUrl.searchParams.set('dates', `${startDate}/${endDate}`);
-    googleUrl.searchParams.set('details', event.description || '');
-    googleUrl.searchParams.set('location', event.location || '');
-    
-    window.open(googleUrl.toString(), '_blank');
-  };
 
-  const exportToOutlookCalendar = (event: CalendarEvent) => {
-    const startDate = event.start.toISOString();
-    const endDate = event.end.toISOString();
-    
-    const outlookUrl = new URL('https://outlook.live.com/calendar/0/deeplink/compose');
-    outlookUrl.searchParams.set('subject', event.title);
-    outlookUrl.searchParams.set('startdt', startDate);
-    outlookUrl.searchParams.set('enddt', endDate);
-    outlookUrl.searchParams.set('body', event.description || '');
-    outlookUrl.searchParams.set('location', event.location || '');
-    
-    window.open(outlookUrl.toString(), '_blank');
-  };
-
-
-
-  const exportToICS = (event: CalendarEvent) => {
-    const formatDate = (date: Date) => {
-      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    };
-
-    const icsContent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//UCLouvain//Calendar//FR',
-      'BEGIN:VEVENT',
-      `UID:${event.id}@uclouvain.be`,
-      `DTSTART:${formatDate(event.start)}`,
-      `DTEND:${formatDate(event.end)}`,
-      `SUMMARY:${event.title}`,
-      `DESCRIPTION:${(event.description || '').replace(/\n/g, '\\n')}`,
-      `LOCATION:${event.location || ''}`,
-      `DTSTAMP:${formatDate(new Date())}`,
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
-
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
 
   const renderCurrentView = () => {
     const handleEventClick = (event: CalendarEvent) => {
@@ -549,11 +488,7 @@ export const Calendar: React.FC = () => {
             >
               🔄 Actualiser
             </button>
-            <ExportPrint 
-              events={filteredEvents}
-              currentDate={currentDate}
-              currentView={currentView}
-            />
+
           </div>
           <div className="header-help-actions">
             <button
@@ -680,9 +615,6 @@ export const Calendar: React.FC = () => {
                 setSelectedEvent(event);
                 setIsModalOpen(true);
               }}
-              onExportToGoogle={exportToGoogleCalendar}
-              onExportToOutlook={exportToOutlookCalendar}
-              onExportToICS={exportToICS}
             />
           </div>
 
@@ -694,10 +626,6 @@ export const Calendar: React.FC = () => {
                 setSelectedEvent(event);
                 setIsModalOpen(true);
               }}
-              onExportToGoogle={exportToGoogleCalendar}
-              onExportToOutlook={exportToOutlookCalendar}
-              onExportToICS={exportToICS}
-
               eventsPerPage={5}
             />
           )}
@@ -713,9 +641,7 @@ export const Calendar: React.FC = () => {
           setIsModalOpen(false);
           setSelectedEvent(null);
         }}
-        onExportToGoogle={exportToGoogleCalendar}
-        onExportToOutlook={exportToOutlookCalendar}
-        onExportToICS={exportToICS}
+
       />
 
 

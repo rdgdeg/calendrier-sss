@@ -1,105 +1,63 @@
--- Script d'initialisation des tables Supabase pour le Calendrier Unifié UCLouvain
+-- Script SQL pour créer la table des statistiques de visite dans Supabase
+-- À exécuter dans l'éditeur SQL de Supabase
 
--- Table pour suivre les synchronisations de calendriers
-CREATE TABLE IF NOT EXISTS calendar_syncs (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    source_name TEXT NOT NULL UNIQUE,
-    source_url TEXT NOT NULL,
-    last_sync TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    events_count INTEGER NOT NULL DEFAULT 0,
-    status TEXT NOT NULL CHECK (status IN ('success', 'error')),
-    error_message TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+-- Créer la table des visites
+CREATE TABLE IF NOT EXISTS calendar_visits (
+  id BIGSERIAL PRIMARY KEY,
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  user_agent TEXT,
+  referrer TEXT,
+  page_path TEXT NOT NULL DEFAULT '/',
+  session_id TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Table pour mettre en cache les événements
-CREATE TABLE IF NOT EXISTS event_cache (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    event_id TEXT NOT NULL UNIQUE,
-    title TEXT NOT NULL,
-    start_date TIMESTAMPTZ NOT NULL,
-    end_date TIMESTAMPTZ NOT NULL,
-    description TEXT,
-    location TEXT,
-    source TEXT NOT NULL CHECK (source IN ('icloud', 'outlook')),
-    color TEXT NOT NULL,
-    category TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Créer des index pour améliorer les performances des requêtes
+CREATE INDEX IF NOT EXISTS idx_calendar_visits_timestamp ON calendar_visits(timestamp);
+CREATE INDEX IF NOT EXISTS idx_calendar_visits_session_id ON calendar_visits(session_id);
+CREATE INDEX IF NOT EXISTS idx_calendar_visits_date ON calendar_visits(DATE(timestamp));
 
--- Index pour améliorer les performances
-CREATE INDEX IF NOT EXISTS idx_event_cache_start_date ON event_cache(start_date);
-CREATE INDEX IF NOT EXISTS idx_event_cache_source ON event_cache(source);
-CREATE INDEX IF NOT EXISTS idx_calendar_syncs_source_name ON calendar_syncs(source_name);
+-- Activer RLS (Row Level Security) pour la sécurité
+ALTER TABLE calendar_visits ENABLE ROW LEVEL SECURITY;
 
--- Fonction pour mettre à jour automatiquement updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
+-- Politique pour permettre l'insertion (tout le monde peut enregistrer une visite)
+CREATE POLICY "Allow insert visits" ON calendar_visits
+  FOR INSERT WITH CHECK (true);
 
--- Triggers pour mettre à jour automatiquement updated_at
-DROP TRIGGER IF EXISTS update_calendar_syncs_updated_at ON calendar_syncs;
-CREATE TRIGGER update_calendar_syncs_updated_at
-    BEFORE UPDATE ON calendar_syncs
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
+-- Politique pour permettre la lecture (tout le monde peut voir les stats)
+CREATE POLICY "Allow read visits" ON calendar_visits
+  FOR SELECT USING (true);
 
-DROP TRIGGER IF EXISTS update_event_cache_updated_at ON event_cache;
-CREATE TRIGGER update_event_cache_updated_at
-    BEFORE UPDATE ON event_cache
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
--- Politique de sécurité (RLS) - Lecture publique, écriture restreinte
-ALTER TABLE calendar_syncs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE event_cache ENABLE ROW LEVEL SECURITY;
-
--- Permettre la lecture publique
-CREATE POLICY "Allow public read access on calendar_syncs" ON calendar_syncs
-    FOR SELECT USING (true);
-
-CREATE POLICY "Allow public read access on event_cache" ON event_cache
-    FOR SELECT USING (true);
-
--- Permettre l'écriture pour les utilisateurs authentifiés (ou service role)
-CREATE POLICY "Allow authenticated insert on calendar_syncs" ON calendar_syncs
-    FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Allow authenticated update on calendar_syncs" ON calendar_syncs
-    FOR UPDATE USING (true);
-
-CREATE POLICY "Allow authenticated insert on event_cache" ON event_cache
-    FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Allow authenticated update on event_cache" ON event_cache
-    FOR UPDATE USING (true);
-
-CREATE POLICY "Allow authenticated delete on event_cache" ON event_cache
-    FOR DELETE USING (true);
-
--- Fonction pour nettoyer les anciens événements (appelée par un cron job)
-CREATE OR REPLACE FUNCTION cleanup_old_events()
+-- Fonction pour nettoyer les anciennes visites (optionnel - garder seulement 1 an)
+CREATE OR REPLACE FUNCTION cleanup_old_visits()
 RETURNS void AS $$
 BEGIN
-    DELETE FROM event_cache 
-    WHERE start_date < NOW() - INTERVAL '7 days';
+  DELETE FROM calendar_visits 
+  WHERE timestamp < NOW() - INTERVAL '1 year';
+END;
+$$ LANGUAGE plpgsql;
+
+-- Créer une fonction pour obtenir des statistiques rapides
+CREATE OR REPLACE FUNCTION get_visit_stats()
+RETURNS JSON AS $$
+DECLARE
+  result JSON;
+BEGIN
+  SELECT json_build_object(
+    'total_visits', (SELECT COUNT(*) FROM calendar_visits),
+    'unique_sessions', (SELECT COUNT(DISTINCT session_id) FROM calendar_visits),
+    'today_visits', (SELECT COUNT(*) FROM calendar_visits WHERE DATE(timestamp) = CURRENT_DATE),
+    'week_visits', (SELECT COUNT(*) FROM calendar_visits WHERE timestamp >= CURRENT_DATE - INTERVAL '7 days'),
+    'month_visits', (SELECT COUNT(*) FROM calendar_visits WHERE timestamp >= DATE_TRUNC('month', CURRENT_DATE))
+  ) INTO result;
+  
+  RETURN result;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Commentaires pour la documentation
-COMMENT ON TABLE calendar_syncs IS 'Table pour suivre les synchronisations des calendriers externes';
-COMMENT ON TABLE event_cache IS 'Cache des événements pour améliorer les performances';
-COMMENT ON FUNCTION cleanup_old_events() IS 'Fonction pour nettoyer les événements anciens (> 7 jours)';
-
--- Insérer des données de test (optionnel)
-INSERT INTO calendar_syncs (source_name, source_url, events_count, status) 
-VALUES 
-    ('Calendrier iCloud', 'https://p25-caldav.icloud.com/published/2/...', 0, 'success'),
-    ('Calendrier Outlook UCLouvain', 'https://outlook.office365.com/owa/calendar/...', 0, 'success')
-ON CONFLICT (source_name) DO NOTHING;
+COMMENT ON TABLE calendar_visits IS 'Table pour stocker les statistiques de visite du calendrier SSS';
+COMMENT ON COLUMN calendar_visits.session_id IS 'Identifiant unique de session pour éviter les doublons';
+COMMENT ON COLUMN calendar_visits.user_agent IS 'Information sur le navigateur (limitée pour la confidentialité)';
+COMMENT ON COLUMN calendar_visits.referrer IS 'Site de provenance de la visite';
+COMMENT ON COLUMN calendar_visits.page_path IS 'Chemin de la page visitée';

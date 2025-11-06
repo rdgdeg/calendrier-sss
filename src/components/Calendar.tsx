@@ -23,7 +23,9 @@ import { HelpSystem, FAQSection } from './HelpSystem';
 import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
 
 import { LoadingScreen } from './LoadingScreen';
+import { trackVisit } from '../utils/analytics';
 import '../styles/header-redesign.css';
+import '../styles/visit-stats.css';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
@@ -365,6 +367,11 @@ export const Calendar: React.FC = () => {
   useEffect(() => {
     // Toujours forcer le rechargement au démarrage pour avoir les données les plus récentes
     loadEvents();
+    
+    // Enregistrer la visite (analytics)
+    trackVisit().catch(error => {
+      console.warn('Analytics non disponible:', error);
+    });
     
     // Actualisation automatique toutes les 10 minutes (moins fréquent pour économiser les ressources)
     const autoRefreshInterval = setInterval(() => {

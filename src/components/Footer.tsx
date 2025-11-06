@@ -1,4 +1,5 @@
 import React from 'react';
+import { VisitStats } from './VisitStats';
 
 export const Footer: React.FC = () => {
   return (
@@ -57,6 +58,7 @@ export const Footer: React.FC = () => {
             day: 'numeric' 
           })}</p>
         </div>
+        <VisitStats className="footer-stats" />
       </div>
     </footer>
   );

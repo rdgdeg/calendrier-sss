@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
       <div className="footer-content">
         <div className="footer-section">
           <h4>Secteur des Sciences de la Santé</h4>
-          <p>Université catholique de Louvain</p>
+          <p>UCLouvain - Secteur des Sciences de la Santé</p>
           <p>Rue Martin V 40, Batiment Les Arches</p>
           <p>1200 Woluwe-Saint-Lambert</p>
         </div>
@@ -50,6 +50,13 @@ export const Footer: React.FC = () => {
       
       <div className="footer-bottom">
         <p>&copy; {new Date().getFullYear()} UCLouvain - Secteur des Sciences de la Santé</p>
+        <div className="footer-version">
+          <p>Version 2.1.0 • Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</p>
+        </div>
       </div>
     </footer>
   );

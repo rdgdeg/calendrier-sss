@@ -23,6 +23,7 @@ import { HelpSystem, FAQSection } from './HelpSystem';
 import { ToastNotification, NetworkStatus, RealTimeLoadingIndicator } from './LoadingStates';
 import { ExportPrint } from './ExportPrint';
 import { LoadingScreen } from './LoadingScreen';
+import '../styles/header-redesign.css';
 
 const CALENDAR_SOURCES: CalendarSource[] = [
   {
@@ -568,85 +569,96 @@ export const Calendar: React.FC = () => {
 
 
 
-      {/* Header de navigation avec recherche */}
-      <div className="calendar-header">
-        <div className="calendar-nav">
-          <button 
-            onClick={() => navigateDate('prev')} 
-            className="nav-button"
-            aria-label="Période précédente"
-          >
-            ← Précédent
-          </button>
-          <button 
-            onClick={goToToday} 
-            className="nav-button"
-            aria-label="Aller à aujourd'hui"
-          >
-            Aujourd'hui
-          </button>
-          <button 
-            onClick={() => navigateDate('next')} 
-            className="nav-button"
-            aria-label="Période suivante"
-          >
-            Suivant →
-          </button>
+      {/* Header réorganisé avec navigation et titre */}
+      <div className="calendar-header-redesigned">
+        {/* Première ligne : Navigation et Titre/Vue */}
+        <div className="header-top-row">
+          <div className="calendar-nav">
+            <button 
+              onClick={() => navigateDate('prev')} 
+              className="nav-button"
+              aria-label="Période précédente"
+            >
+              ← Précédent
+            </button>
+            <button 
+              onClick={goToToday} 
+              className="nav-button"
+              aria-label="Aller à aujourd'hui"
+            >
+              Aujourd'hui
+            </button>
+            <button 
+              onClick={() => navigateDate('next')} 
+              className="nav-button"
+              aria-label="Période suivante"
+            >
+              Suivant →
+            </button>
+          </div>
+
+          <div className="month-year-container-redesigned">
+            <h2 className="month-year">
+              {getNavigationLabel()}
+            </h2>
+            {currentView === 'month' && (
+              <span className="month-badge">Vue mensuelle</span>
+            )}
+          </div>
+
+          <div className="header-controls">
+            <ViewSelector 
+              currentView={currentView} 
+              onViewChange={setCurrentView} 
+            />
+          </div>
         </div>
 
-        <div className="calendar-search-section">
-          <SearchBar
-            events={events}
-            onSearchResults={(_, query) => {
-              setQuery(query);
-            }}
-            onClearSearch={() => {
-              clearSearch();
-            }}
-            placeholder="Rechercher dans les événements..."
-          />
-          
-          {/* Bouton pour aller aux résultats ou message si aucun résultat */}
-          {searchState.isSearching && (
-            <>
-              {searchState.results.length > 0 ? (
-                <button
-                  className="scroll-to-results-btn"
-                  onClick={() => {
-                    searchResultsRef.current?.scrollIntoView({ 
-                      behavior: 'smooth', 
-                      block: 'start' 
-                    });
-                  }}
-                  title="Voir les résultats de recherche"
-                >
-                  📍 {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} trouvé{searchState.results.length !== 1 ? 's' : ''} • Voir ↓
-                </button>
-              ) : (
-                <div className="no-results-message-inline">
-                  🔍 Aucun résultat pour "{searchState.query}"
-                </div>
-              )}
-            </>
-          )}
-        </div>
-        
-        <div className="month-year-container">
-          <h2 className="month-year">
-            {getNavigationLabel()}
-          </h2>
-          {currentView === 'month' && (
-            <div className="month-indicator">
-              <span className="month-badge">Vue mensuelle</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="header-controls">
-          <ViewSelector 
-            currentView={currentView} 
-            onViewChange={setCurrentView} 
-          />
+        {/* Deuxième ligne : Recherche et Statistiques */}
+        <div className="header-bottom-row">
+          <div className="calendar-search-section-redesigned">
+            <SearchBar
+              events={events}
+              onSearchResults={(_, query) => {
+                setQuery(query);
+              }}
+              onClearSearch={() => {
+                clearSearch();
+              }}
+              placeholder="Rechercher dans les événements..."
+            />
+            
+            {/* Bouton pour aller aux résultats ou message si aucun résultat */}
+            {searchState.isSearching && (
+              <>
+                {searchState.results.length > 0 ? (
+                  <button
+                    className="scroll-to-results-btn"
+                    onClick={() => {
+                      searchResultsRef.current?.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                      });
+                    }}
+                    title="Voir les résultats de recherche"
+                  >
+                    📍 {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} trouvé{searchState.results.length !== 1 ? 's' : ''} • Voir ↓
+                  </button>
+                ) : (
+                  <div className="no-results-message-inline">
+                    🔍 Aucun résultat pour "{searchState.query}"
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="events-stats-redesigned">
+            <span className="stats-total">{filteredEvents.length} événements</span>
+            {searchState.isSearching && (
+              <span className="stats-found">• {searchState.results.length} trouvés</span>
+            )}
+          </div>
         </div>
       </div>
 

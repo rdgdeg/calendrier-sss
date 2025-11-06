@@ -414,6 +414,94 @@ export const Calendar: React.FC = () => {
     }
   };
 
+  // Fonctions d'export vers les calendriers
+  const exportToGoogle = (event: CalendarEvent) => {
+    const startDate = event.start.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const endDate = event.end.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    const googleUrl = new URL('https://calendar.google.com/calendar/render');
+    googleUrl.searchParams.set('action', 'TEMPLATE');
+    googleUrl.searchParams.set('text', event.title);
+    googleUrl.searchParams.set('dates', `${startDate}/${endDate}`);
+    
+    if (event.description) {
+      googleUrl.searchParams.set('details', cleanHtmlContent(event.description));
+    }
+    
+    if (event.location) {
+      googleUrl.searchParams.set('location', event.location);
+    }
+    
+    window.open(googleUrl.toString(), '_blank');
+    showToast('success', 'Événement ouvert dans Google Calendar');
+  };
+
+  const exportToOutlook = (event: CalendarEvent) => {
+    const startDate = event.start.toISOString();
+    const endDate = event.end.toISOString();
+    
+    const outlookUrl = new URL('https://outlook.live.com/calendar/0/deeplink/compose');
+    outlookUrl.searchParams.set('subject', event.title);
+    outlookUrl.searchParams.set('startdt', startDate);
+    outlookUrl.searchParams.set('enddt', endDate);
+    
+    if (event.description) {
+      outlookUrl.searchParams.set('body', cleanHtmlContent(event.description));
+    }
+    
+    if (event.location) {
+      outlookUrl.searchParams.set('location', event.location);
+    }
+    
+    window.open(outlookUrl.toString(), '_blank');
+    showToast('success', 'Événement ouvert dans Outlook');
+  };
+
+  const exportToICS = (event: CalendarEvent) => {
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+    
+    const escapeText = (text: string) => {
+      return text
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '');
+    };
+    
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//UCLouvain//Calendrier SSS//FR',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@calendrier-sss.uclouvain.be`,
+      `DTSTART:${formatDate(event.start)}`,
+      `DTEND:${formatDate(event.end)}`,
+      `SUMMARY:${escapeText(event.title)}`,
+      event.description ? `DESCRIPTION:${escapeText(cleanHtmlContent(event.description))}` : '',
+      event.location ? `LOCATION:${escapeText(event.location)}` : '',
+      `CREATED:${formatDate(new Date())}`,
+      `LAST-MODIFIED:${formatDate(new Date())}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].filter(line => line !== '').join('\r\n');
+    
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    URL.revokeObjectURL(url);
+    showToast('success', 'Fichier ICS téléchargé');
+  };
+
 
 
 
@@ -430,7 +518,10 @@ export const Calendar: React.FC = () => {
       onEventClick: handleEventClick,
       onEventHover: showTooltip,
       onEventLeave: hideTooltip,
-      isEventHighlighted
+      isEventHighlighted,
+      onExportToGoogle: exportToGoogle,
+      onExportToOutlook: exportToOutlook,
+      onExportToICS: exportToICS
     };
 
     switch (currentView) {
@@ -648,7 +739,9 @@ export const Calendar: React.FC = () => {
           setIsModalOpen(false);
           setSelectedEvent(null);
         }}
-
+        onExportToGoogle={exportToGoogle}
+        onExportToOutlook={exportToOutlook}
+        onExportToICS={exportToICS}
       />
 
 

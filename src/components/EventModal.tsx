@@ -18,7 +18,10 @@ interface EventModalProps {
 export const EventModal: React.FC<EventModalProps> = ({ 
   event, 
   isOpen, 
-  onClose
+  onClose,
+  onExportToGoogle,
+  onExportToOutlook,
+  onExportToICS
 }) => {
   const descriptionRef = useRef<HTMLDivElement>(null);
   const [scrollState, setScrollState] = useState({
@@ -225,6 +228,44 @@ export const EventModal: React.FC<EventModalProps> = ({
             )}
 
             {/* Boutons d'export */}
+            <div className="event-detail-row export-row">
+              <div className="detail-icon">💾</div>
+              <div className="detail-content">
+                <strong>Ajouter à mon calendrier</strong>
+                <div className="export-buttons">
+                  {onExportToGoogle && (
+                    <button
+                      className="export-button google"
+                      onClick={() => onExportToGoogle(event)}
+                      title="Ajouter à Google Calendar"
+                    >
+                      <span className="export-icon">📅</span>
+                      <span className="export-label">Google</span>
+                    </button>
+                  )}
+                  {onExportToOutlook && (
+                    <button
+                      className="export-button outlook"
+                      onClick={() => onExportToOutlook(event)}
+                      title="Ajouter à Outlook"
+                    >
+                      <span className="export-icon">📆</span>
+                      <span className="export-label">Outlook</span>
+                    </button>
+                  )}
+                  {onExportToICS && (
+                    <button
+                      className="export-button ics"
+                      onClick={() => onExportToICS(event)}
+                      title="Télécharger fichier ICS"
+                    >
+                      <span className="export-icon">💾</span>
+                      <span className="export-label">Fichier ICS</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
           </div>
         </div>

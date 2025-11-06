@@ -14,6 +14,9 @@ interface AgendaViewProps {
   onEventLeave: () => void;
   isEventHighlighted?: (eventId: string) => boolean;
   selectedEventId?: string;
+  onExportToGoogle?: (event: CalendarEvent) => void;
+  onExportToOutlook?: (event: CalendarEvent) => void;
+  onExportToICS?: (event: CalendarEvent) => void;
 }
 
 export const AgendaView: React.FC<AgendaViewProps> = ({
@@ -22,7 +25,10 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
   onEventHover,
   onEventLeave,
   isEventHighlighted = () => false,
-  selectedEventId
+  selectedEventId,
+  onExportToGoogle,
+  onExportToOutlook,
+  onExportToICS
 }) => {
   const [dateRange, setDateRange] = useState('all'); // 'all', '7', '30', '60', '90'
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -332,6 +338,51 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                                 </div>
                               </div>
                             )}
+                            
+                            {/* Boutons d'export dans les détails étendus */}
+                            <div className="event-detail-item export-actions">
+                              <span className="detail-icon">💾</span>
+                              <div className="detail-text">
+                                <div className="agenda-export-buttons">
+                                  {onExportToGoogle && (
+                                    <button
+                                      className="btn-agenda-export google"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onExportToGoogle(event);
+                                      }}
+                                      title="Ajouter à Google Calendar"
+                                    >
+                                      📅
+                                    </button>
+                                  )}
+                                  {onExportToOutlook && (
+                                    <button
+                                      className="btn-agenda-export outlook"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onExportToOutlook(event);
+                                      }}
+                                      title="Ajouter à Outlook"
+                                    >
+                                      📆
+                                    </button>
+                                  )}
+                                  {onExportToICS && (
+                                    <button
+                                      className="btn-agenda-export ics"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onExportToICS(event);
+                                      }}
+                                      title="Télécharger fichier ICS"
+                                    >
+                                      💾
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>

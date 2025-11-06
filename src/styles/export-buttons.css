@@ -1,0 +1,377 @@
+/* Styles pour les boutons d'export vers les calendriers */
+
+/* Boutons d'export dans le modal */
+.export-row {
+  border-top: 1px solid var(--ucl-border-light);
+  padding-top: var(--ucl-spacing-md);
+  margin-top: var(--ucl-spacing-md);
+}
+
+.export-buttons {
+  display: flex;
+  gap: var(--ucl-spacing-sm);
+  flex-wrap: wrap;
+  margin-top: var(--ucl-spacing-sm);
+}
+
+.export-button {
+  display: flex;
+  align-items: center;
+  gap: var(--ucl-spacing-xs);
+  padding: var(--ucl-spacing-sm) var(--ucl-spacing-md);
+  border: 2px solid transparent;
+  border-radius: var(--ucl-border-radius);
+  background: var(--ucl-gray-100);
+  color: var(--ucl-text-primary);
+  font-size: var(--ucl-font-size-sm);
+  font-weight: var(--ucl-font-weight-medium);
+  font-family: var(--ucl-font-family);
+  cursor: pointer;
+  transition: all var(--ucl-transition);
+  text-decoration: none;
+  min-width: 100px;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.export-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left var(--ucl-transition);
+}
+
+.export-button:hover::before {
+  left: 100%;
+}
+
+.export-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ucl-shadow-md);
+}
+
+.export-button:active {
+  transform: translateY(0);
+}
+
+.export-button.google {
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+  color: white;
+  border-color: #4285f4;
+}
+
+.export-button.google:hover {
+  background: linear-gradient(135deg, #3367d6 0%, #2d8f47 100%);
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+}
+
+.export-button.outlook {
+  background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+  color: white;
+  border-color: #0078d4;
+}
+
+.export-button.outlook:hover {
+  background: linear-gradient(135deg, #106ebe 0%, #005a9e 100%);
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.4);
+}
+
+.export-button.ics {
+  background: linear-gradient(135deg, var(--ucl-success) 0%, #059669 100%);
+  color: white;
+  border-color: var(--ucl-success);
+}
+
+.export-button.ics:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.export-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.export-label {
+  font-weight: var(--ucl-font-weight-semibold);
+}
+
+/* Boutons d'export dans l'agenda */
+.agenda-export-buttons {
+  display: flex;
+  gap: var(--ucl-spacing-xs);
+  margin-top: var(--ucl-spacing-xs);
+}
+
+.btn-agenda-export {
+  background: var(--ucl-gray-100);
+  border: 1px solid var(--ucl-gray-300);
+  color: var(--ucl-text-secondary);
+  padding: var(--ucl-spacing-xs);
+  border-radius: var(--ucl-border-radius-sm);
+  cursor: pointer;
+  transition: all var(--ucl-transition);
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-agenda-export::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--ucl-transition);
+}
+
+.btn-agenda-export:hover::before {
+  opacity: 1;
+}
+
+.btn-agenda-export:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: var(--ucl-shadow-sm);
+}
+
+.btn-agenda-export.google:hover {
+  background: #4285f4;
+  color: white;
+  border-color: #4285f4;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+}
+
+.btn-agenda-export.outlook:hover {
+  background: #0078d4;
+  color: white;
+  border-color: #0078d4;
+  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
+}
+
+.btn-agenda-export.ics:hover {
+  background: var(--ucl-success);
+  color: white;
+  border-color: var(--ucl-success);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.export-actions {
+  border-top: 1px solid var(--ucl-border-light);
+  padding-top: var(--ucl-spacing-sm);
+  margin-top: var(--ucl-spacing-sm);
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+  .export-buttons {
+    flex-direction: column;
+    gap: var(--ucl-spacing-xs);
+  }
+  
+  .export-button {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .agenda-export-buttons {
+    justify-content: center;
+    gap: var(--ucl-spacing-sm);
+  }
+  
+  .btn-agenda-export {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+/* Mode sombre */
+@media (prefers-color-scheme: dark) {
+  .export-button {
+    background: var(--ucl-bg-secondary);
+    color: var(--ucl-text-primary);
+    border-color: var(--ucl-border);
+  }
+  
+  .export-button:not(.google):not(.outlook):not(.ics) {
+    background: var(--ucl-bg-secondary);
+  }
+  
+  .export-button:not(.google):not(.outlook):not(.ics):hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .btn-agenda-export {
+    background: var(--ucl-bg-secondary);
+    border-color: var(--ucl-border);
+    color: var(--ucl-text-secondary);
+  }
+  
+  .btn-agenda-export:hover {
+    background: var(--ucl-bg-hover);
+  }
+  
+  .export-row {
+    border-color: var(--ucl-border);
+  }
+  
+  .export-actions {
+    border-color: var(--ucl-border-light);
+  }
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  .export-button,
+  .btn-agenda-export {
+    transition: none !important;
+  }
+  
+  .export-button:hover,
+  .btn-agenda-export:hover {
+    transform: none !important;
+  }
+  
+  .export-button::before,
+  .btn-agenda-export::before {
+    display: none !important;
+  }
+}
+
+/* Contraste élevé */
+@media (prefers-contrast: high) {
+  .export-button {
+    border-width: 3px;
+    font-weight: var(--ucl-font-weight-bold);
+  }
+  
+  .btn-agenda-export {
+    border-width: 2px;
+    font-weight: var(--ucl-font-weight-bold);
+  }
+  
+  .export-button.google {
+    border-color: #1a73e8;
+  }
+  
+  .export-button.outlook {
+    border-color: #0078d4;
+  }
+  
+  .export-button.ics {
+    border-color: var(--ucl-success);
+  }
+}
+
+/* Animation d'apparition */
+.export-buttons {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.agenda-export-buttons {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Focus pour l'accessibilité */
+.export-button:focus,
+.btn-agenda-export:focus {
+  outline: 2px solid var(--ucl-accent);
+  outline-offset: 2px;
+  border-radius: var(--ucl-border-radius);
+}
+
+/* Tooltip amélioré */
+.export-button[title],
+.btn-agenda-export[title] {
+  position: relative;
+}
+
+.export-button[title]:hover::after,
+.btn-agenda-export[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ucl-dark);
+  color: var(--ucl-white);
+  padding: var(--ucl-spacing-xs) var(--ucl-spacing-sm);
+  border-radius: var(--ucl-border-radius-sm);
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 4px;
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+/* Indicateur de succès après export */
+.export-button.success {
+  background: var(--ucl-success) !important;
+  color: white !important;
+  border-color: var(--ucl-success) !important;
+}
+
+.export-button.success .export-icon::before {
+  content: "✓";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: inherit;
+  border-radius: inherit;
+}
+
+.btn-agenda-export.success {
+  background: var(--ucl-success) !important;
+  color: white !important;
+  border-color: var(--ucl-success) !important;
+}
+
+.btn-agenda-export.success::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: bold;
+}

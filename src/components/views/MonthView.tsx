@@ -10,6 +10,9 @@ interface MonthViewProps {
   onEventHover: (event: React.MouseEvent, eventData: CalendarEvent) => void;
   onEventLeave: () => void;
   isEventHighlighted?: (eventId: string) => boolean;
+  onExportToGoogle?: (event: CalendarEvent) => void;
+  onExportToOutlook?: (event: CalendarEvent) => void;
+  onExportToICS?: (event: CalendarEvent) => void;
 }
 
 export const MonthView: React.FC<MonthViewProps> = ({
@@ -18,7 +21,10 @@ export const MonthView: React.FC<MonthViewProps> = ({
   onEventClick,
   onEventHover,
   onEventLeave,
-  isEventHighlighted = () => false
+  isEventHighlighted = () => false,
+  onExportToGoogle,
+  onExportToOutlook,
+  onExportToICS
 }) => {
   const generateCalendarDays = () => {
     const monthStart = startOfMonth(currentDate);

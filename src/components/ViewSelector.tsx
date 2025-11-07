@@ -8,8 +8,9 @@ interface ViewSelectorProps {
 
 const VIEW_CONFIGS: CalendarViewConfig[] = [
   { view: 'month', title: 'Mois', icon: '📅' },
-  { view: 'agenda', title: 'Agenda', icon: '📋' },
-  { view: 'screen', title: 'Écran', icon: '📺' }
+  { view: 'agenda', title: 'Agenda', icon: '📋' }
+  // Vue écran temporairement désactivée - Décommenter pour activer :
+  // { view: 'screen', title: 'Écran', icon: '📺' }
 ];
 
 export const ViewSelector: React.FC<ViewSelectorProps> = ({

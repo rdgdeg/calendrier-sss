@@ -96,7 +96,7 @@ export const VisitStats: React.FC<VisitStatsProps> = ({
     <div className={`visit-stats compact ${className}`}>
       <span className="stats-icon">👥</span>
       <span className="stats-text">
-        {stats.total_visits.toLocaleString()} visites
+        {stats.total_visits.toLocaleString()} visites ({stats.unique_sessions.toLocaleString()})
         {stats.today_visits > 0 && (
           <span className="today-badge">+{stats.today_visits} aujourd'hui</span>
         )}

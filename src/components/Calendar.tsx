@@ -11,6 +11,7 @@ import { ScreenView } from './views/ScreenView';
 
 import { EventModal } from './EventModal';
 import { Footer } from './Footer';
+import { OtherAgendasSection } from './OtherAgendasSection';
 
 import { SearchBar } from './SearchBar';
 
@@ -788,9 +789,10 @@ export const Calendar: React.FC = () => {
         </div>
       )}
 
-      {/* Footer et système d'aide - Masqués en vue écran */}
+      {/* Autres agendas + Footer et système d'aide - Masqués en vue écran */}
       {currentView !== 'screen' && (
         <>
+          <OtherAgendasSection />
           <Footer />
           
           {/* Système d'aide */}

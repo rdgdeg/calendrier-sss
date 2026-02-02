@@ -60,14 +60,17 @@ export class ICalParser {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), timeout);
           
+          // Pas d'en-têtes personnalisés avec les proxies : ils déclenchent un preflight
+          // que certains proxies (ex. allorigins.win) rejettent (Cache-Control non autorisé).
+          const isDirect = proxyUrl === url;
           const response = await fetch(proxyUrl, {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; CalendrierSSS/1.0)',
-              'Accept': 'text/calendar,text/plain,*/*',
-              'Cache-Control': 'no-cache'
-            },
+            headers: isDirect
+              ? {
+                  'Accept': 'text/calendar,text/plain,*/*',
+                }
+              : undefined,
             signal: controller.signal,
-            mode: proxyUrl === url ? 'cors' : 'cors'
+            mode: 'cors',
           });
           
           clearTimeout(timeoutId);

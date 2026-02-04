@@ -184,29 +184,91 @@ export const Calendar: React.FC = () => {
     setToast(prev => ({ ...prev, isVisible: false }));
   };
 
-  const loadEvents = async () => {
-    setLoading(true);
+  /** Actualise les événements en arrière-plan (sans écran de chargement). */
+  const refreshEventsInBackground = async () => {
+    try {
+      const sourcePromises = CALENDAR_SOURCES.map(async (source) => {
+        try {
+          const sourceEvents = await ICalParser.fetchAndParse(source.url, source.source);
+          try {
+            await syncCalendarStatus({
+              source_name: source.name,
+              source_url: source.url,
+              last_sync: new Date().toISOString(),
+              events_count: sourceEvents.length,
+              status: 'success'
+            });
+          } catch (_) {}
+          return sourceEvents;
+        } catch (sourceError) {
+          console.error(`Erreur chargement ${source.name}:`, sourceError);
+          try {
+            await syncCalendarStatus({
+              source_name: source.name,
+              source_url: source.url,
+              last_sync: new Date().toISOString(),
+              events_count: 0,
+              status: 'error',
+              error_message: sourceError instanceof Error ? sourceError.message : 'Erreur inconnue'
+            });
+          } catch (_) {}
+          showToast('error', `Erreur de chargement: ${source.name}`);
+          return [];
+        }
+      });
+      const allSourceEvents = await Promise.all(sourcePromises);
+      const allEvents: CalendarEvent[] = allSourceEvents.flat();
+      if (allEvents.length > 0) {
+        const eventsWithSourceColors = allEvents.map(event => {
+          const sourceConfig = CALENDAR_SOURCES.find(s => s.source === event.source);
+          return {
+            ...event,
+            color: sourceConfig?.color || (event.source === 'icloud' ? '#ff6b6b' : '#4ecdc4'),
+            category: {
+              ...event.category,
+              id: event.category.id || `${event.source}-${event.category.name}`,
+              color: sourceConfig?.color || (event.source === 'icloud' ? '#ff6b6b' : '#4ecdc4'),
+              source: event.source
+            }
+          };
+        });
+        setEvents(eventsWithSourceColors);
+        try {
+          const eventsToCache = eventsWithSourceColors.map(event => ({
+            event_id: event.id,
+            title: event.title,
+            start_date: event.start.toISOString(),
+            end_date: event.end.toISOString(),
+            description: event.description,
+            location: event.location,
+            source: event.source,
+            color: event.color,
+            category: event.category.name
+          }));
+          await cacheEvents(eventsToCache);
+        } catch (_) {}
+        showToast('success', `${allEvents.length} événements actualisés`);
+      }
+    } catch (_) {
+      showToast('error', 'Erreur lors de l\'actualisation');
+    } finally {
+      setIsRealTimeLoading(false);
+    }
+  };
+
+  const loadEvents = async (options?: { forceRefresh?: boolean }) => {
+    const isForceRefresh = options?.forceRefresh === true;
+
     setError(null);
     setLoadingProgress(0);
-    setLoadingMessage('Initialisation...');
+    setLoadingMessage('Vérification du cache...');
     setIsRealTimeLoading(true);
-    
-    try {
-      // Toujours vider le cache lors de l'actualisation (fusion des fonctionnalités)
-      setLoadingMessage('Vidage du cache...');
-      try {
-        await clearCache();
-      } catch (error) {
-        console.warn('Cache non disponible, continuons sans cache');
-      }
-      setLoadingProgress(10);
-      
-      // Toujours essayer de charger depuis le cache d'abord pour un affichage rapide
-      setLoadingMessage('Vérification du cache...');
+
+    // Au premier chargement : afficher le cache tout de suite s'il existe, puis actualiser en arrière-plan
+    if (!isForceRefresh) {
       try {
         const cachedEvents = await getCachedEvents();
         setLoadingProgress(20);
-        
         if (cachedEvents.length > 0) {
           const eventsWithColors = cachedEvents.map(cached => ({
             id: cached.event_id,
@@ -225,23 +287,31 @@ export const Calendar: React.FC = () => {
               source: cached.source as 'icloud' | 'outlook'
             }
           }));
-          
-          // Afficher immédiatement les événements en cache
           setEvents(eventsWithColors);
-          setLoadingMessage('Événements en cache chargés, actualisation...');
-          
-          // Continuer le chargement en arrière-plan pour actualiser
-          setTimeout(() => {
-            setLoading(false);
-            setIsRealTimeLoading(false);
-          }, 1000);
+          setLoading(false); // Afficher le calendrier tout de suite
+          // Actualisation en arrière-plan (sans bloquer l'UI)
+          refreshEventsInBackground();
+          return;
         }
-      } catch (error) {
+      } catch (e) {
         console.warn('Cache non disponible, chargement direct des calendriers');
-        setLoadingProgress(20);
+      }
+    }
+
+    // Pas de cache ou actualisation forcée : afficher l'écran de chargement
+    setLoading(true);
+    try {
+      if (isForceRefresh) {
+        setLoadingMessage('Vidage du cache...');
+        try {
+          await clearCache();
+        } catch (error) {
+          console.warn('Cache non disponible');
+        }
+        setLoadingProgress(10);
       }
 
-      // Charger les événements frais en arrière-plan (en parallèle pour plus de rapidité)
+      // Charger les événements frais (en parallèle pour plus de rapidité)
       setLoadingMessage('Chargement des calendriers...');
       setLoadingProgress(30);
       
@@ -563,7 +633,7 @@ export const Calendar: React.FC = () => {
       <div className="error">
         <h3>Erreur de chargement</h3>
         <p>{error}</p>
-        <button onClick={() => loadEvents()} className="nav-button">Réessayer</button>
+        <button onClick={() => loadEvents({ forceRefresh: true })} className="nav-button">Réessayer</button>
       </div>
     );
   }
@@ -595,7 +665,7 @@ export const Calendar: React.FC = () => {
         <div className="header-actions-group">
           <div className="header-refresh-actions">
             <button 
-              onClick={() => loadEvents()} 
+              onClick={() => loadEvents({ forceRefresh: true })} 
               className="nav-button refresh-button compact"
               aria-label="Actualiser les calendriers"
               title="Actualiser les calendriers (vide automatiquement le cache)"
@@ -729,7 +799,7 @@ export const Calendar: React.FC = () => {
               onViewChange={setCurrentView} 
             />
             <button 
-              onClick={() => loadEvents()} 
+              onClick={() => loadEvents({ forceRefresh: true })} 
               className="nav-button refresh-button"
               aria-label="Actualiser les événements"
               title="Actualiser les événements"

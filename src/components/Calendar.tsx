@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, RefreshCw, HelpCircle, MapPin, Search } from 'lucide-react';
 import { CalendarEvent, CalendarSource, CalendarView } from '../types';
 import { ICalParser } from '../utils/icalParser';
 import { format, addMonths, subMonths } from 'date-fns';
@@ -10,6 +11,7 @@ import { AgendaView } from './views/AgendaView';
 import { ScreenView } from './views/ScreenView';
 
 import { EventModal } from './EventModal';
+import { DayEventsModal } from './DayEventsModal';
 import { Footer } from './Footer';
 import { OtherAgendasSection } from './OtherAgendasSection';
 
@@ -92,6 +94,7 @@ export const Calendar: React.FC = () => {
     x: 0,
     y: 0
   });
+  const [dayEventsModal, setDayEventsModal] = useState<{ date: Date; events: CalendarEvent[] } | null>(null);
 
   // Fonction pour nettoyer et formater le contenu HTML
   const cleanHtmlContent = (htmlString: string): string => {
@@ -530,7 +533,13 @@ export const Calendar: React.FC = () => {
 
     switch (currentView) {
       case 'month':
-        return <MonthView {...commonProps} />;
+        return (
+          <MonthView
+            {...commonProps}
+            sourceLegend={CALENDAR_SOURCES.map(s => ({ name: s.name, color: s.color }))}
+            onMoreEventsClick={(date, dayEvents) => setDayEventsModal({ date, events: dayEvents })}
+          />
+        );
       case 'agenda':
         return <AgendaView {...commonProps} selectedEventId={selectedEvent?.id} />;
       case 'screen':
@@ -580,7 +589,8 @@ export const Calendar: React.FC = () => {
       {/* Header principal compact */}
       <div className="calendar-main-header-compact">
         <h1 className="calendar-main-title-compact">
-          📅 Calendrier SSS - UCLouvain
+          <CalendarIcon size={28} className="header-title-icon" aria-hidden />
+          Calendrier SSS - UCLouvain
         </h1>
         <div className="header-actions-group">
           <div className="header-refresh-actions">
@@ -590,17 +600,18 @@ export const Calendar: React.FC = () => {
               aria-label="Actualiser les calendriers"
               title="Actualiser les calendriers (vide automatiquement le cache)"
             >
-              🔄 Actualiser
+              <RefreshCw size={18} aria-hidden />
+              Actualiser
             </button>
-
           </div>
           <div className="header-help-actions">
             <button
               className="faq-btn"
               onClick={() => setShowFAQ(true)}
               title="Questions fréquentes"
+              aria-label="Questions fréquentes"
             >
-              ❓
+              <HelpCircle size={20} aria-hidden />
             </button>
           </div>
         </div>
@@ -616,24 +627,28 @@ export const Calendar: React.FC = () => {
             <div className="calendar-nav">
               <button 
                 onClick={() => navigateDate('prev')} 
-                className="nav-button"
+                className="nav-button nav-button-icon"
                 aria-label="Période précédente"
+                title="Période précédente"
               >
-                ← Précédent
+                <ChevronLeft size={22} aria-hidden />
               </button>
               <button 
                 onClick={goToToday} 
                 className="nav-button"
                 aria-label="Aller à aujourd'hui"
+                title="Aujourd'hui"
               >
+                <CalendarIcon size={18} aria-hidden />
                 Aujourd'hui
               </button>
               <button 
                 onClick={() => navigateDate('next')} 
-                className="nav-button"
+                className="nav-button nav-button-icon"
                 aria-label="Période suivante"
+                title="Période suivante"
               >
-                Suivant →
+                <ChevronRight size={22} aria-hidden />
               </button>
             </div>
 
@@ -682,11 +697,13 @@ export const Calendar: React.FC = () => {
                       }}
                       title="Voir les résultats de recherche"
                     >
-                      📍 {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} trouvé{searchState.results.length !== 1 ? 's' : ''} • Voir ↓
+                      <MapPin size={16} aria-hidden />
+                      {searchState.results.length} résultat{searchState.results.length !== 1 ? 's' : ''} trouvé{searchState.results.length !== 1 ? 's' : ''} · Voir
                     </button>
                   ) : (
                     <div className="no-results-message-inline">
-                      🔍 Aucun résultat pour "{searchState.query}"
+                      <Search size={16} aria-hidden />
+                      Aucun résultat pour "{searchState.query}"
                     </div>
                   )}
                 </>
@@ -717,7 +734,8 @@ export const Calendar: React.FC = () => {
               aria-label="Actualiser les événements"
               title="Actualiser les événements"
             >
-              🔄 Actualiser
+              <RefreshCw size={18} aria-hidden />
+              Actualiser
             </button>
           </div>
         </div>
@@ -773,6 +791,15 @@ export const Calendar: React.FC = () => {
         onExportToOutlook={exportToOutlook}
         onExportToICS={exportToICS}
       />
+
+      {dayEventsModal && (
+        <DayEventsModal
+          date={dayEventsModal.date}
+          events={dayEventsModal.events}
+          onClose={() => setDayEventsModal(null)}
+          onEventClick={e => { setSelectedEvent(e); setIsModalOpen(true); }}
+        />
+      )}
 
 
 

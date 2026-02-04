@@ -1,0 +1,95 @@
+.day-events-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.day-events-modal {
+  background: var(--ucl-white);
+  border-radius: var(--ucl-border-radius-lg);
+  box-shadow: var(--ucl-shadow-xl);
+  max-width: 420px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-events-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ucl-spacing-lg);
+  border-bottom: 1px solid var(--ucl-gray-200);
+  flex-shrink: 0;
+}
+
+.day-events-modal-header h3 {
+  margin: 0;
+  font-size: var(--ucl-font-size-lg);
+  font-weight: var(--ucl-font-weight-semibold);
+  color: var(--ucl-primary);
+}
+
+.day-events-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ucl-gray-600);
+  cursor: pointer;
+  border-radius: var(--ucl-border-radius);
+  transition: background 0.2s, color 0.2s;
+}
+
+.day-events-modal-close:hover {
+  background: var(--ucl-gray-100);
+  color: var(--ucl-gray-800);
+}
+
+.day-events-modal-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--ucl-spacing-sm);
+  overflow-y: auto;
+}
+
+.day-events-modal-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: var(--ucl-spacing-md);
+  margin-bottom: 4px;
+  border: none;
+  border-left: 4px solid var(--ucl-primary);
+  border-radius: var(--ucl-border-radius);
+  background: var(--ucl-gray-50);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.day-events-modal-item:hover {
+  background: var(--ucl-gray-100);
+  transform: translateX(2px);
+}
+
+.day-events-modal-time {
+  font-size: var(--ucl-font-size-sm);
+  color: var(--ucl-gray-600);
+}
+
+.day-events-modal-title {
+  font-weight: var(--ucl-font-weight-semibold);
+  color: var(--ucl-text-primary);
+}

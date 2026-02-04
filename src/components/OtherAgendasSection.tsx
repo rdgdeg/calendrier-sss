@@ -1,4 +1,5 @@
 import React from 'react';
+import { Pin, ExternalLink } from 'lucide-react';
 import '../styles/other-agendas.css';
 
 export interface OtherAgendaItem {
@@ -23,7 +24,8 @@ export const OtherAgendasSection: React.FC = () => {
   return (
     <section className="other-agendas-section" aria-labelledby="other-agendas-heading">
       <h2 id="other-agendas-heading" className="other-agendas-heading">
-        📌 Autres agendas
+        <Pin size={24} aria-hidden />
+        Autres agendas
       </h2>
       <p className="other-agendas-intro">
         Découvrez d’autres calendriers d’événements utiles.
@@ -42,7 +44,7 @@ export const OtherAgendasSection: React.FC = () => {
               <p className="other-agenda-card-desc">{item.description}</p>
               <span className="other-agenda-card-link">
                 {item.label ?? 'Voir l’agenda'}
-                <span className="other-agenda-card-arrow" aria-hidden>→</span>
+                <ExternalLink size={14} className="other-agenda-card-arrow" aria-hidden />
               </span>
             </div>
           </a>

@@ -3,6 +3,11 @@ import { CalendarEvent } from '../../types';
 import { startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, startOfWeek, endOfWeek, isSameDay } from 'date-fns';
 import { darkenColor } from '../../utils/colorUtils';
 
+export interface SourceLegendItem {
+  name: string;
+  color: string;
+}
+
 interface MonthViewProps {
   currentDate: Date;
   events: CalendarEvent[];
@@ -13,6 +18,8 @@ interface MonthViewProps {
   onExportToGoogle?: (event: CalendarEvent) => void;
   onExportToOutlook?: (event: CalendarEvent) => void;
   onExportToICS?: (event: CalendarEvent) => void;
+  sourceLegend?: SourceLegendItem[];
+  onMoreEventsClick?: (date: Date, events: CalendarEvent[]) => void;
 }
 
 export const MonthView: React.FC<MonthViewProps> = ({
@@ -24,7 +31,9 @@ export const MonthView: React.FC<MonthViewProps> = ({
   isEventHighlighted = () => false,
   onExportToGoogle,
   onExportToOutlook,
-  onExportToICS
+  onExportToICS,
+  sourceLegend = [],
+  onMoreEventsClick
 }) => {
   const generateCalendarDays = () => {
     const monthStart = startOfMonth(currentDate);
@@ -103,8 +112,9 @@ export const MonthView: React.FC<MonthViewProps> = ({
                     );
                   })}
                   {dayEvents.length > 2 && (
-                    <div
-                      className="event-item more-events"
+                    <button
+                      type="button"
+                      className="event-item more-events more-events-btn"
                       style={{
                         background: 'linear-gradient(135deg, #6c757d, #495057)',
                         color: '#fff',
@@ -112,10 +122,14 @@ export const MonthView: React.FC<MonthViewProps> = ({
                         fontWeight: '600',
                         textAlign: 'center'
                       }}
-                      title={`${dayEvents.length - 2} autres événements ce jour`}
+                      title={`Voir les ${dayEvents.length} événements de ce jour`}
+                      onClick={e => {
+                        e.stopPropagation();
+                        onMoreEventsClick?.(day, dayEvents);
+                      }}
                     >
-                      +{dayEvents.length - 2}
-                    </div>
+                      +{dayEvents.length - 2} autres
+                    </button>
                   )}
                 </div>
               </div>
@@ -123,6 +137,16 @@ export const MonthView: React.FC<MonthViewProps> = ({
           })}
         </div>
       </div>
+      {sourceLegend.length > 0 && (
+        <div className="month-view-legend" role="group" aria-label="Légende des sources">
+          {sourceLegend.map(({ name, color }) => (
+            <span key={name} className="month-view-legend-item">
+              <span className="month-view-legend-dot" style={{ backgroundColor: color }} aria-hidden />
+              <span>{name}</span>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

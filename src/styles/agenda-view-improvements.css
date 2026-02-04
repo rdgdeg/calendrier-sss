@@ -338,3 +338,47 @@
     text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
   }
 }
+
+/* Filtres période en chips */
+.agenda-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ucl-spacing-sm);
+}
+
+.agenda-filter-label {
+  font-weight: var(--ucl-font-weight-medium);
+  color: var(--ucl-text-secondary);
+  font-size: var(--ucl-font-size-sm);
+  margin-right: 4px;
+}
+
+.agenda-chip {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--ucl-gray-300);
+  background: var(--ucl-white);
+  color: var(--ucl-gray-700);
+  font-size: var(--ucl-font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.agenda-chip:hover {
+  border-color: var(--ucl-primary);
+  color: var(--ucl-primary);
+  background: rgba(0, 61, 122, 0.05);
+}
+
+.agenda-chip.active {
+  background: var(--ucl-primary);
+  border-color: var(--ucl-primary);
+  color: white;
+}
+
+.agenda-event-card {
+  border-left-style: solid;
+  border-left-width: 3px;
+}

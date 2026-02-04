@@ -15,6 +15,7 @@
 @import './styles/upcoming-events-section.css';
 @import './styles/event-images-preview.css';
 @import './styles/event-modal.css';
+@import './styles/day-events-modal.css';
 
 /* UCLouvain Color Palette - Charte officielle */
 :root {
@@ -9289,8 +9290,8 @@ méliorations supplémentaires pour la lisibilité des événements */
     grid-template-columns: repeat(5, 1fr);
   }
 }
-/
-* ===== STYLES POUR LES RÉSULTATS DE RECHERCHE SOUS LE CALENDRIER ===== */
+
+/* ===== STYLES POUR LES RÉSULTATS DE RECHERCHE SOUS LE CALENDRIER ===== */
 
 .search-results-section {
   margin-top: var(--ucl-spacing-xl);

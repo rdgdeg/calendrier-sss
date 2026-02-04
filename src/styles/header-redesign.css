@@ -158,16 +158,33 @@
 }
 
 /* Amélioration des boutons de navigation */
+.nav-button:not(.nav-button-icon) {
+  padding: 8px 16px;
+}
+
 .nav-button {
   background: white;
   border: 1px solid #d1d5db;
   color: #374151;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: 8px;
   font-weight: 500;
   transition: all 0.2s ease;
   cursor: pointer;
   font-size: 0.875rem;
+}
+
+.view-selector .view-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.faq-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
 }
 
 .nav-button:hover {
@@ -187,7 +204,31 @@
   flex: 1;
 }
 
+.calendar-main-title-compact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calendar-main-title-compact .header-title-icon {
+  flex-shrink: 0;
+  color: white;
+}
+
+.nav-button-icon {
+  padding: 8px 12px;
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .scroll-to-results-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: #10b981;
   color: white;
   border: none;
@@ -205,6 +246,9 @@
 }
 
 .no-results-message-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #6b7280;
   font-size: 0.875rem;
   font-style: italic;
@@ -224,8 +268,8 @@
   margin: 0;
   text-align: center;
 }
-/
-* Optimisation de la disposition générale */
+
+/* Optimisation de la disposition générale */
 .calendar-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -262,6 +306,41 @@
 /* Amélioration du calendrier mensuel */
 .month-view {
   width: 100%;
+}
+
+.month-view-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ucl-spacing-lg);
+  margin-top: var(--ucl-spacing-lg);
+  padding: var(--ucl-spacing-md) 0;
+  border-top: 1px solid var(--ucl-gray-200);
+}
+
+.month-view-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ucl-spacing-xs);
+  font-size: var(--ucl-font-size-sm);
+  color: var(--ucl-gray-700);
+}
+
+.month-view-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.event-item.more-events-btn {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  width: 100%;
+}
+
+.event-item.more-events-btn:hover {
+  filter: brightness(1.1);
 }
 
 .calendar-grid {

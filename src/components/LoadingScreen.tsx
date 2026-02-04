@@ -1,4 +1,5 @@
 import React from 'react';
+import { Calendar, Search, Zap } from 'lucide-react';
 
 interface LoadingScreenProps {
   progress: number;
@@ -9,16 +10,14 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress, message 
   return (
     <div className="loading-screen">
       <div className="loading-content">
-        {/* Logo/Icône UCLouvain */}
         <div className="loading-logo">
           <div className="ucl-logo">
-            📅
+            <Calendar size={48} aria-hidden />
           </div>
           <h1 className="loading-title">Événements SSS</h1>
           <p className="loading-subtitle">Secteur des Sciences de la Santé - UCLouvain</p>
         </div>
 
-        {/* Barre de progression animée */}
         <div className="loading-progress-container">
           <div className="loading-progress-bar">
             <div 
@@ -29,7 +28,6 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress, message 
           <div className="loading-percentage">{Math.min(Math.round(progress), 100)}%</div>
         </div>
 
-        {/* Message de chargement */}
         <div className="loading-message">
           <span className="loading-text">{message}</span>
           <div className="loading-dots">
@@ -39,27 +37,17 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ progress, message 
           </div>
         </div>
 
-        {/* Conseils utiles pendant le chargement */}
         <div className="loading-tips">
           <div className="loading-tip">
-            <span className="tip-icon">🔄</span>
-            <span>Synchronisation via proxies CORS sécurisés...</span>
+            <Search size={20} className="tip-icon" aria-hidden />
+            <span>Recherche en temps réel dans les événements</span>
           </div>
           <div className="loading-tip">
-            <span className="tip-icon">🔍</span>
-            <span>Utilisez la recherche pour trouver rapidement vos événements</span>
-          </div>
-          <div className="loading-tip">
-            <span className="tip-icon">📱</span>
-            <span>Interface responsive adaptée à tous les écrans</span>
-          </div>
-          <div className="loading-tip">
-            <span className="tip-icon">⚡</span>
-            <span>Chargement intelligent avec cache pour plus de rapidité</span>
+            <Zap size={20} className="tip-icon" aria-hidden />
+            <span>Cache intelligent pour un chargement rapide</span>
           </div>
         </div>
 
-        {/* Informations de contact */}
         <div className="loading-footer">
           <p>Rue Martin V 40, Batiment Les Arches, 1200 Woluwe-Saint-Lambert</p>
         </div>

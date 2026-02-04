@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { CalendarDays } from 'lucide-react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -52,7 +53,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
     return (
       <div className="upcoming-events-section">
         <div className="upcoming-events-header">
-          <h3 className="upcoming-events-title">📅 Prochains événements</h3>
+          <h3 className="upcoming-events-title"><CalendarDays size={22} aria-hidden /> Prochains événements</h3>
         </div>
         <div className="no-upcoming-events">
           <p>Aucun événement à venir</p>
@@ -64,7 +65,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
   return (
     <div className="upcoming-events-section">
       <div className="upcoming-events-header">
-        <h3 className="upcoming-events-title">📅 Prochains événements</h3>
+        <h3 className="upcoming-events-title"><CalendarDays size={22} aria-hidden /> Prochains événements</h3>
         <div className="events-pagination-info">
           {upcomingEvents.length} événement{upcomingEvents.length > 1 ? 's' : ''} à venir
         </div>
@@ -122,7 +123,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                   className="btn-event-details"
                   title="Voir les détails"
                 >
-                  👁️ Détails
+                  Détails
                 </button>
               </div>
 

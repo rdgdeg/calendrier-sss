@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { Calendar, MapPin, FileText, Download, X } from 'lucide-react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -157,7 +158,7 @@ export const EventModal: React.FC<EventModalProps> = ({
           <div className="event-modal-details">
             {/* Date et heure */}
             <div className="event-detail-row">
-              <div className="detail-icon">📅</div>
+              <div className="detail-icon"><Calendar size={20} aria-hidden /></div>
               <div className="detail-content">
                 <strong>Date et heure</strong>
                 <span>
@@ -173,7 +174,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             {/* Lieu */}
             {event.location && (
               <div className="event-detail-row">
-                <div className="detail-icon">📍</div>
+                <div className="detail-icon"><MapPin size={20} aria-hidden /></div>
                 <div className="detail-content">
                   <strong>Lieu</strong>
                   <span>{event.location}</span>
@@ -192,7 +193,7 @@ export const EventModal: React.FC<EventModalProps> = ({
             {/* Description formatée avec indicateurs de scroll */}
             {processedDescription && (
               <div className="event-detail-row description-row">
-                <div className="detail-icon">📝</div>
+                <div className="detail-icon"><FileText size={20} aria-hidden /></div>
                 <div className="detail-content">
                   <strong>Description</strong>
                   <div className="description-content-wrapper">
@@ -229,7 +230,7 @@ export const EventModal: React.FC<EventModalProps> = ({
 
             {/* Boutons d'export */}
             <div className="event-detail-row export-row">
-              <div className="detail-icon">💾</div>
+              <div className="detail-icon"><Download size={20} aria-hidden /></div>
               <div className="detail-content">
                 <strong>Ajouter à mon calendrier</strong>
                 <div className="export-buttons">
@@ -239,7 +240,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                       onClick={() => onExportToGoogle(event)}
                       title="Ajouter à Google Calendar"
                     >
-                      <span className="export-icon">📅</span>
+                      <Calendar size={18} className="export-icon" aria-hidden />
                       <span className="export-label">Google</span>
                     </button>
                   )}
@@ -249,7 +250,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                       onClick={() => onExportToOutlook(event)}
                       title="Ajouter à Outlook"
                     >
-                      <span className="export-icon">📆</span>
+                      <Calendar size={18} className="export-icon" aria-hidden />
                       <span className="export-label">Outlook</span>
                     </button>
                   )}
@@ -259,7 +260,7 @@ export const EventModal: React.FC<EventModalProps> = ({
                       onClick={() => onExportToICS(event)}
                       title="Télécharger fichier ICS"
                     >
-                      <span className="export-icon">💾</span>
+                      <Download size={18} className="export-icon" aria-hidden />
                       <span className="export-label">Fichier ICS</span>
                     </button>
                   )}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Calendar, List } from 'lucide-react';
 import { CalendarView, CalendarViewConfig } from '../types';
 
 interface ViewSelectorProps {
@@ -7,11 +8,15 @@ interface ViewSelectorProps {
 }
 
 const VIEW_CONFIGS: CalendarViewConfig[] = [
-  { view: 'month', title: 'Mois', icon: '📅' },
-  { view: 'agenda', title: 'Agenda', icon: '📋' }
-  // Vue écran temporairement désactivée - Décommenter pour activer :
-  // { view: 'screen', title: 'Écran', icon: '📺' }
+  { view: 'month', title: 'Mois', icon: 'month' },
+  { view: 'agenda', title: 'Agenda', icon: 'agenda' }
 ];
+
+const ViewIcon: React.FC<{ view: CalendarView }> = ({ view }) => {
+  if (view === 'month') return <Calendar size={18} aria-hidden />;
+  if (view === 'agenda') return <List size={18} aria-hidden />;
+  return <Calendar size={18} aria-hidden />;
+};
 
 export const ViewSelector: React.FC<ViewSelectorProps> = ({
   currentView,
@@ -27,7 +32,7 @@ export const ViewSelector: React.FC<ViewSelectorProps> = ({
             onClick={() => onViewChange(config.view)}
             title={config.title}
           >
-            <span className="view-icon">{config.icon}</span>
+            <span className="view-icon"><ViewIcon view={config.view} /></span>
             <span className="view-label">{config.title}</span>
           </button>
         ))}

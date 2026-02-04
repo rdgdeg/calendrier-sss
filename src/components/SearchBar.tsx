@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Search, X } from 'lucide-react';
 import { CalendarEvent } from '../types';
 
 interface SearchBarProps {
@@ -115,7 +116,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     <div className="search-bar-container">
       <div className={`search-bar ${isActive ? 'active' : ''}`}>
         <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
+          <Search className="search-icon" size={20} aria-hidden />
           <input
             ref={inputRef}
             type="text"
@@ -133,7 +134,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               className="search-clear"
               title="Effacer la recherche"
             >
-              ✕
+              <X size={18} aria-hidden />
             </button>
           )}
         </div>

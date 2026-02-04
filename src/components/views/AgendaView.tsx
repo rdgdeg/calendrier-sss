@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { CalendarEvent } from '../../types';
 import { format, isSameDay, startOfDay, addDays, isAfter, isBefore } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -122,22 +123,25 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
     <div className="agenda-view">
       <div className="agenda-controls">
         <div className="agenda-filters">
-          <div className="date-range-controls">
-            <label>Période :</label>
-            <select 
-              value={dateRange} 
-              onChange={(e) => setDateRange(e.target.value)}
-              className="range-select"
-            >
-              <option value="all">Tous</option>
-              <option value="7">7 jours</option>
-              <option value="14">2 semaines</option>
-              <option value="30">1 mois</option>
-              <option value="60">2 mois</option>
-              <option value="90">3 mois</option>
-            </select>
+          <div className="agenda-filter-chips">
+            <span className="agenda-filter-label">Période :</span>
+            {[
+              { value: '7', label: '7 j' },
+              { value: '30', label: '30 j' },
+              { value: '60', label: '60 j' },
+              { value: '90', label: '90 j' },
+              { value: 'all', label: 'Tous' }
+            ].map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                className={`agenda-chip ${dateRange === value ? 'active' : ''}`}
+                onClick={() => setDateRange(value)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          
           <div className="past-events-toggle">
             <label>
               <input
@@ -286,7 +290,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                           
                           <div className="event-main-info">
                             <h4 className="event-title" style={{ color: getHighContrastTitleColor(event.color) }}>
-                              {isHighlighted && <span className="search-indicator">🔍 </span>}
+                              {isHighlighted && <Search size={14} className="search-indicator" aria-hidden />}
                               {event.title}
                             </h4>
 
@@ -302,7 +306,7 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                                 }}
                                 aria-label={isExpanded ? 'Réduire les détails' : 'Voir les détails'}
                               >
-                                {isExpanded ? '▲' : '▼'}
+                                {isExpanded ? <ChevronUp size={18} aria-hidden /> : <ChevronDown size={18} aria-hidden />}
                               </button>
                             )}
                             <button
@@ -312,8 +316,9 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                                 onEventClick(event);
                               }}
                               title="Ouvrir dans une fenêtre"
+                              aria-label="Voir les détails"
                             >
-                              🔍
+                              <Search size={18} aria-hidden />
                             </button>
                           </div>
                         </div>
@@ -322,14 +327,12 @@ export const AgendaView: React.FC<AgendaViewProps> = ({
                           <div className="agenda-event-details">
                             {event.location && (
                               <div className="event-detail-item">
-                                <span className="detail-icon">📍</span>
                                 <span className="detail-text">{event.location}</span>
                               </div>
                             )}
                             
                             {event.description && (
                               <div className="event-detail-item">
-                                <span className="detail-icon">📝</span>
                                 <div className="detail-text">
                                   <EventDescription 
                                     description={event.description}

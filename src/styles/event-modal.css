@@ -603,3 +603,46 @@
   outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 2px;
 }
+
+/* Notice pièce jointe non accessible (ex. CID) */
+.event-modal-attachment-notice {
+  display: flex;
+  gap: var(--ucl-spacing-sm);
+  padding: var(--ucl-spacing-md);
+  background: var(--ucl-gray-50);
+  border-radius: var(--ucl-border-radius);
+  border-left: 4px solid var(--ucl-gray-400);
+  margin: var(--ucl-spacing-sm) 0;
+}
+
+.event-modal-attachment-notice-icon {
+  flex-shrink: 0;
+  color: var(--ucl-gray-600);
+  margin-top: 2px;
+}
+
+.event-modal-attachment-notice-content {
+  flex: 1;
+}
+
+.event-modal-attachment-notice-text {
+  margin: 0 0 var(--ucl-spacing-xs) 0;
+  font-size: var(--ucl-font-size-sm);
+  color: var(--ucl-gray-700);
+  line-height: 1.5;
+}
+
+.event-modal-calendar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--ucl-font-size-sm);
+  font-weight: var(--ucl-font-weight-semibold);
+  color: var(--ucl-secondary);
+  text-decoration: none;
+}
+
+.event-modal-calendar-link:hover {
+  color: var(--ucl-primary);
+  text-decoration: underline;
+}

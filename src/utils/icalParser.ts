@@ -124,7 +124,8 @@ export class ICalParser {
               }
               
               const category = determineEventCategoryWithColor(title, description, source);
-              
+              const eventUrl = (vevent as ICAL.Component).getFirstPropertyValue('url') ?? undefined;
+
               events.push({
                 id: event.uid,
                 title,
@@ -135,7 +136,8 @@ export class ICalParser {
                 source,
                 allDay: event.startDate.isDate,
                 category,
-                color: category.color
+                color: category.color,
+                eventUrl: typeof eventUrl === 'string' && eventUrl.startsWith('http') ? eventUrl : undefined
               });
             }
           } else {
@@ -163,7 +165,8 @@ export class ICalParser {
                 }
                 
                 const category = determineEventCategoryWithColor(title, description, source);
-                
+                const eventUrl = (vevent as ICAL.Component).getFirstPropertyValue('url') ?? undefined;
+
                 events.push({
                   id: `${event.uid}_${occurrence.toString()}`,
                   title,
@@ -174,7 +177,8 @@ export class ICalParser {
                   source,
                   allDay: event.startDate.isDate,
                   category,
-                  color: category.color
+                  color: category.color,
+                  eventUrl: typeof eventUrl === 'string' && eventUrl.startsWith('http') ? eventUrl : undefined
                 });
               }
               count++;

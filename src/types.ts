@@ -16,6 +16,8 @@ export interface CalendarEvent {
   allDay?: boolean;
   category: EventCategory;
   color: string;
+  /** URL de l'événement dans le calendrier source (si présente dans l'ICS) */
+  eventUrl?: string;
 }
 
 export interface CalendarSource {

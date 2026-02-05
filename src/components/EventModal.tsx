@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { Calendar, MapPin, FileText, Download, X } from 'lucide-react';
+import { Calendar, MapPin, FileText, Download, X, Info, ExternalLink } from 'lucide-react';
 import { CalendarEvent } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { customMarkdownFormatter } from '../utils/customMarkdownFormatter';
+import { extractImagesFromDescription } from '../utils/imageExtractor';
 import { ResponsiveText } from './display/ResponsiveText';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -31,16 +32,16 @@ export const EventModal: React.FC<EventModalProps> = ({
     isScrollable: false
   });
 
-  // Process description content with custom formatting and line breaks
-  const processedDescription = useMemo(() => {
-    if (!event?.description) return null;
+  const processedContent = useMemo(
+    () => (event?.description ? extractImagesFromDescription(event.description) : null),
+    [event?.description]
+  );
 
-    // Apply custom markdown formatting FIRST (+++bold+++, ___italic___, ~~~underline~~~, |||, ===)
-    // Then clean HTML to preserve the custom formatting
-    let processedText = event.description;
-    
-    // Clean basic HTML but preserve structure
-    processedText = processedText
+  const processedDescription = useMemo(() => {
+    const text = processedContent?.cleanDescription ?? event?.description;
+    if (!text) return null;
+
+    let processedText = text
       .replace(/<script[^>]*>.*?<\/script>/gis, '')
       .replace(/<style[^>]*>.*?<\/style>/gis, '')
       .replace(/<!--.*?-->/gs, '')
@@ -50,12 +51,9 @@ export const EventModal: React.FC<EventModalProps> = ({
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
-    
-    // Apply custom formatting
-    const formattedText = customMarkdownFormatter.processEventDescription(processedText);
 
-    return formattedText;
-  }, [event?.description]);
+    return customMarkdownFormatter.processEventDescription(processedText);
+  }, [processedContent?.cleanDescription, event?.description]);
 
   // Stable scroll state update function - no dependencies to avoid re-creation
   const updateScrollState = useCallback(() => {
@@ -182,10 +180,28 @@ export const EventModal: React.FC<EventModalProps> = ({
               </div>
             )}
 
-
-
-
-
+            {/* Notice pièce jointe non accessible (ex. CID Outlook) */}
+            {processedContent?.hadUnavailableAttachments && (
+              <div className="event-modal-attachment-notice" role="status">
+                <Info size={18} className="event-modal-attachment-notice-icon" aria-hidden />
+                <div className="event-modal-attachment-notice-content">
+                  <p className="event-modal-attachment-notice-text">
+                    La pièce jointe concernant les détails n'est pas accessible ici. Consultez l'événement dans votre calendrier (Outlook, Google, etc.) pour voir les pièces jointes.
+                  </p>
+                  {event.eventUrl && (
+                    <a
+                      href={event.eventUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="event-modal-calendar-link"
+                    >
+                      <ExternalLink size={16} aria-hidden />
+                      Voir l'événement dans le calendrier
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
 
 
 

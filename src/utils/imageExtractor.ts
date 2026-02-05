@@ -12,6 +12,8 @@ export interface ProcessedEventContent {
   cleanDescription: string;
   images: ExtractedImage[];
   hasImages: boolean;
+  /** True si au moins une pièce jointe non affichable (ex. CID Outlook) a été retirée */
+  hadUnavailableAttachments: boolean;
 }
 
 /**
@@ -22,12 +24,14 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
     return {
       cleanDescription: '',
       images: [],
-      hasImages: false
+      hasImages: false,
+      hadUnavailableAttachments: false
     };
   }
 
   const images: ExtractedImage[] = [];
   let cleanDescription = description;
+  let hadUnavailableAttachments = false;
 
   // Regex pour détecter les images HTML
   const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*(?:alt=["']([^"']*)["'])?[^>]*(?:title=["']([^"']*)["'])?[^>]*>/gi;
@@ -47,7 +51,9 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
     const src = match[1];
     const alt = match[2] || '';
     const title = match[3] || '';
-    
+    if (src.toLowerCase().startsWith('cid:')) {
+      hadUnavailableAttachments = true;
+    }
     images.push({
       src,
       alt,
@@ -99,8 +105,7 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
   base64ImageRegex.lastIndex = 0; // Reset regex
   while ((match = cidImageRegex.exec(description)) !== null) {
     const fullMatch = match[0]; // Le code complet [cid:...]
-    
-    // Remplacer le code par un placeholder plus propre ou le supprimer complètement
+    hadUnavailableAttachments = true;
     cleanDescription = cleanDescription.replace(fullMatch, '');
   }
 
@@ -113,7 +118,8 @@ export const extractImagesFromDescription = (description: string): ProcessedEven
   return {
     cleanDescription,
     images,
-    hasImages: images.length > 0
+    hasImages: images.length > 0,
+    hadUnavailableAttachments
   };
 };
 
